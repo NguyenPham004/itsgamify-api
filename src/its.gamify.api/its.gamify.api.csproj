@@ -10,6 +10,7 @@
 		<NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
@@ -18,12 +19,19 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
+=======
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5" />
+>>>>>>> 13b13c3 (modify)
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\its.gamify.core\its.gamify.core.csproj" />
     <ProjectReference Include="..\its.gamify.domains\its.gamify.domains.csproj" />
     <ProjectReference Include="..\its.gamify.infras\its.gamify.infras.csproj" />
+<<<<<<< HEAD
     <ProjectReference Include="..\its.gamify.core\its.gamify.core.csproj" />
     <ProjectReference Include="..\its.gamify.infras\its.gamify.infras.csproj" />
+=======
+>>>>>>> 13b13c3 (modify)
   </ItemGroup>
 </Project>

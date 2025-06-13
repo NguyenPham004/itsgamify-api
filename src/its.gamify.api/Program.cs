@@ -17,6 +17,7 @@ builder.Services.AddAutoMapper(typeof(MapperConfigurationProfile).Assembly);
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Configure the HTTP request pipeline.
+<<<<<<< HEAD
 /*if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -24,6 +25,10 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+=======
+
+app.MapOpenApi();
+>>>>>>> 13b13c3 (modify)
 
 
 app.UseAuthentication();
