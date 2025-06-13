@@ -1,6 +1,7 @@
 using AutoMapper;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.Departments;
+using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
 
 namespace its.gamify.core.Mappers;
@@ -8,16 +9,14 @@ public class MapperConfigurationProfile : Profile
 {
     public MapperConfigurationProfile()
     {
-        #region Customer
-        //CreateMap<Admin, AdminCreateModel>().ReverseMap();
-        //CreateMap<Customer, CustomerViewModel>().ReverseMap();
-        //CreateMap<CustomerCreateModel, Customer>().ReverseMap();
-        //CreateMap<CustomerUpdateModel, Customer>().ReverseMap();
-        #endregion
+        #region Users
+        CreateMap<User, UserViewModel>()
+            .ForMember(x => x.DeptName, cfg => cfg.MapFrom(x => (x.Department!.Name ?? string.Empty)))
+            .ReverseMap();
+        CreateMap<User, UserUpdateModel>().ReverseMap();
+        CreateMap<User, UserCreateModel>().ForMember(x => x.DeptId, cfg => cfg.MapFrom(x => x.DepartmentId))
+            .ReverseMap();
 
-        #region BloodUnit
-        //CreateMap<BloodUnitCreateModel, BloodUnit>().ReverseMap();
-        //CreateMap<BloodUnitUpdateModel, BloodUnit>().ReverseMap();
         #endregion
 
         #region Course

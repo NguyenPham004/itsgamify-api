@@ -1,8 +1,14 @@
+using its.gamify.api.Validations;
 using its.gamify.core.Mappers;
 using its.gamify.infras.Datas;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Scrutor;
 using System.Reflection;
+using System.Text;
 
 namespace its.gamify.api;
 
@@ -16,6 +22,39 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
+        services.AddSwaggerGen(opt =>
+        {
+            opt.SwaggerDoc("v1", new OpenApiInfo { Title = "ITS-Gamify", Version = "v1" });
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            opt.IncludeXmlComments(xmlPath);
+            opt.AddSecurityDefinition(name: "Bearer", securityScheme: new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Bearer Generated JWT-Token",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+
+            });
+            opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+                        {
+                            {
+                                new OpenApiSecurityScheme
+                                {
+                                    Reference = new OpenApiReference
+                                    {
+                                        Type = ReferenceType.SecurityScheme,
+                                        Id = JwtBearerDefaults.AuthenticationScheme
+                                    },
+                                    Scheme = "oauth2",
+                                    Name = "Bearer",
+                                    In = ParameterLocation.Header,
+                                }, Array.Empty<string>()
+                            }
+                        });
+        });
+
         services.AddHttpContextAccessor();
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
             services.BuildServiceProvider().GetRequiredService<IConfiguration>()
@@ -25,15 +64,33 @@ public static class ServiceCollectionExtensions
         //         .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
 
         services.AddHttpContextAccessor();
-
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.Scan(scan =>
         {
             scan.FromAssemblies(getAssemblies())
                 .AddClasses()
                 .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                 .AsMatchingInterface()
-                .WithScopedLifetime();
+                .WithTransientLifetime();
         });
+        services.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(x =>
+        {
+            x.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("VERYSTRONGPASSWORD_CHANGEMEIFYOUNEED")),
+                ValidateIssuer = true,
+                ValidIssuer = "its.gamify",
+                ValidAudience = "its.gamify.client",
+                ValidateAudience = true
+            };
+        });
+        services.AddHttpContextAccessor();
         // AutoMapper
         services.AddAutoMapper(typeof(MapperConfigurationProfile));
         return services;

@@ -1,11 +1,11 @@
-using System.Linq.Expressions;
 using its.gamify.core.Repositories;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Models;
 using its.gamify.infras.Datas;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Text.Json;
-using its.gamify.domains.Models;
 
 namespace its.gamify.infras.Repositories;
 

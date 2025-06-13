@@ -1,6 +1,9 @@
-﻿using its.gamify.core;
+﻿using AutoMapper;
+using its.gamify.core;
 using its.gamify.core.Repositories;
+using its.gamify.domains.Enums;
 using its.gamify.infras.Datas;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace its.gamify.infras
 {
@@ -9,15 +12,57 @@ namespace its.gamify.infras
         private readonly AppDbContext _appDbContext;
         private readonly ICourseRepository _courseRepository;
         private readonly IDepartmentRepository _departmentRepository;
-        public UnitOfWork(AppDbContext dbContext, ICourseRepository courseRepository, IDepartmentRepository departmentRepository)
+        private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository roleRepository;
+        private readonly IMapper mapper;
+        public UnitOfWork(AppDbContext dbContext, ICourseRepository courseRepository, IDepartmentRepository departmentRepository,
+            IServiceProvider serviceProvider)
         {
+            roleRepository = serviceProvider.GetRequiredService<IRoleRepository>();
+            _userRepository = serviceProvider.GetRequiredService<IUserRepository>();
+            mapper = serviceProvider.GetRequiredService<IMapper>();
             _appDbContext = dbContext;
             _courseRepository = courseRepository;
             _departmentRepository = departmentRepository;
         }
         public ICourseRepository CourseRepository => _courseRepository;
+        public IMapper Mapper => mapper;
+        public IUserRepository UserRepository => _userRepository;
         public IDepartmentRepository DepartmentRepository => _departmentRepository;
+        public IRoleRepository RoleRepository => roleRepository;
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;
+
+        public async Task SeedData()
+        {
+            await this.roleRepository.AddRangeAsync(new List<domains.Entities.Role>()
+            {
+                new domains.Entities.Role()
+                {
+                    Id = Guid.NewGuid(),
+                    IsDeleted = false,
+                    Name = RoleEnum.Manager.ToString(),
+                    Description = "",
+
+                },
+                 new domains.Entities.Role()
+                {
+                    Id = Guid.NewGuid(),
+                    IsDeleted = false,
+                    Name = RoleEnum.Admin.ToString(),
+                    Description = "",
+
+                },
+                  new domains.Entities.Role()
+                {
+                    Id = Guid.NewGuid(),
+                    IsDeleted = false,
+                    Name = RoleEnum.Employee.ToString(),
+                    Description = "",
+
+                }
+            });
+            await this.SaveChangesAsync();
+        }
     }
 }

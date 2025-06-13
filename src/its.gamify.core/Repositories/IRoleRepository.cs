@@ -2,5 +2,7 @@
 
 namespace its.gamify.core.Repositories
 {
-    public interface IDepartmentRepository : IGenericRepository<Department>;
+    public interface IRoleRepository : IGenericRepository<Role>
+    {
+    }
 }

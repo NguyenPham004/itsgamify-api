@@ -6,6 +6,8 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
     }
 
+
+
     protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
