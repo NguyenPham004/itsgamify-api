@@ -11,7 +11,6 @@ public class Course : BaseEntity
     public virtual ICollection<CourseReview> CourseReviews { get; set; } = [];
     public virtual ICollection<CourseSection> CourseSections { get; set; } = [];
     public virtual ICollection<Practice> Practices { get; set; } = [];
-    public QuestionBank? QuestionBank { get; set; } = null!;
     public Guid QuarterId { get; set; }
     public virtual Quarter Quarter { get; set; } = null!;
     public Guid DifficultyLevelId { get; set; }

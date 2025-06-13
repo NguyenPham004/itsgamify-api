@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
+        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
             services.BuildServiceProvider().GetRequiredService<IConfiguration>()
                 .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
         // services.AddDbContext<AppDbContext>(options => options.USeSqlServer(

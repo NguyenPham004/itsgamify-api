@@ -7,7 +7,6 @@ public class Challenge : BaseEntity
 
     #region Navigation Properties
     public virtual ICollection<ChallengeParticipation> ChallengeParticipations { get; set; } = [];
-    public virtual ICollection<EmployeeChallenge> EmployeeChallenges { get; set; } = [];
     public virtual ICollection<Quiz> Quizzes { get; set; } = [];
     #endregion
 }

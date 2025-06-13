@@ -27,7 +27,7 @@ public class User : BaseEntity
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public Guid DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
-    public virtual ICollection<EmployeeChallenge> EmployeeChallenges { get; set; } = new List<EmployeeChallenge>();
+
     #endregion
 
 
