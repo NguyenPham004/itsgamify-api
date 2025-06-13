@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using its.gamify.core.Services.Interfaces;
+using System.Security.Claims;
 
 namespace its.gamify.api.Services;
 
