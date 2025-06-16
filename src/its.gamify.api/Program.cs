@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCoreServices();
 builder.Services.AddControllers();
+builder.Services.AddRouting(x => x.LowercaseUrls = true);
 var configuration = builder.Configuration.Get<AppSetting>() ?? throw new Exception("Null configuration");
 builder.Services.AddSingleton(configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -16,19 +17,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MapperConfigurationProfile).Assembly);
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-// Configure the HTTP request pipeline.
-<<<<<<< HEAD
-/*if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}*/
+
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
-=======
-
 app.MapOpenApi();
->>>>>>> 13b13c3 (modify)
+
 
 
 app.UseAuthentication();

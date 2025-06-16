@@ -314,16 +314,15 @@ public class GenericRepository<TEntity>(
 
         var dataQuery = PrepareQuery(withDeleted, filter, orderByList, true, includes);
 
-        var countTask = countQuery.CountAsync(cancellationToken);
-        var itemsTask = dataQuery
+        var countTask = await countQuery.CountAsync(cancellationToken);
+        var itemsTask = await dataQuery
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        await Task.WhenAll(countTask, itemsTask);
-
-        var totalCount = await countTask;
-        var items = await itemsTask;
+        //await Task.WhenAll(countTask, itemsTask);
+        var totalCount = countTask;
+        var items = itemsTask;
 
         var pagination = new Pagination
         {
