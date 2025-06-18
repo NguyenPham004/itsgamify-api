@@ -90,7 +90,7 @@ public static class ServiceCollectionExtensions
                 ValidateAudience = true
             };
         });
-        services.AddHttpContextAccessor();
+
         // AutoMapper
         services.AddAutoMapper(typeof(MapperConfigurationProfile));
         return services;
