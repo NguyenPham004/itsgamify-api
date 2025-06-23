@@ -1,0 +1,67 @@
+name: 🚀 CI/CD Deploy to MonsterASP
+
+on:
+  push:
+    branches:
+      - main # or master
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🛠 Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x' # or your project version
+
+    - name: 🧱 Restore dependencies
+      run: dotnet restore
+
+    - name: 🏗 Build
+      run: dotnet build --configuration Release
+
+    - name: 🔑 Inject secrets into appsettings.json
+      run: |
+        $appSettingsPath = 'src/its.gamify.api/appsettings.json'
+        (Get-Content $appSettingsPath) -replace '"DefaultConnection": ""', '"DefaultConnection": "${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}"' |
+        Set-Content $appSettingsPath
+        (Get-Content $appSettingsPath) -replace '"Bucket": ""', '"Bucket": "${{ secrets.FIREBASECONFIG__BUCKET }}"' |
+        Set-Content $appSettingsPath
+        (Get-Content $appSettingsPath) -replace '"ServiceAccountAdmin": ""', '"ServiceAccountAdmin": "${{ secrets.FIREBASECONFIG__SERVICEACCOUNTADMIN }}"' |
+        Set-Content $appSettingsPath
+        (Get-Content $appSettingsPath) -replace '"ServiceAccountPass": ""', '"ServiceAccountPass": "${{ secrets.FIREBASECONFIG__SERVICEACCOUNTPASS }}"' |
+        Set-Content $appSettingsPath
+        (Get-Content $appSettingsPath) -replace '"ApiKey" : ""', '"ApiKey" : "${{ secrets.FIREBASECONFIG__APIKEY }}"' |
+        Set-Content $appSettingsPath
+      shell: pwsh
+
+    - name: Replace all appsettings.json secrets from GitHub Actions
+      shell: pwsh
+      run: |
+        $appSettingsPath = 'src/its.gamify.api/appsettings.json'
+        $json = Get-Content $appSettingsPath | ConvertFrom-Json
+        # Replace ConnectionStrings.DefaultConnection
+        $json.ConnectionStrings.DefaultConnection = "${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}"
+        # Replace FirebaseConfig values
+        $json.FirebaseConfig.Bucket = "${{ secrets.FIREBASECONFIG__BUCKET }}"
+        $json.FirebaseConfig.ServiceAccountAdmin = "${{ secrets.FIREBASECONFIG__SERVICEACCOUNTADMIN }}"
+        $json.FirebaseConfig.ServiceAccountPass = "${{ secrets.FIREBASECONFIG__SERVICEACCOUNTPASS }}"
+        $json.FirebaseConfig.ApiKey = "${{ secrets.FIREBASECONFIG__APIKEY }}"
+        $json | ConvertTo-Json -Depth 10 | Set-Content $appSettingsPath -Encoding UTF8
+
+    - name: 🧪 Publish
+      run: dotnet publish -c Release -o publish_output
+
+    - name: 🚀 Deploy via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.0.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /wwwroot/
+        local-dir: publish_output/
+        dangerous-clean-slate: true # optional: clears remote dir first
