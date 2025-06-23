@@ -1,4 +1,4 @@
-﻿using its.gamify.domains.Entities;
+using its.gamify.domains.Entities;
 
 namespace its.gamify.core.Repositories
 {
