@@ -1,5 +1,6 @@
 using its.gamify.api.Validations;
 using its.gamify.core.Mappers;
+using its.gamify.domains.Models;
 using its.gamify.infras.Datas;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +21,8 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddCoreServices(this IServiceCollection services)
+    public static IServiceCollection AddCoreServices(this IServiceCollection services,
+        AppSetting appSetting)
     {
         services.AddSwaggerGen(opt =>
         {
@@ -57,8 +59,7 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpContextAccessor();
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
-            services.BuildServiceProvider().GetRequiredService<IConfiguration>()
-                .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
+            appSetting.ConnectionStrings["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
         // services.AddDbContext<AppDbContext>(options => options.USeSqlServer(
         //     services.BuildServiceProvider().GetRequiredService<IConfiguration>()
         //         .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
@@ -72,7 +73,7 @@ public static class ServiceCollectionExtensions
                 .AddClasses()
                 .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                 .AsMatchingInterface()
-                .WithTransientLifetime();
+                .WithScopedLifetime();
         });
         services.AddAuthentication(x =>
         {

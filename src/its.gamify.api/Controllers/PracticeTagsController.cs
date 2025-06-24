@@ -1,12 +1,11 @@
 ﻿using its.gamify.core.Features.PracticeTags.Queries;
-using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/practice-tags")]
     public class PracticeTagsController : ControllerBase
     {
         private readonly IMediator _mediator;

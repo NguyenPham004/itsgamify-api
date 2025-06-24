@@ -15,13 +15,19 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 // Add services to the container.
-builder.Services.AddCoreServices();
+var configuration = builder.Configuration
+    .Get<AppSetting>() ?? throw new Exception("Null configuration");
+builder.Services.AddCoreServices(appSetting: configuration);
+
 builder.Services.AddControllers();
 builder.Services.AddRouting(x => x.LowercaseUrls = true);
 builder.Configuration.AddUserSecrets<Program>();
-var configuration = builder.Configuration
-    .Get<AppSetting>() ?? throw new Exception("Null configuration");
+
 builder.Services.AddSingleton<GlobalErrorHandlingMiddleware>();
 builder.Services.AddSingleton<Ultils>();
 builder.Services.AddSingleton(configuration);

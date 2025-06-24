@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace its.gamify.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/wish-lists")]
     public class WishListsController : ControllerBase
     {
         private readonly IMediator _mediator;

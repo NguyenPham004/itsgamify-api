@@ -1,12 +1,11 @@
 using its.gamify.core.Features.CourseReviews.Queries;
-using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/course-reviews")]
     public class CourseReviewsController : ControllerBase
     {
         private readonly IMediator _mediator;

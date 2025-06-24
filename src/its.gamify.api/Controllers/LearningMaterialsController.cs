@@ -1,12 +1,11 @@
 ﻿using its.gamify.core.Features.LearningMaterials.Queries;
-using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/learning-materials")]
     public class LearningMaterialsController : ControllerBase
     {
         private readonly IMediator _mediator;

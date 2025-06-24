@@ -1,11 +1,9 @@
 ﻿using its.gamify.core.Features.AvailablesData;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace its.gamify.api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/quiz-answers")]
     [ApiController]
     public class QuizAnswerController : ControllerBase
     {

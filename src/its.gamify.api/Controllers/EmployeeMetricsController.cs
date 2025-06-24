@@ -1,10 +1,9 @@
 ﻿using its.gamify.core.Features.AvailablesData;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/employee-metrics")]
     [ApiController]
     public class EmployeeMetricsController : ControllerBase
     {

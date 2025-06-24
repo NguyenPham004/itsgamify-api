@@ -1,12 +1,11 @@
 using its.gamify.core.Features.CourseParticipations.Queries;
-using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/course-participations")]
     public class CourseParticipationsController : ControllerBase
     {
         private readonly IMediator _mediator;
