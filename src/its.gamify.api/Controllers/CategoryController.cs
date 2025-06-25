@@ -1,21 +1,23 @@
 ﻿using its.gamify.core.Features.AvailablesData;
-using Microsoft.AspNetCore.Http;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private Ultils Ultils { get; set; }
-        public CategoryController(Ultils ultils)
+        private readonly IMediator mediator;
+        public CategoriesController(Ultils ultils,
+            IMediator mediator)
         {
+            this.mediator = mediator;
             Ultils = ultils;
         }
         /// <summary>
-        /// Get all Quater
+        /// Get all Category
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,

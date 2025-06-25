@@ -5,7 +5,9 @@ public class Course : BaseEntity
     public string Title { get; set; } = string.Empty;
     public double DurationInHours { get; set; } = 0.0;
     public string Description { get; set; } = string.Empty;
-
+    public string LongDescription { get; set; } = string.Empty;
+    public List<string> Tags { get; set; } = [];
+    public List<(string media, string url)> Medias { get; set; } = [];
     public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
     public virtual ICollection<CourseParticipation> CourseParticipations { get; set; } = [];
     public virtual ICollection<CourseReview> CourseReviews { get; set; } = [];

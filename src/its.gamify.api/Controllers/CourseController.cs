@@ -1,4 +1,5 @@
-﻿using its.gamify.api.Features.Users.Queries;
+﻿using its.gamify.api.Features.CourseParticipations;
+using its.gamify.api.Features.Courses.Commands;
 using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Services.Interfaces;
@@ -38,7 +39,7 @@ namespace its.gamify.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
                                         [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm=""
+                                        [FromQuery] string searchTerm = ""
                                         )
         {
             return Ok(data.courses);
@@ -62,18 +63,28 @@ namespace its.gamify.api.Controllers
         /// Create course
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CourseCreateModel createItem)
+        public async Task<IActionResult> Create([FromForm] CreateCourseCommand command,
+            [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
-            var result = await _courseService.Create(createItem);
-            if (result is null)
-            {
-                return BadRequest("Can not create Course");
 
-            }
-            else return Ok(result);
+            var result = await mediator.Send(command);
+            return Ok(result);
         }
 
+        [HttpGet("{id}/course-participation")]
+        public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageIndex = 0)
+        {
+            var result = await mediator.Send(new GetCourseParticipationByCourse()
+            {
+                CourseId = id,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
+            return Ok(result);
+        }
 
         /// <summary>
         /// Get course by Id

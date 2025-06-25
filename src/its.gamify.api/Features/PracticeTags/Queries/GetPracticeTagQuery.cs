@@ -1,4 +1,5 @@
-﻿using its.gamify.core.Models.ShareModels;
+﻿using FluentValidation;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -8,6 +9,13 @@ namespace its.gamify.core.Features.PracticeTags.Queries
     {
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
+        class QueryValidation : AbstractValidator<GetPracticeTagQuery>
+        {
+            public QueryValidation()
+            {
+                RuleFor(x => x.PageIndex);
+            }
+        }
         class QueryHandler : IRequestHandler<GetPracticeTagQuery, BasePagingResponseModel<PracticeTag>>
         {
             private readonly IUnitOfWork unitOfWork;
