@@ -1,7 +1,14 @@
 using AutoMapper;
+using its.gamify.core.Models.Categories;
 using its.gamify.core.Models.Courses;
+using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Departments;
-using its.gamify.core.Models.Questions;
+using its.gamify.core.Models.DifficultyLevels;
+using its.gamify.core.Models.Lessons;
+using its.gamify.core.Models.Quarters;
+using its.gamify.core.Models.QuizAnswers;
+using its.gamify.core.Models.Quizes;
+using its.gamify.core.Models.QuizResults;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
 
@@ -32,20 +39,22 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
         #endregion
 
-        #region Question
-        CreateMap<Question, QuestionViewModel>().ReverseMap();
-        CreateMap<Question, QuestionCreateModel>().ReverseMap();
-        CreateMap<Question, QuestionUpdateModel>().ReverseMap();
+        CreateMap<Category, CategoryCreateModel>().ReverseMap();
+        CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
+        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap()
+            .ForMember(x => x.Lessons, cfg => cfg.Ignore());
+        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
+        CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
+        CreateMap<Quiz, QuizCreateModel>().ReverseMap();
+        CreateMap<Quiz, QuizUpdateModel>().ReverseMap();
+        CreateMap<Quiz, QuizViewModel>().ReverseMap();
 
-        #endregion
+        CreateMap<QuizResult, QuizResultCreateModel>().ReverseMap();
+        CreateMap<QuizResult, QuizResultUpdateModel>().ReverseMap();
+        CreateMap<QuizResult, QuizResultViewModel>().ReverseMap();
 
-        #region Quiz
-        #endregion
-
-        #region Quiz result
-        #endregion
-
-        #region Quiz answer
-        #endregion
+        CreateMap<QuizAnswer, QuizAnswerCreateModel>().ReverseMap();
+        CreateMap<QuizAnswer, QuizAnswerUpdateModel>().ReverseMap();
+        CreateMap<QuizAnswer, QuizAnswerViewModel>().ReverseMap();
     }
 }

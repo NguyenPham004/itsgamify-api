@@ -1,21 +1,25 @@
-﻿using its.gamify.core.Features.AvailablesData;
-using Microsoft.AspNetCore.Http;
+﻿using its.gamify.api.Features.Categories.Commands;
+using its.gamify.api.Features.Categories.Queries;
+using its.gamify.core.Features.AvailablesData;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private Ultils Ultils { get; set; }
-        public CategoryController(Ultils ultils)
+        private readonly IMediator mediator;
+        public CategoriesController(Ultils ultils,
+            IMediator mediator)
         {
+            this.mediator = mediator;
             Ultils = ultils;
         }
         /// <summary>
-        /// Get all Quater
+        /// Get all Category
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
@@ -23,8 +27,20 @@ namespace its.gamify.api.Controllers
                                         [FromQuery] string searchTerm = ""
                                         )
         {
-            return Ok(Ultils.categories);
+            var res = await mediator.Send(new GetAllCategoriesQuery()
+            {
+                PageIndex = pageNumber,
+                SearchTerm = searchTerm,
+                PageSize = pageSize
+            });
+            return Ok(res);
 
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
+        {
+            var res = await mediator.Send(command);
+            return Ok(res);
         }
     }
 }

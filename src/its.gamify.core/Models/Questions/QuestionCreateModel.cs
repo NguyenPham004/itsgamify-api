@@ -15,5 +15,7 @@ namespace its.gamify.core.Models.Questions
         public string OptionD { get; set; } = string.Empty;
         public string CorrectAnswer { get; set; } = string.Empty;
         public string Explanation { get; set; } = string.Empty;
+        public Guid QuestionBankId { get; set; }
+        public Guid QuizId { get; set; }
     }
 }

@@ -7,4 +7,5 @@ public class QuizResult : BaseEntity
     public bool IsPassed { get; set; } = false;
     public ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();
     public LearningProgress? LearningProgress { get; set; } = null!;
+    public Guid LearningProgressId { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using its.gamify.api.Features.Users.Commands;
 using its.gamify.core;
+using its.gamify.core.IntegrationServices.Interfaces;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.Users;
 using its.gamify.core.Services.Interfaces;
@@ -9,39 +10,55 @@ using MediatR;
 
 namespace its.gamify.api.Features.Courses.Commands
 {
-    public class CreateCourseCommand : IRequest<CourseViewModel?>
+    public class CreateCourseCommand : CourseCreateModel, IRequest<Course>
     {
         public CourseViewModel Model { get; set; } = new();
         class CommandValidation : AbstractValidator<CreateCourseCommand>
         {
             public CommandValidation()
             {
-                RuleFor(x => x.Model.Title).NotEmpty().NotNull().WithMessage("Input title's course");
-                RuleFor(x => x.Model.DurationInHours).GreaterThanOrEqualTo(0).WithMessage("Duration in hour of course must be larger than 0");
+                RuleFor(x => x.CategoryId).NotNull().NotEmpty();
+                RuleFor(x => x.DifficultyLevelId).NotNull().NotEmpty();
+                RuleFor(x => x.QuarterId).NotNull().NotEmpty();
+
             }
         }
-        class CommandHandler : IRequestHandler<CreateCourseCommand, CourseViewModel?>
+        class CommandHandler : IRequestHandler<CreateCourseCommand, Course>
         {
             private readonly IUnitOfWork unitOfWork;
-            private readonly IAuthService authService;
+            private readonly IFirebaseService firebaseService;
             public CommandHandler(IUnitOfWork unitOfWork,
-                IAuthService authService)
+                IFirebaseService firebaseService)
             {
-                this.authService = authService;
+                this.firebaseService = firebaseService;
                 this.unitOfWork = unitOfWork;
 
             }
-            public async Task<CourseViewModel?> Handle(CreateCourseCommand request,
-                CancellationToken cancellationToken)
+            public async Task<Course> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = unitOfWork.Mapper.Map<Course>(request.Model);
-                await unitOfWork.CourseRepository.AddAsync(course);
-                if (await unitOfWork.SaveChangesAsync())
+                var course = unitOfWork.Mapper.Map<Course>(request);
+                if (request.ThumbNail is not null)
                 {
-                    return unitOfWork.Mapper.Map<CourseViewModel>(await unitOfWork.CourseRepository.GetByIdAsync(course.Id,
-                        false, cancellationToken, x => x.QuarterId!));
+                    var fileRes = await firebaseService.UploadFileAsync(request.ThumbNail.File,
+                        request.ThumbNail.Directory ?? string.Empty);
+                    if (fileRes.fileName != string.Empty)
+                    {
+                        course.Medias.Add($"ThumbNail|{fileRes.fileName}|{fileRes.url}");
+                    }
                 }
-                else return null;
+                if (request.IntroVideo is not null)
+                {
+                    var fileRes = await firebaseService.UploadFileAsync(request.IntroVideo.File,
+                       request.IntroVideo.Directory ?? string.Empty);
+                    if (fileRes.fileName != string.Empty)
+                    {
+                        course.Medias.Add($"Video|{fileRes.fileName}|{fileRes.url}");
+                    }
+                }
+
+                await unitOfWork.CourseRepository.AddAsync(course);
+                await unitOfWork.SaveChangesAsync();
+                return course;
             }
         }
     }
