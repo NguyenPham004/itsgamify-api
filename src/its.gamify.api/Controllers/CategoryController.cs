@@ -1,4 +1,6 @@
-﻿using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.api.Features.Categories.Commands;
+using its.gamify.api.Features.Categories.Queries;
+using its.gamify.core.Features.AvailablesData;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +27,20 @@ namespace its.gamify.api.Controllers
                                         [FromQuery] string searchTerm = ""
                                         )
         {
-            return Ok(Ultils.categories);
+            var res = await mediator.Send(new GetAllCategoriesQuery()
+            {
+                PageIndex = pageNumber,
+                SearchTerm = searchTerm,
+                PageSize = pageSize
+            });
+            return Ok(res);
 
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
+        {
+            var res = await mediator.Send(command);
+            return Ok(res);
         }
     }
 }

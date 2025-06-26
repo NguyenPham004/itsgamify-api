@@ -1,6 +1,8 @@
-﻿using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.api.Features.Quarters.Commands;
+using its.gamify.api.Features.Quarters.Queries;
+using its.gamify.core.Features.AvailablesData;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace its.gamify.api.Controllers
 {
@@ -9,10 +11,12 @@ namespace its.gamify.api.Controllers
     public class QuaterController : ControllerBase
     {
         private Ultils data;
-        public QuaterController(Ultils data)
+        private readonly IMediator mediator;
+        public QuaterController(Ultils data,
+            IMediator mediator)
         {
-            this.data = data;
-            
+            this.mediator = mediator;
+
         }
         /// <summary>
         /// Get all Quater
@@ -20,11 +24,26 @@ namespace its.gamify.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
                                         [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm = ""
-                                        )
+                                        [FromQuery] string searchTerm = "",
+                                        [FromQuery] DateTime? dateFrom = null,
+                                        [FromQuery] DateTime? dateTo = null)
         {
-            return Ok(data.quarters);
+            var res = await mediator.Send(new GetAllQuarterQuery()
+            {
+                DateFrom = dateFrom,
+                DateTo = dateTo,
+                PageIndex = pageNumber,
+                PageSize = pageSize,
+                SearchTerm = searchTerm
+            });
+            return Ok(res);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] CreateQuaterCommand command)
+        {
+            var res = await mediator.Send(command);
+            return Ok(res);
         }
     }
 }

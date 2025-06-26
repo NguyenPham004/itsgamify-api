@@ -1,6 +1,11 @@
 using AutoMapper;
+using its.gamify.core.Models.Categories;
 using its.gamify.core.Models.Courses;
+using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Departments;
+using its.gamify.core.Models.DifficultyLevels;
+using its.gamify.core.Models.Lessons;
+using its.gamify.core.Models.Quarters;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
 
@@ -30,5 +35,12 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
         #endregion
+
+        CreateMap<Category, CategoryCreateModel>().ReverseMap();
+        CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
+        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap()
+            .ForMember(x => x.Lessons, cfg => cfg.Ignore());
+        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
+        CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
     }
 }

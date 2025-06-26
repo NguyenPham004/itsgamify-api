@@ -13,8 +13,8 @@ using its.gamify.infras.Datas;
 namespace its.gamify.infras.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250625164205_V0_3_AddFieldsCourse")]
-    partial class V0_3_AddFieldsCourse
+    [Migration("20250625181409_V0_3_AddDifficultyLevel")]
+    partial class V0_3_AddDifficultyLevel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,6 +185,9 @@ namespace its.gamify.infras.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("CourseType")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -208,9 +211,9 @@ namespace its.gamify.infras.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.PrimitiveCollection<List<ValueTuple<string, string>>>("Medias")
+                    b.PrimitiveCollection<List<string>>("Medias")
                         .IsRequired()
-                        .HasColumnType("record[]");
+                        .HasColumnType("text[]");
 
                     b.Property<Guid>("QuarterId")
                         .HasColumnType("uuid");

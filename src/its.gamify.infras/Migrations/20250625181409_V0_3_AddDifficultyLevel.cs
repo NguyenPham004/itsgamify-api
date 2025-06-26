@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -7,11 +6,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace its.gamify.infras.Migrations
 {
     /// <inheritdoc />
-    public partial class V0_3_AddFieldsCourse : Migration
+    public partial class V0_3_AddDifficultyLevel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "CourseType",
+                table: "Course",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
             migrationBuilder.AddColumn<string>(
                 name: "LongDescription",
                 table: "Course",
@@ -19,10 +25,10 @@ namespace its.gamify.infras.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<List<ValueTuple<string, string>>>(
+            migrationBuilder.AddColumn<List<string>>(
                 name: "Medias",
                 table: "Course",
-                type: "record[]",
+                type: "text[]",
                 nullable: false);
 
             migrationBuilder.AddColumn<List<string>>(
@@ -35,6 +41,10 @@ namespace its.gamify.infras.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "CourseType",
+                table: "Course");
+
             migrationBuilder.DropColumn(
                 name: "LongDescription",
                 table: "Course");

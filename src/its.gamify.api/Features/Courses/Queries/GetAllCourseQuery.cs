@@ -1,37 +1,43 @@
 ﻿using its.gamify.core;
 using its.gamify.core.Features.AvailablesData;
-using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.ShareModels;
-using its.gamify.core.Models.Users;
-using its.gamify.domains.Models;
+using its.gamify.domains.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace its.gamify.api.Features.Users.Queries
 {
 
-    public class GetAllCourseQuery : IRequest<BasePagingResponseModel<CourseViewModel>>
+    public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
     {
-       
-        class QueryHandler : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<CourseViewModel>>
+        public int PageSize { get; set; }
+        public int PageIndex { get; set; }
+        public string Search { get; set; } = string.Empty;
+        class QueryHandler : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<Course>>
         {
             private readonly IUnitOfWork unitOfWork;
             private Ultils data;
             public QueryHandler(IUnitOfWork unitOfWork, Ultils data)
             {
                 this.unitOfWork = unitOfWork;
-                this.data= data;
+                this.data = data;
             }
-            public async Task<BasePagingResponseModel<CourseViewModel>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
+            public async Task<BasePagingResponseModel<Course>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
             {
-                var res = await unitOfWork.CourseRepository.ToPagination(includes: x => x.Category!);
-                var resModel = unitOfWork.Mapper.Map<List<CourseViewModel>>(res.Item2);
-                return new BasePagingResponseModel<CourseViewModel>(datas: resModel, pagination: res.Item1);
+
+                Expression<Func<Course, bool>>? filter = null;
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    filter = x => x.Title.Contains(request.Search);
+                }
+                var res = await unitOfWork.CourseRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.Category!,
+                 x => x.DifficultyLevel, x => x.Quarter]);
+
+                return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);
             }
 
         }
-       
+
     }
 
 }

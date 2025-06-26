@@ -8,3 +8,10 @@ public enum CourseStatusEnum
     Failed = 4,
     Withdrawn = 5
 }
+
+public enum CourseTypeEnum
+{
+    LeaderOnly,
+    All,
+    DepartmentOnly
+}

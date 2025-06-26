@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using its.gamify.infras.Datas;
@@ -12,9 +13,11 @@ using its.gamify.infras.Datas;
 namespace its.gamify.infras.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250625202303_V0_4_Adddescription_CourseSection")]
+    partial class V0_4_Adddescription_CourseSection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -681,7 +684,7 @@ namespace its.gamify.infras.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("LearningProgressId")
+                    b.Property<Guid>("LearningProgressId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
@@ -1411,7 +1414,9 @@ namespace its.gamify.infras.Migrations
 
                     b.HasOne("its.gamify.domains.Entities.LearningProgress", "LearningProgress")
                         .WithMany("Lessons")
-                        .HasForeignKey("LearningProgressId");
+                        .HasForeignKey("LearningProgressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CourseSection");
 
