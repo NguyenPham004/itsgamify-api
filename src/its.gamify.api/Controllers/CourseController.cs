@@ -135,7 +135,7 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}/course-participation")]
+        [HttpGet("{id}/course-participations")]
         public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageIndex = 0)

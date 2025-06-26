@@ -10,6 +10,8 @@ public class Course : BaseEntity
     public string LongDescription { get; set; } = string.Empty;
     public CourseTypeEnum CourseType { get; set; } = CourseTypeEnum.All;
     public List<string> Tags { get; set; } = [];
+    public List<string> Targets { get; set; } = [];
+    public string Requirements { get; set; } = string.Empty;
     public List<string> Medias { get; set; } = [];
     public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
     public virtual ICollection<CourseParticipation> CourseParticipations { get; set; } = [];

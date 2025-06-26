@@ -29,6 +29,12 @@ namespace its.gamify.api.Controllers
             if (result) return Ok("Delete Successfully");
             else return BadRequest("Deleted Failed");
         }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRage([FromBody] List<Guid> ids)
+        {
+            var result = await _departmentService.DeleteRange(ids);
+            return NoContent();
+        }
 
         /// <summary>
         /// Get all Department

@@ -31,7 +31,8 @@ public class MapperConfigurationProfile : Profile
         #endregion
 
         #region Department
-        CreateMap<Department, DepartmentViewModel>().ReverseMap();
+        CreateMap<Department, DepartmentViewModel>().ForMember(x => x.EmployeeCount, cfg => cfg.MapFrom(c => c.Users!.Count))
+                .ReverseMap();
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
         #endregion

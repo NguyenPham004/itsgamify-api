@@ -1,4 +1,5 @@
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 namespace its.gamify.infras.Datas;
 
 public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
@@ -38,6 +39,20 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        Role[] roles = [new Role()
+        {
+            Name = RoleEnum.Employee.ToString()
+        }, new Role()
+        {
+            Name = RoleEnum.Leader.ToString()
+        }, new Role() { Name = RoleEnum.TrainingStaff.ToString()}, new Role()
+        {
+            Name = RoleEnum.Manager.ToString()
+        }, new Role()
+        { Name = RoleEnum.Admin.ToString()}];
+
+
+        modelBuilder.Entity<Role>().HasData(roles);
         modelBuilder.ApplyConfigurationsFromAssembly(its.gamify.infras.AssemblyReference.Assembly);
     }
 }

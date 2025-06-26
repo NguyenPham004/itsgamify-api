@@ -2,14 +2,10 @@
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using its.gamify.domains.Enums;
 
 namespace its.gamify.core.Services;
-    public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
+public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -20,31 +16,39 @@ namespace its.gamify.core.Services;
         var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
         if (departments.Count > 0)
         {
-            // Sắp xếp danh sách phòng ban theo orderBy
-            /*if (orderBy != null && orderBy.Any())
-            {
-                foreach (var order in orderBy)
-                {
-                    if (order.OrderColumn.ToLower() == "name")
-                    {
-                        departments = order.OrderDir.ToUpper() == "ASC" ? departments.OrderBy(d => d.Name).ToList() : departments.OrderByDescending(d => d.Name).ToList();
-                    }
-                }
-            }*/
+            var leaderROle = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString());
 
             // Phân trang
             var pagedDepartments = departments.Skip(page * limit).Take(limit).ToList();
             var departmentsList = _mapper.Map<List<DepartmentViewModel>>(pagedDepartments);
-
+            foreach (var dept in departmentsList)
+            {
+                dept.Leader = await GetLeader(dept.Id);
+            }
             return departmentsList;
         }
         else throw new Exception("Not have any department");
     }
+    private async Task<User?> GetLeader(Guid id)
+    {
+        var leader = await _unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.DepartmentId == id && x.Role.Name == RoleEnum.Leader.ToString(), includes: [x => x.Role]);
+        return leader;
+    }
     public async Task<DepartmentViewModel> GetDepartment(Guid id)
     {
-        var result = await _unitOfWork.DepartmentRepository.GetByIdAsync(id);
-        if (result is not null) return _mapper.Map<DepartmentViewModel>(result);
-        else throw new Exception("Not found");
+        var result = await _unitOfWork.DepartmentRepository.GetByIdAsync(id, includes: [x => x.Users]);
+        var roles = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString())
+            ?? throw new Exception("Chưa tồn tại role leader");
+        if (result is not null)
+        {
+            var res = _unitOfWork.Mapper.Map<DepartmentViewModel>(result);
+            res.Leader = result.Users?.FirstOrDefault(x => x.RoleId == roles.Id);
+            return res;
+        }
+        else throw new Exception("Không tồn tại phòng ban");
+
+
+
     }
     public async Task<DepartmentViewModel> Create(DepartmentCreateModel item)
     {
@@ -79,5 +83,13 @@ namespace its.gamify.core.Services;
             return true;
         }
         else throw new Exception("Not found");
+    }
+
+    public async Task<bool> DeleteRange(List<Guid> ids)
+    {
+        var deletedItems = await _unitOfWork.DepartmentRepository.WhereAsync(x => ids.Contains(x.Id));
+        _unitOfWork.DepartmentRepository.SoftRemoveRange(deletedItems);
+        return await _unitOfWork.SaveChangesAsync();
+        //var deletedItems = _unitOfWork.DepartmentRepository.SoftRemoveRange() 
     }
 }
