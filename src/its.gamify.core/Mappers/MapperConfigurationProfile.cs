@@ -1,6 +1,7 @@
 using AutoMapper;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.Departments;
+using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
 
@@ -29,6 +30,22 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Department, DepartmentViewModel>().ReverseMap();
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
+        #endregion
+
+        #region Question
+        CreateMap<Question, QuestionViewModel>().ReverseMap();
+        CreateMap<Question, QuestionCreateModel>().ReverseMap();
+        CreateMap<Question, QuestionUpdateModel>().ReverseMap();
+
+        #endregion
+
+        #region Quiz
+        #endregion
+
+        #region Quiz result
+        #endregion
+
+        #region Quiz answer
         #endregion
     }
 }
