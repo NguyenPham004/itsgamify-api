@@ -37,6 +37,7 @@ namespace its.gamify.infras
         private readonly IChallengeRepository _challengeRepository;
         private readonly IChallengeParticipationRepository _challengeParticipationRepository;
         private readonly ILearningMaterialRepository learningMaterialRepository;
+        private readonly IFileRepository _fileRepository;
 
         private readonly IMapper mapper;
         public UnitOfWork(AppDbContext dbContext, ICourseRepository courseRepository, IDepartmentRepository departmentRepository,
@@ -46,6 +47,7 @@ namespace its.gamify.infras
             _userRepository = serviceProvider.GetRequiredService<IUserRepository>();
             mapper = serviceProvider.GetRequiredService<IMapper>();
             _appDbContext = dbContext;
+            _fileRepository = serviceProvider.GetRequiredService<IFileRepository>();
             learningMaterialRepository = serviceProvider.GetRequiredService<ILearningMaterialRepository>();
             _courseRepository = courseRepository;
             practiceTagRepository = serviceProvider.GetRequiredService<IPracticeTagRepository>();
@@ -100,6 +102,7 @@ namespace its.gamify.infras
         public IChallengeRepository ChallengeRepository => _challengeRepository;
         public ILearningMaterialRepository LearningMaterialRepository => learningMaterialRepository;
         public IChallengeParticipationRepository ChallengeParticipationRepository => _challengeParticipationRepository;
+        public IFileRepository FileRepository => _fileRepository;
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;
 

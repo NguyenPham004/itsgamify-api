@@ -1,15 +1,19 @@
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
+using Microsoft.EntityFrameworkCore;
 namespace its.gamify.infras.Datas;
 
 public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
+    private DbSet<User> user;
+    private DbSet<Role> role;
+
     public AppDbContext(Microsoft.EntityFrameworkCore.DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-
-    public Microsoft.EntityFrameworkCore.DbSet<User> User { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Role> Role { get; set; }
+    public DbSet<FileEntity> File { get; set; }
+    public Microsoft.EntityFrameworkCore.DbSet<User> User { get => user; set => user = value; }
+    public Microsoft.EntityFrameworkCore.DbSet<Role> Role { get => role; set => role = value; }
     public Microsoft.EntityFrameworkCore.DbSet<WishList> WishList { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<QuizResult> QuizResult { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<QuizAnswer> QuizAnswer { get; set; }

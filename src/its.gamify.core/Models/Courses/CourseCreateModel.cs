@@ -1,13 +1,18 @@
 ﻿using its.gamify.core.Models.Files;
 using its.gamify.domains.Enums;
+using System.Text.Json.Serialization;
 
 namespace its.gamify.core.Models.Courses
 {
     public class CourseCreateModel
     {
+        
         public string Title { get; set; } = string.Empty;
+        [JsonPropertyName("course_type")]
         public CourseTypeEnum CourseType { get; set; } = CourseTypeEnum.All;
+        [JsonPropertyName("long_description")]
         public string Description { get; set; } = string.Empty;
+
         public string LongDescription { get; set; } = string.Empty;
         public FileUploadRequestModel? ThumbNail { get; set; }
         public FileUploadRequestModel? IntroVideo { get; set; }
