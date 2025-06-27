@@ -2,6 +2,7 @@
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
+using System.Linq.Expressions;
 
 namespace its.gamify.api.Features.Categories.Queries
 {
@@ -19,7 +20,16 @@ namespace its.gamify.api.Features.Categories.Queries
             }
             public async Task<BasePagingResponseModel<Category>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
             {
-                var categories = await unitOfWork.CategoryRepository.ToPagination(request.PageIndex, request.PageSize, false, x => x.Name == request.SearchTerm);
+                Expression<Func<Category, bool>>? filter = null;
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    filter = x =>
+                            x.Name.ToLower().Contains(request.SearchTerm.ToLower()) ||
+                            (!string.IsNullOrEmpty(x.Description) &&
+                             x.Description.ToLower().Contains(request.SearchTerm.ToLower()));
+                }
+                var categories = await unitOfWork.CategoryRepository.ToPagination(request.PageIndex, request.PageSize, false, filter);
                 return new BasePagingResponseModel<Category>(categories.Entities, categories.Pagination);
             }
         }

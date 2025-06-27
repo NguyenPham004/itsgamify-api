@@ -1,7 +1,4 @@
-﻿using Firebase.Auth;
-using its.gamify.domains.Entities;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using System.Text.Json;
+﻿using its.gamify.domains.Entities;
 
 namespace its.gamify.core.Features.AvailablesData
 {
@@ -166,12 +163,12 @@ namespace its.gamify.core.Features.AvailablesData
 
             courses = new List<Course>
         {
-            new Course { Id = Guid.NewGuid(), Title = "Introduction to Programming", DurationInHours = 40.0, Description = "Learn the basics of programming.", QuarterId = quarters[0].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
-            new Course { Id = Guid.NewGuid(), Title = "Advanced Data Structures", DurationInHours = 60.0, Description = "Deep dive into data structures.", QuarterId = quarters[1].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
-            new Course { Id = Guid.NewGuid(), Title = "Machine Learning Basics", DurationInHours = 50.0, Description = "Introduction to machine learning concepts.", QuarterId = quarters[2].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
-            new Course { Id = Guid.NewGuid(), Title = "Web Development", DurationInHours = 45.0, Description = "Learn to build web applications.", QuarterId = quarters[3].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
-            new Course { Id = Guid.NewGuid(), Title = "Data Science with Python", DurationInHours = 55.0, Description = "Learn data science techniques using Python.", QuarterId = quarters[4].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
-            new Course { Id = Guid.NewGuid(), Title = "Cybersecurity Fundamentals", DurationInHours = 30.0, Description = "Introduction to cybersecurity principles.", QuarterId = quarters[5].Id, DifficultyLevelId = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() }
+            new Course { Id = Guid.NewGuid(), Title = "Introduction to Programming", DurationInHours = 40.0, Description = "Learn the basics of programming.", QuarterId = quarters[0].Id = Guid.NewGuid(), CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
+            new Course { Id = Guid.NewGuid(), Title = "Advanced Data Structures", DurationInHours = 60.0, Description = "Deep dive into data structures.", QuarterId = quarters[1].Id, CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
+            new Course { Id = Guid.NewGuid(), Title = "Machine Learning Basics", DurationInHours = 50.0, Description = "Introduction to machine learning concepts.", QuarterId = quarters[2].Id, CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
+            new Course { Id = Guid.NewGuid(), Title = "Web Development", DurationInHours = 45.0, Description = "Learn to build web applications.", QuarterId = quarters[3].Id, CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
+            new Course { Id = Guid.NewGuid(), Title = "Data Science with Python", DurationInHours = 55.0, Description = "Learn data science techniques using Python.", QuarterId = quarters[4].Id, CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() },
+            new Course { Id = Guid.NewGuid(), Title = "Cybersecurity Fundamentals", DurationInHours = 30.0, Description = "Introduction to cybersecurity principles.", QuarterId = quarters[5].Id,  CategoryId = Guid.NewGuid(), CreatedDate = DateTime.Now, UpdatedDate = DateTime.Now, IsDeleted = false, CreatedBy = Guid.NewGuid(), UpdatedBy = Guid.NewGuid() }
         };
 
             departments = new List<Department>
@@ -203,17 +200,17 @@ namespace its.gamify.core.Features.AvailablesData
         };
 
         }
-       
-       /* public async Task<List<Quarter>> GetAllQuarterssAsync()
-        {
-            if (!File.Exists(_filePath))
-                return new List<Quarter>();
 
-            var json = await File.ReadAllTextAsync(_filePath);
-            var objectReadable = JsonSerializer.Deserialize<QuizData>(json);
-            var result = objectReadable?.quarters;
-            return result ?? new List<Quarter>();
-        }*/
+        /* public async Task<List<Quarter>> GetAllQuarterssAsync()
+         {
+             if (!File.Exists(_filePath))
+                 return new List<Quarter>();
+
+             var json = await File.ReadAllTextAsync(_filePath);
+             var objectReadable = JsonSerializer.Deserialize<QuizData>(json);
+             var result = objectReadable?.quarters;
+             return result ?? new List<Quarter>();
+         }*/
     }
     /*public class QuizData
     {

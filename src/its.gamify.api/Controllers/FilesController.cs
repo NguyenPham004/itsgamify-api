@@ -20,7 +20,9 @@ namespace its.gamify.api.Controllers
         public async Task<IActionResult> PostFile([FromForm] FileCreateModel model)
         {
             var res = await mediator.Send(new UploadFileCommand()
-            { });
+            {
+                File = model.File,
+            });
 
             return Ok(res);
         }

@@ -1,6 +1,7 @@
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace its.gamify.infras.Datas;
 
 public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
@@ -39,24 +40,38 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     public Microsoft.EntityFrameworkCore.DbSet<Challenge> Challenge { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Category> Category { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Badge> Badge { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ConfigureWarnings(warnings =>
+     warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
+
+    }
     protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(its.gamify.infras.AssemblyReference.Assembly);
         Role[] roles = [new Role()
         {
+            Id = Guid.Parse("71874fd3-1892-4d92-a77f-c85c0d16b8db"),
             Name = RoleEnum.Employee.ToString()
         }, new Role()
         {
+                Id = Guid.Parse("620d170e-c32e-4443-b450-32848c1eb5e9"),
             Name = RoleEnum.Leader.ToString()
-        }, new Role() { Name = RoleEnum.TrainingStaff.ToString()}, new Role()
+        }, new Role() {
+                Id = Guid.Parse("3b72db68-b2c6-40d8-859e-b4996f8535a1"),
+            Name = RoleEnum.TrainingStaff.ToString()}, new Role()
         {
+                    Id = Guid.Parse("f7fa7c6b-f76a-4b95-8711-517eb8205a1a"),
             Name = RoleEnum.Manager.ToString()
         }, new Role()
-        { Name = RoleEnum.Admin.ToString()}];
+        {     Id = Guid.Parse("b002d347-66b9-4722-9547-5b2165abaa9f"),
+            Name = RoleEnum.Admin.ToString()}];
 
 
         modelBuilder.Entity<Role>().HasData(roles);
-        modelBuilder.ApplyConfigurationsFromAssembly(its.gamify.infras.AssemblyReference.Assembly);
     }
 }

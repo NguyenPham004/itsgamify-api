@@ -31,7 +31,7 @@ namespace its.gamify.api.Features.Users.Queries
                     filter = x => x.Title.Contains(request.Search);
                 }
                 var res = await unitOfWork.CourseRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.Category!,
-                 x => x.DifficultyLevel, x => x.Quarter]);
+                 x => x.Quarter]);
 
                 return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);
             }

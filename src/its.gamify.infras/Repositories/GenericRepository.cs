@@ -454,4 +454,20 @@ public class GenericRepository<TEntity>(
     }
 
     #endregion
+
+    #region Generic Function
+
+    public async Task<TEntity> EnsureExistsIfIdNotEmpty(Guid id)
+    {
+        if (id != Guid.Empty)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity == null)
+                throw new ArgumentNullException($"{typeof(TEntity).Name} not found.");
+
+            return entity;
+        }
+        return null!;
+    }
+    #endregion
 }

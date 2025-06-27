@@ -82,4 +82,8 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         params Expression<Func<TEntity, object>>[] includes);
 
     #endregion
+
+    #region Generic Function
+    Task<TEntity> EnsureExistsIfIdNotEmpty(Guid id);
+    #endregion
 }

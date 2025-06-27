@@ -6,9 +6,9 @@ public abstract class BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     [JsonPropertyName("created_date")]
-    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     [JsonPropertyName("updated_date")]
-    public DateTime UpdatedDate { get; set; } = DateTime.Now;
+    public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
     [JsonPropertyName("is_deleted")]
     public bool IsDeleted { get; set; } = false;
     [JsonPropertyName("created_by")]

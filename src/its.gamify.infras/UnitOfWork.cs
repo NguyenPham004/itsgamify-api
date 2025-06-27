@@ -193,7 +193,7 @@ namespace its.gamify.infras
             // Seed Courses with FK to Category, Difficulty, Quarter
             var courses = new List<domains.Entities.Course>
             {
-                new domains.Entities.Course { Id = Guid.NewGuid(), Title = "Sample Course", DurationInHours = 10, Description = "Description", QuarterId = quarters[0].Id, DifficultyLevelId = difficulties[0].Id, CategoryId = categories[0].Id }
+                new domains.Entities.Course { Id = Guid.NewGuid(), Title = "Sample Course", DurationInHours = 10, Description = "Description", QuarterId = quarters[0].Id, CategoryId = categories[0].Id }
             };
             if (!(await this._courseRepository.GetAllAsync()).Any())
             {
