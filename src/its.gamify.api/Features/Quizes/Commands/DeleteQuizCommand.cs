@@ -27,3 +27,4 @@ namespace its.gamify.api.Features.Quizes.Commands
             }
         }
     }
+}
