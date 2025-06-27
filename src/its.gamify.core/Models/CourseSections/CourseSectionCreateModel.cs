@@ -1,16 +1,18 @@
 ﻿using its.gamify.core.Models.Lessons;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace its.gamify.core.Models.CourseSections
 {
     public class CourseSectionCreateModel
     {
+        [JsonPropertyName("id")]
+        public Guid? CreateId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        [ModelBinder(BinderType = typeof(JsonModelBinder))]
-        public List<LessonCreateModel> Lessons { get; set; }
+        [JsonPropertyName("lessons")]
+        public List<LessonCreateModel>? Lessons { get; set; }
     }
     public class JsonModelBinder : IModelBinder
     {

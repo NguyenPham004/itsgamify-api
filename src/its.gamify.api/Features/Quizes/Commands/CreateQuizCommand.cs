@@ -31,7 +31,6 @@ namespace its.gamify.api.Features.Quizes.Commands
             public async Task<Quiz> Handle(CreateQuizCommand request, CancellationToken cancellationToken)
             {
                 var quiz = unitOfWork.Mapper.Map<Quiz>(request);
-                await unitOfWork.LessonRepository.EnsureExistsIfIdNotEmpty(request.Model.LessonId);
                 await unitOfWork.QuizRepository.AddAsync(quiz);
                 await unitOfWork.SaveChangesAsync();
                 return quiz;

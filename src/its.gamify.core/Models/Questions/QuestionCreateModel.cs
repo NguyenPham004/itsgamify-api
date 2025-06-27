@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace its.gamify.core.Models.Questions
+﻿namespace its.gamify.core.Models.Questions
 {
-    public class QuestionCreateModel
+    public class QuestionCreateModel : QuestionUpsertModel
     {
-        public string Content { get; set; } = string.Empty;
-        public string OptionA { get; set; } = string.Empty;
-        public string OptionB { get; set; } = string.Empty;
-        public string OptionC { get; set; } = string.Empty;
-        public string OptionD { get; set; } = string.Empty;
-        public string CorrectAnswer { get; set; } = string.Empty;
-        public string Explanation { get; set; } = string.Empty;
-        public Guid QuestionBankId { get; set; }
-        public Guid QuizId { get; set; }
+
+        public Guid QuestionBankId { get; set; } = Guid.Empty;
+        public Guid QuizId { get; set; } = Guid.Empty;
     }
 }

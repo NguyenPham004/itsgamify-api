@@ -17,7 +17,7 @@ namespace its.gamify.api.Features.Courses.Queries
             public async Task<Course> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
             {
                 return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    [x => x.CourseSections, x => x.Quarter, x => x.DifficultyLevel, x => x.Category, x => x.LearningMaterials]))
+                    [x => x.CourseSections, x => x.Quarter, x => x.Category, x => x.LearningMaterials]))
                      ?? throw new InvalidOperationException("Không tìm thấy Course với id " + request.Id);
             }
         }

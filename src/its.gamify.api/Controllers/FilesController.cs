@@ -1,4 +1,5 @@
-﻿using its.gamify.core.Models.Files;
+﻿using its.gamify.api.Features.Files.Commands;
+using its.gamify.core.Models.Files;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +17,13 @@ namespace its.gamify.api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PostFile([FromForm] FileUploadRequestModel model)
+        public async Task<IActionResult> PostFile([FromForm] FileCreateModel model)
         {
-            var res = await mediator.Send(model);
+            var res = await mediator.Send(new UploadFileCommand()
+            {
+                File = model.File,
+            });
+
             return Ok(res);
         }
     }

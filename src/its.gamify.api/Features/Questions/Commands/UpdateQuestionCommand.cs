@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using its.gamify.api.Features.Courses.Commands;
 using its.gamify.core;
-using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.Questions;
 using MediatR;
 

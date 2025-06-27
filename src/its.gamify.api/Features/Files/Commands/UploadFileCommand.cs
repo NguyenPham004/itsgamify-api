@@ -1,31 +1,40 @@
-﻿using its.gamify.core.IntegrationServices.Interfaces;
+﻿using its.gamify.core;
+using its.gamify.core.IntegrationServices.Interfaces;
 using its.gamify.core.Models.Files;
+using its.gamify.domains.Entities;
 using MediatR;
 
 namespace its.gamify.api.Features.Files.Commands
 {
-    public class UploadFileCommand : FileUploadRequestModel, IRequest<FileUploadResponseModel>
+    public class UploadFileCommand : FileCreateModel, IRequest<FileEntity>
     {
-        class CommandHandler : IRequestHandler<UploadFileCommand, FileUploadResponseModel>
+        class CommandHandler : IRequestHandler<UploadFileCommand, FileEntity>
         {
             private readonly IFirebaseService firebaseService;
-            public CommandHandler(IFirebaseService firebaseService)
+            private readonly IUnitOfWork unitOfWork;
+            public CommandHandler(IFirebaseService firebaseService,
+                IUnitOfWork unitOfwork)
             {
+                this.unitOfWork = unitOfwork;
                 this.firebaseService = firebaseService;
             }
-            public async Task<FileUploadResponseModel> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+            public async Task<FileEntity> Handle(UploadFileCommand request, CancellationToken cancellationToken)
             {
-                var res = await firebaseService.UploadFileAsync(request.File, string.IsNullOrEmpty(request.Directory) ? "its-gamify/storage" : request.Directory);
+                var res = await firebaseService.UploadFileAsync(request.File, "its-gamify/storage");
                 if (!string.IsNullOrEmpty(res.url))
                 {
-                    return new FileUploadResponseModel()
+                    var file = new domains.Entities.FileEntity()
                     {
-                        ContentType = "",
+                        Id = Guid.NewGuid(),
                         FileName = res.fileName,
                         Url = res.url
                     };
+                    await unitOfWork.FileRepository.AddAsync(file);
+                    await unitOfWork.SaveChangesAsync();
+                    return file;
                 }
-                throw new InvalidOperationException("Upload File Failed");
+                else
+                    throw new InvalidOperationException("Upload File Failed");
             }
         }
 

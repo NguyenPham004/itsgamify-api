@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Departments.Commands;
 using its.gamify.api.Features.Questions.Commands;
+using its.gamify.api.Features.Users.Queries;
 using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Services.Interfaces;
@@ -32,6 +33,12 @@ namespace its.gamify.api.Controllers
             if (result) return Ok("Delete Successfully");
             else return BadRequest("Deleted Failed");
         }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRage([FromBody] List<Guid> ids)
+        {
+            var result = await _departmentService.DeleteRange(ids);
+            return NoContent();
+        }
 
         /// <summary>
         /// Get all Department
@@ -42,7 +49,8 @@ namespace its.gamify.api.Controllers
                                         [FromQuery] string searchTerm = ""
                                         )
         {
-            return Ok(data.courses);
+            var res = _departmentService.GetAll(pageNumber, pageSize, searchTerm);
+            return Ok(res);
 
         }
 
@@ -61,7 +69,7 @@ namespace its.gamify.api.Controllers
         /// Create department
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DepartmentCreateModel createItem)
+        public async Task<IActionResult> Create([FromBody] DepartmentCreateModel createItem)
         {
             /*createdepartmentDTO.File = formFile;*/
             var result = await _departmentService.Create(createItem);

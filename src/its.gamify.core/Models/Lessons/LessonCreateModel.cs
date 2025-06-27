@@ -1,17 +1,23 @@
-﻿using its.gamify.core.Models.Files;
+﻿using its.gamify.core.Models.Questions;
 using its.gamify.domains.Enums;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace its.gamify.core.Models.Lessons
 {
     public class LessonCreateModel
     {
-        [System.Text.Json.Serialization.JsonIgnore]
-        [JsonIgnore]
-        public FileUploadRequestModel? File { get; set; }
+
+        [JsonPropertyName("id")]
+        public Guid? CreateId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [JsonPropertyName("duration")]
         public int DurationInMinutes { get; set; }
+        [JsonPropertyName("video_url")]
+        public string? VideoUrl { get; set; } = string.Empty;
         public string Type { get; set; } = LearningMaterialType.Video.ToString();
+        [JsonPropertyName("quiz")]
+        public List<QuestionUpsertModel>? QuestionModels { get; set; }
+        public string Content { get; set; } = string.Empty;
     }
 }

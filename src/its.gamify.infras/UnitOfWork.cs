@@ -37,6 +37,7 @@ namespace its.gamify.infras
         private readonly IChallengeRepository _challengeRepository;
         private readonly IChallengeParticipationRepository _challengeParticipationRepository;
         private readonly ILearningMaterialRepository learningMaterialRepository;
+        private readonly IFileRepository _fileRepository;
 
         private readonly IMapper mapper;
         public UnitOfWork(AppDbContext dbContext, ICourseRepository courseRepository, IDepartmentRepository departmentRepository,
@@ -46,6 +47,7 @@ namespace its.gamify.infras
             _userRepository = serviceProvider.GetRequiredService<IUserRepository>();
             mapper = serviceProvider.GetRequiredService<IMapper>();
             _appDbContext = dbContext;
+            _fileRepository = serviceProvider.GetRequiredService<IFileRepository>();
             learningMaterialRepository = serviceProvider.GetRequiredService<ILearningMaterialRepository>();
             _courseRepository = courseRepository;
             practiceTagRepository = serviceProvider.GetRequiredService<IPracticeTagRepository>();
@@ -100,6 +102,7 @@ namespace its.gamify.infras
         public IChallengeRepository ChallengeRepository => _challengeRepository;
         public ILearningMaterialRepository LearningMaterialRepository => learningMaterialRepository;
         public IChallengeParticipationRepository ChallengeParticipationRepository => _challengeParticipationRepository;
+        public IFileRepository FileRepository => _fileRepository;
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;
 
@@ -190,7 +193,7 @@ namespace its.gamify.infras
             // Seed Courses with FK to Category, Difficulty, Quarter
             var courses = new List<domains.Entities.Course>
             {
-                new domains.Entities.Course { Id = Guid.NewGuid(), Title = "Sample Course", DurationInHours = 10, Description = "Description", QuarterId = quarters[0].Id, DifficultyLevelId = difficulties[0].Id, CategoryId = categories[0].Id }
+                new domains.Entities.Course { Id = Guid.NewGuid(), Title = "Sample Course", DurationInHours = 10, Description = "Description", QuarterId = quarters[0].Id, CategoryId = categories[0].Id }
             };
             if (!(await this._courseRepository.GetAllAsync()).Any())
             {

@@ -6,6 +6,7 @@ using its.gamify.core.Models.Departments;
 using its.gamify.core.Models.DifficultyLevels;
 using its.gamify.core.Models.Lessons;
 using its.gamify.core.Models.Quarters;
+using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.Quizes;
 using its.gamify.core.Models.QuizResults;
@@ -34,15 +35,16 @@ public class MapperConfigurationProfile : Profile
         #endregion
 
         #region Department
-        CreateMap<Department, DepartmentViewModel>().ReverseMap();
+        CreateMap<Department, DepartmentViewModel>().ForMember(x => x.EmployeeCount, cfg => cfg.MapFrom(c => c.Users!.Count))
+                .ReverseMap();
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
         #endregion
 
         CreateMap<Category, CategoryCreateModel>().ReverseMap();
         CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
-        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap()
-            .ForMember(x => x.Lessons, cfg => cfg.Ignore());
+        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap();
+        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
         CreateMap<Lesson, LessonCreateModel>().ReverseMap();
         CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizCreateModel>().ReverseMap();
@@ -52,6 +54,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<QuizResult, QuizResultCreateModel>().ReverseMap();
         CreateMap<QuizResult, QuizResultUpdateModel>().ReverseMap();
         CreateMap<QuizResult, QuizResultViewModel>().ReverseMap();
+        CreateMap<Question, QuestionUpsertModel>().ReverseMap();
 
         CreateMap<QuizAnswer, QuizAnswerCreateModel>().ReverseMap();
         CreateMap<QuizAnswer, QuizAnswerUpdateModel>().ReverseMap();

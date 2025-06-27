@@ -66,18 +66,18 @@ namespace its.gamify.api.Controllers
             [FromRoute] Guid id)
         {
 
-            return Ok(await mediator.Send(new CreateCourseSectionCommand()
+            return Ok(await mediator.Send(new UpsertCourseSectionCommand()
             {
-                CourseId = id,
-                Lessons = command.Lessons.Select(x =>
-                {
-                    int index = command.Lessons.IndexOf(x);
-                    x.File = new();
-                    x.File.File = files[index];
-                    return x;
-                }).ToList(),
-                Description = command.Description,
-                Title = command.Title
+                //CourseId = id,
+                //Lessons = command.Lessons.Select(x =>
+                //{
+                //    int index = command.Lessons.IndexOf(x);
+                //    x.File = new();
+                //    x.File.File = files[index];
+                //    return x;
+                //}).ToList(),
+                //Description = command.Description,
+                //Title = command.Title
             }));
         }
         [HttpGet("{id}/course-sections")]
@@ -115,9 +115,12 @@ namespace its.gamify.api.Controllers
         /// Update course
         /// </summary>
         [HttpPut]
-        public async Task<IActionResult> Update([FromForm] CourseUpdateModel updatedItem)
+        public async Task<IActionResult> Update([FromBody] CourseUpdateModel updatedItem)
         {
-            var result = await _courseService.Update(updatedItem);
+            var result = await mediator.Send(new UpdateCourseCommand()
+            {
+                Model = updatedItem
+            });
             if (result) return NoContent();
             else return BadRequest();
         }
@@ -126,7 +129,7 @@ namespace its.gamify.api.Controllers
         /// Create course
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateCourseCommand command,
+        public async Task<IActionResult> Create([FromBody] CreateCourseCommand command,
             [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
@@ -135,7 +138,7 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}/course-participation")]
+        [HttpGet("{id}/course-participations")]
         public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageIndex = 0)

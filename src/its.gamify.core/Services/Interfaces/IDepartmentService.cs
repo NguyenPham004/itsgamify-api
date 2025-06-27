@@ -9,5 +9,6 @@ namespace its.gamify.core.Services.Interfaces
         Task<DepartmentViewModel> Create(DepartmentCreateModel item);
         Task<bool> Update(DepartmentUpdateModel item);
         Task<bool> Delete(Guid Id);
+        Task<bool> DeleteRange(List<Guid> ids);
     }
 }

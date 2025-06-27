@@ -24,7 +24,7 @@ public class FirebaseService : IFirebaseService
 
                 });
     }
-    public async Task<(string url, string fileName)> UploadFileAsync(IFormFile file, string directory)
+    public async Task<(string fileName, string url)> UploadFileAsync(IFormFile file, string directory)
     {
         if (file.Length > 0)
         {

@@ -18,6 +18,7 @@ namespace its.gamify.core
         public IEmployeeMetricRepository EmployeeMetricRepository { get; }
         public ILeaderBoardRepository LeaderBoardRepository { get; }
         public ILessonRepository LessonRepository { get; }
+        public IFileRepository FileRepository { get; }
         public ICourseSectionRepository CourseSectionRepository { get; }
         public ILearningProgressRepository LearningProgressRepository { get; }
         public ICourseReviewRepository CourseReviewRepository { get; }
@@ -33,7 +34,7 @@ namespace its.gamify.core
         public IChallengeRepository ChallengeRepository { get; }
         public IChallengeParticipationRepository ChallengeParticipationRepository { get; }
         public ILearningMaterialRepository LearningMaterialRepository { get; }
-        
+
         Task<bool> SaveChangesAsync();
         Task SeedData();
     }

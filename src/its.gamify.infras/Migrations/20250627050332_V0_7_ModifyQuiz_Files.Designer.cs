@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using its.gamify.infras.Datas;
@@ -12,9 +13,11 @@ using its.gamify.infras.Datas;
 namespace its.gamify.infras.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627050332_V0_7_ModifyQuiz_Files")]
+    partial class V0_7_ModifyQuiz_Files
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,17 +222,12 @@ namespace its.gamify.infras.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "short_description");
 
+                    b.Property<Guid>("DifficultyLevelId")
+                        .HasColumnType("uuid");
+
                     b.Property<double>("DurationInHours")
                         .HasColumnType("double precision")
                         .HasAnnotation("Relational:JsonPropertyName", "duration_in_hours");
-
-                    b.Property<string>("IntroVideo")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "introduction_video");
-
-                    b.Property<Guid>("IntroVideoId")
-                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -240,6 +238,10 @@ namespace its.gamify.infras.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
+                    b.PrimitiveCollection<List<string>>("Medias")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
                     b.Property<Guid>("QuarterId")
                         .HasColumnType("uuid");
 
@@ -247,10 +249,6 @@ namespace its.gamify.infras.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "requirement");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.PrimitiveCollection<List<string>>("Tags")
                         .IsRequired()
@@ -261,14 +259,6 @@ namespace its.gamify.infras.Migrations
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasAnnotation("Relational:JsonPropertyName", "targets");
-
-                    b.Property<Guid>("ThumbnailId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ThumbnailImage")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "thumbnail_image");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -285,6 +275,9 @@ namespace its.gamify.infras.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("DifficultyLevelId")
+                        .IsUnique();
 
                     b.HasIndex("QuarterId");
 
@@ -799,10 +792,7 @@ namespace its.gamify.infras.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("CourseSectionId")
+                    b.Property<Guid>("CourseSectionId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CreatedBy")
@@ -818,8 +808,7 @@ namespace its.gamify.infras.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("DurationInMinutes")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "duration");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -845,8 +834,8 @@ namespace its.gamify.infras.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "updated_date");
 
                     b.Property<string>("Url")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "video_url");
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -1121,10 +1110,10 @@ namespace its.gamify.infras.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ChallengIdId")
+                    b.Property<Guid>("ChallengIdId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ChallengeId")
+                    b.Property<Guid>("ChallengeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CreatedBy")
@@ -1310,56 +1299,56 @@ namespace its.gamify.infras.Migrations
                         {
                             Id = new Guid("71874fd3-1892-4d92-a77f-c85c0d16b8db"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(802),
+                            CreatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7077),
                             Description = "",
                             IsDeleted = false,
                             Name = "Employee",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(804)
+                            UpdatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7079)
                         },
                         new
                         {
                             Id = new Guid("620d170e-c32e-4443-b450-32848c1eb5e9"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1350),
+                            CreatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7589),
                             Description = "",
                             IsDeleted = false,
                             Name = "Leader",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1350)
+                            UpdatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7590)
                         },
                         new
                         {
                             Id = new Guid("3b72db68-b2c6-40d8-859e-b4996f8535a1"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1360),
+                            CreatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7602),
                             Description = "",
                             IsDeleted = false,
                             Name = "TrainingStaff",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1360)
+                            UpdatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7602)
                         },
                         new
                         {
                             Id = new Guid("f7fa7c6b-f76a-4b95-8711-517eb8205a1a"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1362),
+                            CreatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7619),
                             Description = "",
                             IsDeleted = false,
                             Name = "Manager",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1363)
+                            UpdatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7619)
                         },
                         new
                         {
                             Id = new Guid("b002d347-66b9-4722-9547-5b2165abaa9f"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1365),
+                            CreatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7621),
                             Description = "",
                             IsDeleted = false,
                             Name = "Admin",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 6, 27, 9, 14, 51, 177, DateTimeKind.Utc).AddTicks(1365)
+                            UpdatedDate = new DateTime(2025, 6, 27, 5, 3, 31, 879, DateTimeKind.Utc).AddTicks(7622)
                         });
                 });
 
@@ -1539,6 +1528,12 @@ namespace its.gamify.infras.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("its.gamify.domains.Entities.Difficulty", "DifficultyLevel")
+                        .WithOne("Course")
+                        .HasForeignKey("its.gamify.domains.Entities.Course", "DifficultyLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("its.gamify.domains.Entities.Quarter", "Quarter")
                         .WithMany("Courses")
                         .HasForeignKey("QuarterId")
@@ -1546,6 +1541,8 @@ namespace its.gamify.infras.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("DifficultyLevel");
 
                     b.Navigation("Quarter");
                 });
@@ -1664,7 +1661,8 @@ namespace its.gamify.infras.Migrations
                     b.HasOne("its.gamify.domains.Entities.CourseSection", "CourseSection")
                         .WithMany("Lessons")
                         .HasForeignKey("CourseSectionId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("its.gamify.domains.Entities.LearningProgress", "LearningProgress")
                         .WithMany("Lessons")
@@ -1735,7 +1733,9 @@ namespace its.gamify.infras.Migrations
                 {
                     b.HasOne("its.gamify.domains.Entities.Challenge", "Challenge")
                         .WithMany("Quizzes")
-                        .HasForeignKey("ChallengeId");
+                        .HasForeignKey("ChallengeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("its.gamify.domains.Entities.Lesson", "Lesson")
                         .WithMany("Quizzes")
@@ -1870,6 +1870,11 @@ namespace its.gamify.infras.Migrations
             modelBuilder.Entity("its.gamify.domains.Entities.Department", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("its.gamify.domains.Entities.Difficulty", b =>
+                {
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("its.gamify.domains.Entities.LeadearBoard", b =>

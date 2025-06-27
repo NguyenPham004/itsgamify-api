@@ -1,51 +1,79 @@
 ﻿using FluentValidation;
-using its.gamify.api.Features.Users.Commands;
+using its.gamify.api.Features.CourseSections.Commands;
+using its.gamify.api.Features.LearningMaterials.Commands;
 using its.gamify.core;
 using its.gamify.core.Models.Courses;
-using its.gamify.core.Models.Users;
+using its.gamify.domains.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Net.WebSockets;
 
 namespace its.gamify.api.Features.Courses.Commands
 {
     public class UpdateCourseCommand : IRequest<bool>
     {
-        public Guid Id { get; set; }
+
         public CourseUpdateModel Model { get; set; } = new();
-        class CommandValidate: AbstractValidator<UpdateCourseCommand>
+        class CommandValidate : AbstractValidator<UpdateCourseCommand>
         {
-            public CommandValidate() {
-                RuleFor(x=> x.Model.Title).NotEmpty().NotNull().WithMessage("Input title's course");
-                RuleFor(x => x.Model.DurationInHours).GreaterThanOrEqualTo(0).WithMessage("Duration in hour of course must be larger than 0");
+            public CommandValidate()
+            {
+                RuleFor(x => x.Model.Title).NotEmpty().NotNull().WithMessage("Input title's course");
+                //RuleFor(x => x.Model.DurationInHours).GreaterThanOrEqualTo(0).WithMessage("Duration in hour of course must be larger than 0");
             }
         }
         class CommandHandler : IRequestHandler<UpdateCourseCommand, bool>
         {
             private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
+            private readonly IMediator mediator;
+            public CommandHandler(IUnitOfWork unitOfWork,
+                IMediator mediator)
             {
+                this.mediator = mediator;
                 this.unitOfWork = unitOfWork;
             }
             public async Task<bool> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
             {
-                await unitOfWork.QuarterRepository.EnsureExistsIfIdNotEmpty(request.Model.QuarterId);
-                await unitOfWork.DifficultyRepository.EnsureExistsIfIdNotEmpty(request.Model.DifficultyLevelId);
-                await unitOfWork.CategoryRepository.EnsureExistsIfIdNotEmpty(request.Model.CategoryId);
-                if(request.Model.QuarterId != Guid.Empty)
+                var course = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Model.Id)
+                    ?? throw new InvalidOperationException("Không tìm thấy course với Id " + request.Model.Id);
+                if (request.Model.CourseSectionCreate?.Count > 0
+                    && course.Status == CourseStatusEnum.Initial.ToString())
                 {
-                    var find = await unitOfWork.QuarterRepository.GetByIdAsync(request.Model.QuarterId);
-                    if (find == null) throw new ArgumentNullException("Quarter in " + request.Model.Title + " not found");
+                    course.Status = CourseStatusEnum.BaseContent.ToString();
                 }
-                var quarter = await unitOfWork.QuarterRepository.GetByIdAsync(request.Model.QuarterId);
-                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id);
-                if (course is not null)
+                unitOfWork.Mapper.Map(request.Model, course);
+
+                foreach (var courseSection in request.Model.CourseSectionCreate ?? [])
                 {
-                    unitOfWork.Mapper.Map(request.Model, course);
+                    await mediator.Send(new UpsertCourseSectionCommand()
+                    {
+                        CourseId = request.Model.Id,
+                        CreateId = courseSection.CreateId,
+                        Description = courseSection.Description,
+                        Lessons = courseSection.Lessons,
+                        Title = courseSection.Title,
+                    });
+                }
+                if (request.Model.LearningMaterialIds?.Count > 0)
+                {
+                    var learningMate = await mediator.Send(new UpsertLearningMaterials()
+                    {
+                        CourseId = request.Model.Id,
+                        FileIds = request.Model.LearningMaterialIds,
+                    });
+                    course.Status = CourseStatusEnum.Material.ToString();
+
                     unitOfWork.CourseRepository.Update(course);
-                    return await unitOfWork.SaveChangesAsync();
+                    await unitOfWork.SaveChangesAsync();
                 }
-                else throw new InvalidOperationException("Couse not found");
+                if (request.Model.Status == CourseStatusEnum.Published.ToString())
+                {
+                    var courseToCheck = await unitOfWork.CourseRepository.GetByIdAsync(request.Model.Id, false, default,
+                        [x => x.CourseSections, x => x.LearningMaterials]);
+                    if (courseToCheck.CourseSections?.Count == 0) throw new InvalidOperationException("Chưa add bất kỳ module nào vào course");
+                }
+                await unitOfWork.SaveChangesAsync();
+
+                return true;
+
 
             }
         }
