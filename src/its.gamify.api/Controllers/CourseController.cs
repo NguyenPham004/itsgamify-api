@@ -10,13 +10,14 @@ using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.LearningMaterials;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]s")]
     [ApiController]
     public class CourseController : ControllerBase
     {
@@ -46,11 +47,12 @@ namespace its.gamify.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
                                         [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm = ""
-                                        )
+                                        [FromQuery] string searchTerm = "",
+                                        [FromQuery] List<OrderByModel>? orderby = null)
         {
             var res = await mediator.Send(new GetAllCourseQuery()
             {
+                OrderBy = orderby,
                 PageIndex = pageNumber,
                 PageSize = pageSize,
             });

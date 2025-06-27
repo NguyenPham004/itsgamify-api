@@ -13,6 +13,7 @@ namespace its.gamify.api.Features.Users.Queries
         public int PageSize { get; set; }
         public int PageIndex { get; set; }
         public string Search { get; set; } = string.Empty;
+        public List<OrderByModel>? OrderBy { get; set; }
         class QueryHandler : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<Course>>
         {
             private readonly IUnitOfWork unitOfWork;
@@ -31,7 +32,7 @@ namespace its.gamify.api.Features.Users.Queries
                     filter = x => x.Title.Contains(request.Search);
                 }
                 var res = await unitOfWork.CourseRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.Category!,
-                 x => x.Quarter]);
+                 x => x.Quarter, x => x.CourseSections]);
 
                 return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);
             }

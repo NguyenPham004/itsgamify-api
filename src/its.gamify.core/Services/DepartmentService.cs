@@ -16,7 +16,7 @@ public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsSe
         var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
         if (departments.Count > 0)
         {
-            var leaderROle = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString());
+            var leaderROle = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.LEADER.ToString());
 
             // Phân trang
             var pagedDepartments = departments.Skip(page * limit).Take(limit).ToList();
@@ -31,13 +31,13 @@ public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsSe
     }
     private async Task<User?> GetLeader(Guid id)
     {
-        var leader = await _unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.DepartmentId == id && x.Role.Name == RoleEnum.Leader.ToString(), includes: [x => x.Role]);
+        var leader = await _unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.DepartmentId == id && x.Role.Name == RoleEnum.LEADER.ToString(), includes: [x => x.Role]);
         return leader;
     }
     public async Task<DepartmentViewModel> GetDepartment(Guid id)
     {
         var result = await _unitOfWork.DepartmentRepository.GetByIdAsync(id, includes: [x => x.Users]);
-        var roles = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString())
+        var roles = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.LEADER.ToString())
             ?? throw new Exception("Chưa tồn tại role leader");
         if (result is not null)
         {

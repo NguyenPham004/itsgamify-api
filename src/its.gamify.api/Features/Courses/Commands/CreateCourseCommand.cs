@@ -16,8 +16,9 @@ namespace its.gamify.api.Features.Courses.Commands
         {
             public CommandValidation()
             {
-                RuleFor(x => x.CategoryId).NotNull().NotEmpty();
-                RuleFor(x => x.DepartmentId).NotNull().NotEmpty();
+                RuleFor(x => x.CategoryId).NotNull().NotEmpty().WithMessage("Vui lòng nhập category id");
+                RuleFor(x => x.DepartmentId).NotNull().NotEmpty().WithMessage($"Vui lòng nhập deparment id");
+
 
 
             }
@@ -56,12 +57,7 @@ namespace its.gamify.api.Features.Courses.Commands
             public async Task<Course> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
             {
                 var course = unitOfWork.Mapper.Map<Course>((CourseCreateModel)request);
-                if (request.CourseSectionCreate?.Count > 0)
-                {
-                    course.Status = CourseStatusEnum.Material.ToString();
-
-                }
-
+                course.Status = CourseStatusEnum.INITIAL.ToString();
                 course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.ThumbNailImageId) ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
                 course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.IntroductionVideoId) ?? throw new InvalidOperationException("Không tìm thấấy Intro Video với Id " + request.IntroductionVideoId)).Url;
                 course.ThumbnailId = request.ThumbNailImageId;
