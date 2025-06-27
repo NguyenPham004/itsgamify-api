@@ -1,6 +1,9 @@
-﻿using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.api.Features.Departments.Commands;
+using its.gamify.api.Features.Questions.Commands;
+using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +16,11 @@ namespace its.gamify.api.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
-        private Ultils data;
-        public DepartmentController(IDepartmentService DepartmentService, Ultils data)
+        private readonly IMediator mediator;
+        public DepartmentController(IDepartmentService DepartmentService, IMediator mediator)
         {
             _departmentService = DepartmentService;
-            this.data = data;
+            this.mediator = mediator;
         }
         /// <summary>
         /// Delete Department
@@ -80,6 +83,18 @@ namespace its.gamify.api.Controllers
         {
             var result = await _departmentService.GetDepartment(id);
             return Ok(result);
+        }
+        /// <summary>
+        /// Delete list Department 
+        /// </summary>
+        [HttpDelete("delete-range")]
+        public async Task<IActionResult> DeleteRange(List<Guid> ids)
+        {
+            var res = await mediator.Send(new DeleteRangeDepartmentCommand()
+            {
+                Ids = ids
+            });
+            return res ? NoContent() : StatusCode(500);
         }
     }
 }
