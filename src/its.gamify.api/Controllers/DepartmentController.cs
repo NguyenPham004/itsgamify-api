@@ -1,5 +1,7 @@
 ﻿using its.gamify.api.Features.Departments.Commands;
+using its.gamify.api.Features.Departments.Queries;
 using its.gamify.api.Features.Questions.Commands;
+using its.gamify.api.Features.Questions.Queries;
 using its.gamify.api.Features.Users.Queries;
 using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Departments;
@@ -49,7 +51,11 @@ namespace its.gamify.api.Controllers
                                         [FromQuery] string searchTerm = ""
                                         )
         {
-            var res = _departmentService.GetAll(pageNumber, pageSize, searchTerm);
+            var res = await mediator.Send(new GetAllDepartmentQuery()
+            {
+                PageIndex = pageNumber,
+                PageSize = pageSize,
+            });
             return Ok(res);
 
         }
@@ -85,12 +91,13 @@ namespace its.gamify.api.Controllers
         /// <summary>
         /// Get department by Id
         /// </summary>
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _departmentService.GetDepartment(id);
-            return Ok(result);
+            return Ok(await mediator.Send(new GetDepartmentByIdQuery()
+            {
+                Id = id
+            }));
         }
         /// <summary>
         /// Delete list Department 

@@ -5,18 +5,17 @@ using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 
 namespace its.gamify.core.Services;
-public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
+public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork) : IDepartmentService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IClaimsService _claimsService = claimsService;
 
     public async Task<List<DepartmentViewModel>> GetAll(int page, int limit, string q)
     {
         var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
         if (departments.Count > 0)
         {
-            var leaderROle = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString());
+            var leaderRole = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.Leader.ToString());
 
             // Phân trang
             var pagedDepartments = departments.Skip(page * limit).Take(limit).ToList();
