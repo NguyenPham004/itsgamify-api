@@ -26,6 +26,7 @@ public class User : BaseEntity
     [JsonPropertyName("date_of_birth")]
     public DateTime? DateOfBirth { get; set; } = null;
     public string Status { get; set; } = UserStatusEnum.ACTIVE.ToString();
+    public string? AvatarUrl { get; set; }
 
 
     #region  Relationship Configuration 

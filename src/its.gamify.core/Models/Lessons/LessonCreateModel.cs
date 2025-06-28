@@ -18,6 +18,6 @@ namespace its.gamify.core.Models.Lessons
         public string Type { get; set; } = LearningMaterialType.VIDEO.ToString();
         [JsonPropertyName("quiz")]
         public List<QuestionUpsertModel>? QuestionModels { get; set; }
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; }
     }
 }

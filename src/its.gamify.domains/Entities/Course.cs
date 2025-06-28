@@ -13,7 +13,7 @@ public class Course : BaseEntity
     [JsonPropertyName("description")]
     public string LongDescription { get; set; } = string.Empty;
     [JsonPropertyName("classify")]
-    public CourseTypeEnum CourseType { get; set; } = CourseTypeEnum.ALL;
+    public string CourseType { get; set; } = CourseTypeEnum.ALL.ToString();
     [JsonPropertyName("tags")]
     public List<string> Tags { get; set; } = [];
     [JsonPropertyName("targets")]

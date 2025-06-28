@@ -28,18 +28,12 @@ namespace its.gamify.api.Features.Courses.Commands
                     RuleFor(x => x.Model.Description).NotEmpty().WithMessage("Vui lòng nhập mô tả ngắn");
                     RuleFor(x => x.Model.LongDescription).NotEmpty().WithMessage("Vui lòng nhập mô tả");
                 });
-                When(x => x.Model.Status == CourseStatusEnum.BaseContent.ToString(), () =>
+                When(x => x.Model.Status == CourseStatusEnum.CONTENT.ToString(), () =>
                 {
                     RuleForEach(x => x.Model.CourseSectionCreate).NotNull().WithMessage("Module đang trống")
                         .SetValidator(new CourseSectionValidator());
 
                 });
-
-
-
-
-
-
             }
             class CourseSectionValidator : AbstractValidator<CourseSectionCreateModel>
             {
@@ -97,7 +91,7 @@ namespace its.gamify.api.Features.Courses.Commands
                 if (request.Model.CourseSectionCreate?.Count > 0
                     && course.Status == CourseStatusEnum.INITIAL.ToString())
                 {
-                    course.Status = CourseStatusEnum.BaseContent.ToString();
+                    course.Status = CourseStatusEnum.CONTENT.ToString();
                 }
                 unitOfWork.Mapper.Map(request.Model, course);
 
@@ -119,7 +113,7 @@ namespace its.gamify.api.Features.Courses.Commands
                         CourseId = request.Model.Id,
                         FileIds = request.Model.LearningMaterialIds,
                     });
-                    course.Status = CourseStatusEnum.MATẺRIAL.ToString();
+                    course.Status = CourseStatusEnum.MATERIAL.ToString();
 
                     unitOfWork.CourseRepository.Update(course);
                     await unitOfWork.SaveChangesAsync();

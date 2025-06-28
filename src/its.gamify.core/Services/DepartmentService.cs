@@ -5,11 +5,10 @@ using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 
 namespace its.gamify.core.Services;
-public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
+public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork) : IDepartmentService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IClaimsService _claimsService = claimsService;
 
     public async Task<List<DepartmentViewModel>> GetAll(int page, int limit, string q)
     {

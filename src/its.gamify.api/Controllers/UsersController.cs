@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Users.Commands;
 using its.gamify.api.Features.Users.Queries;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Models.Users;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,12 @@ namespace its.gamify.api.Controllers
             this.mediator = mediator;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllUser()
+        public async Task<IActionResult> GetAllUser([FromQuery] FilterQuery filter)
         {
-            return Ok(await mediator.Send(new GetAllUserQuery()));
+            return Ok(await mediator.Send(new GetAllUserQuery()
+            {
+                FilterQuery = filter
+            }));
         }
 
         [HttpGet("{id}")]

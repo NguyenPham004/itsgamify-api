@@ -1,6 +1,12 @@
-﻿using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.api.Features.Departments.Commands;
+using its.gamify.api.Features.Departments.Queries;
+using its.gamify.api.Features.Questions.Commands;
+using its.gamify.api.Features.Questions.Queries;
+using its.gamify.api.Features.Users.Queries;
+using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +19,11 @@ namespace its.gamify.api.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
-        private Ultils data;
-        public DepartmentController(IDepartmentService DepartmentService, Ultils data)
+        private readonly IMediator mediator;
+        public DepartmentController(IDepartmentService DepartmentService, IMediator mediator)
         {
             _departmentService = DepartmentService;
-            this.data = data;
+            this.mediator = mediator;
         }
         /// <summary>
         /// Delete Department
@@ -45,7 +51,12 @@ namespace its.gamify.api.Controllers
                                         [FromQuery] string searchTerm = ""
                                         )
         {
-            return Ok(data.courses);
+            var res = await mediator.Send(new GetAllDepartmentQuery()
+            {
+                PageIndex = pageNumber,
+                PageSize = pageSize,
+            });
+            return Ok(res);
 
         }
 
@@ -64,7 +75,7 @@ namespace its.gamify.api.Controllers
         /// Create department
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DepartmentCreateModel createItem)
+        public async Task<IActionResult> Create([FromBody] DepartmentCreateModel createItem)
         {
             /*createdepartmentDTO.File = formFile;*/
             var result = await _departmentService.Create(createItem);
@@ -80,12 +91,25 @@ namespace its.gamify.api.Controllers
         /// <summary>
         /// Get department by Id
         /// </summary>
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _departmentService.GetDepartment(id);
-            return Ok(result);
+            return Ok(await mediator.Send(new GetDepartmentByIdQuery()
+            {
+                Id = id
+            }));
+        }
+        /// <summary>
+        /// Delete list Department 
+        /// </summary>
+        [HttpDelete("delete-range")]
+        public async Task<IActionResult> DeleteRange(List<Guid> ids)
+        {
+            var res = await mediator.Send(new DeleteRangeDepartmentCommand()
+            {
+                Ids = ids
+            });
+            return res ? NoContent() : StatusCode(500);
         }
     }
 }

@@ -45,16 +45,11 @@ namespace its.gamify.api.Controllers
         /// Get all course
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
-                                        [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm = "",
-                                        [FromQuery] List<OrderByModel>? orderby = null)
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery query)
         {
             var res = await mediator.Send(new GetAllCourseQuery()
             {
-                OrderBy = orderby,
-                PageIndex = pageNumber,
-                PageSize = pageSize,
+                filterQuery = query
             });
             return Ok(res);
             /*if (result.Count() > 0) { return Ok(result); }
