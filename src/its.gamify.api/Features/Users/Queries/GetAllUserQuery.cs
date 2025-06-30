@@ -24,7 +24,7 @@ namespace its.gamify.api.Features.Users.Queries
                     pageSize: request.FilterQuery.Limit ?? 0,
                     searchFields: ["FirstName", "LastName", "EmpployeeCode", "Email", "Username"],
                     searchTerm: request.FilterQuery.Q,
-                    sortOrders: request.FilterQuery.OrderBy.ToDictionary(x => x.OrderColumn, x => x.OrderDir == "ASC"),
+                    sortOrders: request.FilterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
                     includes: [x => x.Role!, x => x.Department!]);
                 var resModel = unitOfWork.Mapper.Map<List<UserViewModel>>(res.Item2);
                 return new BasePagingResponseModel<UserViewModel>(datas: resModel, pagination: res.Item1);

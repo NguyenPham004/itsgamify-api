@@ -2,15 +2,13 @@
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Models.ShareModels;
 using MediatR;
-using System.Linq.Expressions;
 
 namespace its.gamify.api.Features.Departments.Queries
 {
     public class GetAllDepartmentQuery : IRequest<BasePagingResponseModel<DepartmentViewModel>>
     {
-        public int PageSize { get; set; }
-        public int PageIndex { get; set; }
-        public string Search { get; set; } = string.Empty;
+        public FilterQuery Filter { get; set; }
+
         class QueryHandler : IRequestHandler<GetAllDepartmentQuery, BasePagingResponseModel<DepartmentViewModel>>
         {
             private readonly IUnitOfWork unitOfWork;
@@ -21,12 +19,15 @@ namespace its.gamify.api.Features.Departments.Queries
             public async Task<BasePagingResponseModel<DepartmentViewModel>> Handle(GetAllDepartmentQuery request, CancellationToken cancellationToken)
             {
 
-                Expression<Func<DepartmentViewModel, bool>>? filter = null;
-                if (!string.IsNullOrEmpty(request.Search))
-                {
-                    filter = x => x.Name.Contains(request.Search);
-                }
-                var res = await unitOfWork.DepartmentRepository.ToPagination(request.PageIndex, request.PageSize);
+
+
+                var res = await unitOfWork.DepartmentRepository.ToDynamicPagination(
+                    pageIndex: request.Filter.Page ?? 0,
+                    pageSize: request.Filter.Limit ?? 0,
+                    searchFields: ["Description", "Name"],
+                    searchTerm: request.Filter.Q,
+                    sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
+                    includes: [x => x.Users!]);
                 var models = unitOfWork.Mapper.Map<List<DepartmentViewModel>>(res.Entities);
 
                 return new BasePagingResponseModel<DepartmentViewModel>(datas: models, pagination: res.Pagination);

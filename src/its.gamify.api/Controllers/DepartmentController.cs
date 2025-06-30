@@ -1,13 +1,9 @@
 ﻿using its.gamify.api.Features.Departments.Commands;
 using its.gamify.api.Features.Departments.Queries;
-using its.gamify.api.Features.Questions.Commands;
-using its.gamify.api.Features.Questions.Queries;
-using its.gamify.api.Features.Users.Queries;
-using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.Departments;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -46,15 +42,11 @@ namespace its.gamify.api.Controllers
         /// Get all Department
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
-                                        [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm = ""
-                                        )
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery filter)
         {
             var res = await mediator.Send(new GetAllDepartmentQuery()
             {
-                PageIndex = pageNumber,
-                PageSize = pageSize,
+                Filter = filter
             });
             return Ok(res);
 
@@ -64,7 +56,7 @@ namespace its.gamify.api.Controllers
         /// Update department
         /// </summary>
         [HttpPut]
-        public async Task<IActionResult> Update([FromForm] DepartmentUpdateModel updatedItem)
+        public async Task<IActionResult> Update([FromBody] DepartmentUpdateModel updatedItem)
         {
             var result = await _departmentService.Update(updatedItem);
             if (result) return NoContent();

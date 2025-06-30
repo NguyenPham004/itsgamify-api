@@ -1,5 +1,4 @@
 using its.gamify.core.Features.Challenges.Queries;
-using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

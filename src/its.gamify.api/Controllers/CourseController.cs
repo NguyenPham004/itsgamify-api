@@ -135,6 +135,11 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
+        //[HttpPost("{id}/course-participations")]
+        //public async async Task<IActionResult>([FromBody] Guid id)
+        //{
+        //    return Ok();
+        //}
         [HttpGet("{id}/course-participations")]
         public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
             [FromQuery] int pageSize = 10,

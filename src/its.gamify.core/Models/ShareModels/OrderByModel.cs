@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace its.gamify.core.Models.ShareModels
 {
@@ -20,51 +19,109 @@ namespace its.gamify.core.Models.ShareModels
         public string? Q { get; set; } = string.Empty;
 
         [FromQuery(Name = "order_by")]
-        // [ModelBinder(BinderType = typeof(OrderParamListBinder))]
+        [ModelBinder(BinderType = typeof(OrderParamListBinder))]
         public OrderParam[]? OrderBy { get; set; }
     }
-    public class OrderParamListBinderProvider : IModelBinderProvider
-    {
-        public IModelBinder? GetBinder(ModelBinderProviderContext context)
-        {
-            if (context.Metadata.ModelType == typeof(OrderParam[]))
-            {
-                return new BinderTypeModelBinder(typeof(OrderParamListBinder));
-            }
-            return null;
-        }
-    }
-
-
     public class OrderParamListBinder : IModelBinder
     {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            var result = new List<OrderParam>();
-            var index = 0;
+            if (bindingContext == null)
+                throw new ArgumentNullException(nameof(bindingContext));
 
-            while (true)
+            var request = bindingContext.HttpContext.Request;
+            var orderParams = new List<OrderParam>();
+
+            // Parse query parameters like: order_by[0][order_column]=create_date&order_by[0][order_dir]=ASC
+            var orderByKeys = request.Query.Keys
+                .Where(k => k.StartsWith("order_by["))
+                .ToList();
+
+            // If no order_by parameters found, don't bind anything
+            if (!orderByKeys.Any())
             {
-                var prefix = $"order_by[{index}]";
-                var columnKey = $"{prefix}[order_column]";
-                var dirKey = $"{prefix}[order_dir]";
-
-                var columnValue = bindingContext.ValueProvider.GetValue(columnKey).FirstValue;
-                var dirValue = bindingContext.ValueProvider.GetValue(dirKey).FirstValue;
-
-                if (string.IsNullOrEmpty(columnValue)) break;
-
-                result.Add(new OrderParam
-                {
-                    OrderColumn = columnValue,
-                    OrderDir = dirValue ?? "ASC"
-                });
-
-                index++;
+                bindingContext.Result = ModelBindingResult.Failed();
+                return Task.CompletedTask;
             }
 
-            bindingContext.Result = ModelBindingResult.Success(result);
+            // Group by index
+            var groupedParams = orderByKeys
+                .Select(key =>
+                {
+                    // Extract index from order_by[0][field_name]
+                    var startIndex = key.IndexOf('[') + 1;
+                    var endIndex = key.IndexOf(']', startIndex);
+                    if (startIndex > 0 && endIndex > startIndex)
+                    {
+                        if (int.TryParse(key.Substring(startIndex, endIndex - startIndex), out int index))
+                        {
+                            var fieldStart = key.IndexOf('[', endIndex) + 1;
+                            var fieldEnd = key.IndexOf(']', fieldStart);
+                            if (fieldStart > 0 && fieldEnd > fieldStart)
+                            {
+                                var fieldName = key.Substring(fieldStart, fieldEnd - fieldStart);
+                                return new { Index = index, Field = fieldName, Key = key };
+                            }
+                        }
+                    }
+                    return null;
+                })
+                .Where(x => x != null)
+                .GroupBy(x => x.Index)
+                .OrderBy(g => g.Key);
+
+            foreach (var group in groupedParams)
+            {
+                var orderParam = new OrderParam();
+
+                foreach (var item in group)
+                {
+                    var value = request.Query[item.Key].FirstOrDefault();
+                    // Skip empty values - don't process empty order parameters
+                    if (string.IsNullOrWhiteSpace(value)) continue;
+
+                    switch (item.Field.ToLower())
+                    {
+                        case "order_column":
+                            orderParam.OrderColumn = value.Trim();
+                            break;
+                        case "order_dir":
+                            orderParam.OrderDir = value.Trim().ToUpper();
+                            break;
+                    }
+                }
+
+                // Only add if we have a valid order column (ignore empty ones)
+                if (!string.IsNullOrWhiteSpace(orderParam.OrderColumn))
+                {
+                    orderParams.Add(orderParam);
+                }
+            }
+
+            // If we parsed parameters but none were valid, don't bind
+            if (!orderParams.Any())
+            {
+                bindingContext.Result = ModelBindingResult.Failed();
+                return Task.CompletedTask;
+            }
+
+
+            bindingContext.Result = ModelBindingResult.Success(orderParams.ToArray());
             return Task.CompletedTask;
+        }
+    }
+
+
+    // Model Binder Provider
+    public class OrderParamListBinderProvider : IModelBinderProvider
+    {
+        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        {
+            if (context.Metadata.ModelType == typeof(OrderParam[]))
+            {
+                return new OrderParamListBinder();
+            }
+            return null;
         }
     }
 

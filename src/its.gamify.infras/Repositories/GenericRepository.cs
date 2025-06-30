@@ -295,7 +295,13 @@ public class GenericRepository<TEntity>(
     }
 
     #endregion
+    private static string ConvertToSnakeCase(string pascalCase)
+    {
+        if (string.IsNullOrEmpty(pascalCase)) return string.Empty;
 
+        return string.Concat(pascalCase.Select((x, i) =>
+            i > 0 && char.IsUpper(x) ? "_" + char.ToLower(x) : char.ToLower(x).ToString()));
+    }
     #region Pagination Methods
     public async Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
     int pageIndex = 0,
@@ -362,17 +368,21 @@ public class GenericRepository<TEntity>(
             foreach (var field in searchFields)
             {
                 var property = Expression.Property(parameter, field);
-
-                // Only apply search if the property is of type string
                 if (property.Type != typeof(string)) continue;
 
-                var containsCall = Expression.Call(
-                    property,
-                    typeof(string).GetMethod("Contains", new[] { typeof(string) })!,
-                    Expression.Constant(searchTerm)
-                );
+                // Check if property is not null
+                var notNullCheck = Expression.NotEqual(property, Expression.Constant(null));
 
-                combined = combined == null ? containsCall : Expression.OrElse(combined, containsCall);
+                // Use Contains with StringComparison.OrdinalIgnoreCase
+                var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!;
+                var containsCall = Expression.Call(
+                       Expression.Constant(searchTerm),
+                       typeof(string).GetMethod("Contains", new[] { typeof(string) })!,
+                       property
+                   );
+
+                var safeContains = Expression.AndAlso(notNullCheck, containsCall);
+                combined = combined == null ? safeContains : Expression.OrElse(combined, safeContains);
             }
 
             if (combined != null)
@@ -388,23 +398,32 @@ public class GenericRepository<TEntity>(
 
             foreach (var sort in sortOrders)
             {
-                var parameter = Expression.Parameter(typeof(TEntity), "x");
-                var property = Expression.Property(parameter, sort.Key);
-                var converted = Expression.Convert(property, typeof(object));
-                var lambda = Expression.Lambda<Func<TEntity, object>>(converted, parameter);
+                try
+                {
+                    var pascalKey = ConvertToSnakeCase(sort.Key);
+                    var parameter = Expression.Parameter(typeof(TEntity), "x");
+                    var property = Expression.Property(parameter, pascalKey);
+                    var converted = Expression.Convert(property, typeof(object));
+                    var lambda = Expression.Lambda<Func<TEntity, object>>(converted, parameter);
 
-                if (orderedQuery == null)
-                {
-                    orderedQuery = sort.Value
-                        ? query.OrderByDescending(lambda)
-                        : query.OrderBy(lambda);
+                    if (orderedQuery == null)
+                    {
+                        orderedQuery = sort.Value
+                            ? query.OrderByDescending(lambda)
+                            : query.OrderBy(lambda);
+                    }
+                    else
+                    {
+                        orderedQuery = sort.Value
+                            ? orderedQuery.ThenByDescending(lambda)
+                            : orderedQuery.ThenBy(lambda);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    orderedQuery = sort.Value
-                        ? orderedQuery.ThenByDescending(lambda)
-                        : orderedQuery.ThenBy(lambda);
+                    Console.WriteLine(ex.Message);
                 }
+
             }
 
             query = orderedQuery ?? query;

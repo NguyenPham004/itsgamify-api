@@ -22,7 +22,6 @@ namespace its.gamify.api.Controllers
                                         )
         {
             return Ok(data.employeeMetrics);
-
         }
     }
 }
