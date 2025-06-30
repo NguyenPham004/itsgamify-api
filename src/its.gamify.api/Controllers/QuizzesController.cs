@@ -35,7 +35,7 @@ namespace its.gamify.api.Controllers
         /// Create quiz
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> CreateQuiz([FromForm] CreateQuizCommand command,
+        public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizCommand command,
             [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
@@ -47,7 +47,7 @@ namespace its.gamify.api.Controllers
         /// Update quiz
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateQuiz([FromForm] UpdateQuizCommand updatedItem)
+        public async Task<IActionResult> UpdateQuiz([FromBody] UpdateQuizCommand updatedItem)
         {
             var result = await mediator.Send(updatedItem);
             if (result) return NoContent();
@@ -97,7 +97,7 @@ namespace its.gamify.api.Controllers
         /// Create question
         /// </summary>
         [HttpPost("{id}/questions")]
-        public async Task<IActionResult> Create([FromForm] CreateQuestionCommand command,
+        public async Task<IActionResult> Create([FromBody] CreateQuestionCommand command,
             [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
@@ -109,7 +109,7 @@ namespace its.gamify.api.Controllers
         /// Update question
         /// </summary>
         [HttpPut("{id}/questions")]
-        public async Task<IActionResult> Update([FromForm] UpdateQuestionCommand updatedItem)
+        public async Task<IActionResult> Update([FromBody] UpdateQuestionCommand updatedItem)
         {
             var result = await mediator.Send(updatedItem);
             if (result) return NoContent();
@@ -177,7 +177,7 @@ namespace its.gamify.api.Controllers
         /// Create quiz result
         /// </summary>
         [HttpPost("{id}/quiz-results")]
-        public async Task<IActionResult> CreateQuizResult([FromForm] CreateQuizResultCommand command,
+        public async Task<IActionResult> CreateQuizResult([FromBody] CreateQuizResultCommand command,
             [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
@@ -189,7 +189,7 @@ namespace its.gamify.api.Controllers
         /// Update quiz reuslt
         /// </summary>
         [HttpPut("{id}/quiz-results")]
-        public async Task<IActionResult> UpdateQuizResult([FromForm] UpdateQuizResultCommand updatedItem)
+        public async Task<IActionResult> UpdateQuizResult([FromBody] UpdateQuizResultCommand updatedItem)
         {
             var result = await mediator.Send(updatedItem);
             if (result) return NoContent();
@@ -240,7 +240,7 @@ namespace its.gamify.api.Controllers
         /// Create quiz answer
         /// </summary>
         [HttpPost("{id}/quiz-answers")]
-        public async Task<IActionResult> CreateQuizAnswer([FromForm] CreateQuizAnswerCommand command,
+        public async Task<IActionResult> CreateQuizAnswer([FromBody] CreateQuizAnswerCommand command,
             [FromServices] IMediator mediator)
         {
             /*createcourseDTO.File = formFile;*/
@@ -252,7 +252,7 @@ namespace its.gamify.api.Controllers
         /// Update quiz answer
         /// </summary>
         [HttpPut("{id}/quiz-answers")]
-        public async Task<IActionResult> UpdateQuizAnswer([FromForm] UpdateQuizAnswerCommand updatedItem)
+        public async Task<IActionResult> UpdateQuizAnswer([FromBody] UpdateQuizAnswerCommand updatedItem)
         {
             var result = await mediator.Send(updatedItem);
             if (result) return NoContent();

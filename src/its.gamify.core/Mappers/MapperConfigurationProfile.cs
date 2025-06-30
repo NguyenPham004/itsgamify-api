@@ -21,7 +21,6 @@ public class MapperConfigurationProfile : Profile
         #region Users
         CreateMap<User, UserViewModel>()
             .ForMember(x => x.DeptName, cfg => cfg.MapFrom(x => (x.Department!.Name ?? string.Empty)))
-            .ForMember(x => x.FullName, cfg => cfg.MapFrom(x => $"{x.LastName} {x.FirstName}"))
             .ForMember(x => x.RoleName, cfg => cfg.MapFrom(x => x.Role!.Name))
             .ReverseMap();
         CreateMap<User, UserUpdateModel>().ReverseMap();
@@ -32,7 +31,7 @@ public class MapperConfigurationProfile : Profile
 
         #region Course
         CreateMap<Course, CourseViewModel>().ReverseMap();
-        CreateMap<Course, CourseCreateModel>().ReverseMap();
+        CreateMap<Course, CourseCreateModels>().ReverseMap();
         CreateMap<Course, CourseUpdateModel>().ReverseMap();
         #endregion
 
@@ -44,9 +43,11 @@ public class MapperConfigurationProfile : Profile
         #endregion
 
         CreateMap<Category, CategoryCreateModel>().ReverseMap();
+        CreateMap<Category, CategoryViewModel>().ReverseMap();
+        CreateMap<Category, CategoryUpdateModel>().ReverseMap();
+
         CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
         CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap();
-        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
         CreateMap<Lesson, LessonCreateModel>().ReverseMap();
         CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizCreateModel>().ReverseMap();
@@ -61,5 +62,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<QuizAnswer, QuizAnswerCreateModel>().ReverseMap();
         CreateMap<QuizAnswer, QuizAnswerUpdateModel>().ReverseMap();
         CreateMap<QuizAnswer, QuizAnswerViewModel>().ReverseMap();
+
+
     }
 }

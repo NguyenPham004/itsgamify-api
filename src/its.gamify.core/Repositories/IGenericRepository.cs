@@ -1,3 +1,4 @@
+using its.gamify.core.Models;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Models;
 using System.Linq.Expressions;
@@ -86,6 +87,16 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         bool withDeleted = false,
         Expression<Func<TEntity, bool>>? filter = null,
         List<(Expression<Func<TEntity, object>> OrderBy, bool IsDescending)>? orderByList = null,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes);
+
+
+    Task<(Pagination Pagination, List<TEntity> Entities)> ToPaginationV2(
+        int pageIndex = 0,
+        int pageSize = 10,
+        bool withDeleted = false,
+        Expression<Func<TEntity, bool>>? filter = null,
+         List<OrderByItem>? orderBy = null,
         CancellationToken cancellationToken = default,
         params Expression<Func<TEntity, object>>[] includes);
 

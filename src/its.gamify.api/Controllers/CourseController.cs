@@ -129,8 +129,6 @@ namespace its.gamify.api.Controllers
         public async Task<IActionResult> Create([FromBody] CreateCourseCommand command,
             [FromServices] IMediator mediator)
         {
-            /*createcourseDTO.File = formFile;*/
-
             var result = await mediator.Send(command);
             return Ok(result);
         }

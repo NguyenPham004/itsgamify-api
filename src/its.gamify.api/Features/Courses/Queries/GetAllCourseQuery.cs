@@ -26,16 +26,9 @@ namespace its.gamify.api.Features.Users.Queries
                 var searchTerm = request.filterQuery.Q;
 
                 // Build sort dictionary from query
-                Dictionary<string, bool> sortOrders = new();
-                if (request.filterQuery.OrderBy != null)
-                {
-                    foreach (var order in request.filterQuery.OrderBy)
-                    {
-                        sortOrders[order.OrderColumn] = order.OrderDir.Equals("DESC", StringComparison.OrdinalIgnoreCase);
-                    }
-                }
+
                 var res = await unitOfWork.CourseRepository.ToDynamicPagination(request.filterQuery.Page ?? 0, request.filterQuery.Limit ?? 0, searchTerm: searchTerm, searchFields: ["Title", "Description", "LongDescription"], includes: [x => x.Category!,
-                 x => x.Quarter, x => x.CourseSections], sortOrders: sortOrders);
+                 x => x.Quarter, x => x.CourseSections], sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"));
 
                 return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);
             }

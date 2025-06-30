@@ -47,7 +47,7 @@ namespace its.gamify.core.Services
             if (result is not null) return _mapper.Map<CourseViewModel>(result);
             else throw new Exception("Not found");
         }
-        public async Task<CourseViewModel> Create(CourseCreateModel item)
+        public async Task<CourseViewModel> Create(CourseCreateModels item)
         {
             if (item == null) throw new Exception("No data to create");
 

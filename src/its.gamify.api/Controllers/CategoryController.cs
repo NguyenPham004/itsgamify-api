@@ -1,5 +1,7 @@
 ﻿using its.gamify.api.Features.Categories.Commands;
 using its.gamify.api.Features.Categories.Queries;
+using its.gamify.api.Features.QuizAnswers.Commands;
+using its.gamify.api.Features.Quizes.Commands;
 using its.gamify.core.Features.AvailablesData;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +12,10 @@ namespace its.gamify.api.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private Ultils Ultils { get; set; }
         private readonly IMediator mediator;
-        public CategoriesController(Ultils ultils,
-            IMediator mediator)
+        public CategoriesController(IMediator mediator)
         {
             this.mediator = mediator;
-            Ultils = ultils;
         }
         /// <summary>
         /// Get all Category
@@ -37,10 +36,34 @@ namespace its.gamify.api.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
+        public async Task<IActionResult> Create([FromBody] CreateCategoryCommand command)
         {
             var res = await mediator.Send(command);
             return Ok(res);
+        }
+
+        /// <summary>
+        /// Update category
+        /// </summary>
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
+        {
+            var result = await mediator.Send(updatedItem);
+            if (result) return NoContent();
+            else return BadRequest();
+        }
+
+        /// <summary>
+        /// Delete category
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var res = await mediator.Send(new DeleteCategoryCommand()
+            {
+                Id = id
+            });
+            return res ? NoContent() : StatusCode(500);
         }
     }
 }

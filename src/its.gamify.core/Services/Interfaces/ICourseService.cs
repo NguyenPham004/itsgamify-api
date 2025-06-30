@@ -6,7 +6,7 @@ namespace its.gamify.core.Services.Interfaces
     {
         Task<List<CourseViewModel>> GetAll(int page, int limit, string q);
         Task<CourseViewModel> GetCourse(Guid id);
-        Task<CourseViewModel> Create(CourseCreateModel item);
+        Task<CourseViewModel> Create(CourseCreateModels item);
         Task<bool> Update(CourseUpdateModel item);
         Task<bool> Delete(Guid Id);
     }

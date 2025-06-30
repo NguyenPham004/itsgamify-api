@@ -141,8 +141,8 @@ namespace its.gamify.infras
             // Seed Users with DepartmentId and RoleId FK
             var users = new List<domains.Entities.User>
             {
-                new domains.Entities.User { Id = Guid.NewGuid(), EmpployeeCode = "EMP001", Username = "admin", Email = "admin@example.com", FirstName = "Admin", LastName = "User", Status = "Active", DepartmentId = departments[0].Id, RoleId = roles[0].Id },
-                new domains.Entities.User { Id = Guid.NewGuid(), EmpployeeCode = "EMP002", Username = "manager", Email = "manager@example.com", FirstName = "Manager", LastName = "User", Status = "Active", DepartmentId = departments[1].Id, RoleId = roles[1].Id }
+                new domains.Entities.User { Id = Guid.NewGuid(), EmpployeeCode = "EMP001", Username = "admin", Email = "admin@example.com",  Status = "Active", DepartmentId = departments[0].Id, RoleId = roles[0].Id },
+                new domains.Entities.User { Id = Guid.NewGuid(), EmpployeeCode = "EMP002", Username = "manager", Email = "manager@example.com",  Status = "Active", DepartmentId = departments[1].Id, RoleId = roles[1].Id }
             };
             if (!(await this._userRepository.GetAllAsync()).Any())
             {

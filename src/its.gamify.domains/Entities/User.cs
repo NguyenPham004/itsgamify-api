@@ -15,10 +15,7 @@ public class User : BaseEntity
     [JsonPropertyName("salt")]
     public byte[]? Salt { get; set; } = null;
     public string Email { get; set; } = string.Empty;
-    [JsonPropertyName("first_name")]
-    public string FirstName { get; set; } = string.Empty;
-    [JsonPropertyName("last_name")]
-    public string LastName { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
     [JsonPropertyName("phone_number")]
     public string? PhoneNumber { get; set; } = null;
     [JsonPropertyName("date_joined")]

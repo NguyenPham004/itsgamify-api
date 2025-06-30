@@ -1,60 +1,101 @@
 ﻿using AutoMapper;
+using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
-using its.gamify.domains.Enums;
+using its.gamify.domains.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace its.gamify.core.Services;
-public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork) : IDepartmentService
+
+public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<List<DepartmentViewModel>> GetAll(int page, int limit, string q)
-    {
-        var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
-        if (departments.Count > 0)
-        {
-            var leaderROle = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.LEADER.ToString());
 
-            // Phân trang
-            var pagedDepartments = departments.Skip(page * limit).Take(limit).ToList();
-            var departmentsList = _mapper.Map<List<DepartmentViewModel>>(pagedDepartments);
-            foreach (var dept in departmentsList)
+
+    public Dictionary<string, object> GetTransitions()
+    {
+        return new Dictionary<string, object>
+        {
             {
-                dept.Leader = await GetLeader(dept.Id);
+                CourseStatusConstants.INITIAL_STEP, new CourseStateTransition<Course>{
+                    From = [CourseStatusConstants.INITIAL_STEP],
+                    To = CourseStatusConstants.CONTENT_STEP,
+                    Guard=(course) =>{
+
+                        return true;
+
+                    },
+                    Validate= async (model)=>{
+
+                        await Task.Delay(100);
+                        return true;
+
+                    },
+                    Action = async(param) => {
+
+                        var (course ,model) = param;
+
+                        await Task.Delay(100);
+
+                        return course;
+                    }
+                }
             }
-            return departmentsList;
-        }
-        else throw new Exception("Not have any department");
+        };
     }
-    private async Task<User?> GetLeader(Guid id)
+
+
+
+    public async Task<(Pagination, List<Department>)> GetAll(DepartmentQueryDto queryDto)
     {
-        var leader = await _unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.DepartmentId == id && x.Role.Name == RoleEnum.LEADER.ToString(), includes: [x => x.Role]);
-        return leader;
-    }
-    public async Task<DepartmentViewModel> GetDepartment(Guid id)
-    {
-        var result = await _unitOfWork.DepartmentRepository.GetByIdAsync(id, includes: [x => x.Users]);
-        var roles = await _unitOfWork.RoleRepository.FirstOrDefaultAsync(x => x.Name == RoleEnum.LEADER.ToString())
-            ?? throw new Exception("Chưa tồn tại role leader");
-        if (result is not null)
+        Expression<Func<Department, bool>> filter;
+
+        if (string.IsNullOrEmpty(queryDto.Q))
         {
-            var res = _unitOfWork.Mapper.Map<DepartmentViewModel>(result);
-            res.Leader = result.Users?.FirstOrDefault(x => x.RoleId == roles.Id);
-            return res;
+            // Nếu không có từ khóa tìm kiếm, không cần áp dụng điều kiện tìm kiếm
+            filter = x => true;
         }
-        else throw new Exception("Không tồn tại phòng ban");
+        else
+        {
+            // Sử dụng EF.Functions.Like hoặc EF.Functions.Contains tùy thuộc vào phiên bản EF Core
+            var searchTerm = queryDto.Q.ToLower();
+            filter = x => EF.Functions.Like(x.Name.ToLower(), $"%{searchTerm}%");
 
+            // Hoặc nếu bạn đang sử dụng EF Core 5.0 trở lên, bạn có thể sử dụng:
+            // filter = x => EF.Functions.Contains(x.Name.ToLower(), searchTerm);
+        }
 
+        var departments = await _unitOfWork.DepartmentRepository.ToPaginationV2(
+            pageIndex: queryDto.Page,
+            pageSize: queryDto.Limit,
+            withDeleted: false,
+            filter: filter,
+            orderBy: queryDto.OrderBy
+        );
 
+        return departments;
     }
-    public async Task<DepartmentViewModel> Create(DepartmentCreateModel item)
+    public async Task<Department> GetDepartment(Guid id)
+    {
+        var result = await _unitOfWork.DepartmentRepository.GetByIdAsync(id);
+
+        return result ?? throw new Exception("Not found");
+    }
+    public async Task<Department> Create(DepartmentCreateModel item)
     {
         if (item == null) throw new Exception("No data to create");
         var createItem = _mapper.Map<Department>(item);
         await _unitOfWork.DepartmentRepository.AddAsync(createItem);
-        if (await _unitOfWork.SaveChangesAsync()) return _mapper.Map<DepartmentViewModel>(createItem);
+        if (await _unitOfWork.SaveChangesAsync()) return createItem;
         else throw new Exception("Create failed");
     }
     public async Task<bool> Update(DepartmentUpdateModel item)

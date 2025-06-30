@@ -10,7 +10,7 @@ using MediatR;
 
 namespace its.gamify.api.Features.Courses.Commands
 {
-    public class CreateCourseCommand : CourseCreateModel, IRequest<Course>
+    public class CreateCourseCommand : CourseCreateModels, IRequest<Course>
     {
 
         class CommandValidation : AbstractValidator<CreateCourseCommand>
@@ -48,14 +48,14 @@ namespace its.gamify.api.Features.Courses.Commands
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
                     };
-                    unitOfWork.QuarterRepository.AddAsync(quater);
+                    await unitOfWork.QuarterRepository.AddAsync(quater);
                     await unitOfWork.SaveChangesAsync();
                 }
                 return quater;
             }
             public async Task<Course> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = unitOfWork.Mapper.Map<Course>((CourseCreateModel)request);
+                var course = unitOfWork.Mapper.Map<Course>(request);
                 course.Status = CourseStatusEnum.INITIAL.ToString();
                 course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.ThumbNailImageId)
                     ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
