@@ -24,7 +24,7 @@ namespace its.gamify.core.Models.Courses
         [JsonPropertyName("requirement")]
         public string Requirements { get; set; } = string.Empty;
         [JsonPropertyName("department_id")]
-        public Guid DepartmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
         [JsonPropertyName("category_id")]
         public Guid CategoryId { get; set; }
         [JsonPropertyName("modules")]

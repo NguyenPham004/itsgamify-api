@@ -49,5 +49,6 @@ public class Course : BaseEntity
     public virtual ICollection<WishList> WishLists { get; set; } = [];
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
+    public Guid? DepartmentId { get; set; }
 
 }

@@ -115,9 +115,11 @@ namespace its.gamify.api.Features.Courses.Commands
                     });
                     course.Status = CourseStatusEnum.MATERIAL.ToString();
 
-                    unitOfWork.CourseRepository.Update(course);
-                    await unitOfWork.SaveChangesAsync();
+
                 }
+
+                unitOfWork.CourseRepository.Update(course);
+                await unitOfWork.SaveChangesAsync();
 
 
 

@@ -18,7 +18,6 @@ namespace its.gamify.api.Features.Courses.Commands
             public CommandValidation()
             {
                 RuleFor(x => x.CategoryId).NotNull().NotEmpty().WithMessage("Vui lòng nhập category id");
-                RuleFor(x => x.DepartmentId).NotNull().NotEmpty().WithMessage($"Vui lòng nhập deparment id");
             }
         }
         class CommandHandler : IRequestHandler<CreateCourseCommand, Course>
@@ -60,7 +59,7 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.ThumbNailImageId)
                     ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
                 course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.IntroductionVideoId)
-                    ?? throw new InvalidOperationException("Không tìm thấấy Intro Video với Id " + request.IntroductionVideoId)).Url;
+                    ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id " + request.IntroductionVideoId)).Url;
                 course.ThumbnailId = request.ThumbNailImageId;
                 course.IntroVideoId = request.IntroductionVideoId;
                 var quarter = await UpsertQuarter(DateTime.Now);
