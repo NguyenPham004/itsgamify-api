@@ -9,7 +9,7 @@ using MediatR;
 
 namespace its.gamify.api.Features.Courses.Commands
 {
-    public class CreateCourseCommand : CourseCreateModel, IRequest<Course>
+    public class CreateCourseCommand : CourseCreateModels, IRequest<Course>
     {
 
         class CommandValidation : AbstractValidator<CreateCourseCommand>
@@ -55,7 +55,7 @@ namespace its.gamify.api.Features.Courses.Commands
             }
             public async Task<Course> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = unitOfWork.Mapper.Map<Course>((CourseCreateModel)request);
+                var course = unitOfWork.Mapper.Map<Course>((CourseCreateModels)request);
                 if (request.CourseSectionCreate?.Count > 0)
                 {
                     course.Status = CourseStatusEnum.Material.ToString();

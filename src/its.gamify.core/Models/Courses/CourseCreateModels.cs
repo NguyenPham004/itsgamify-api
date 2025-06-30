@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace its.gamify.core.Models.Courses
 {
-    public class CourseCreateModel
+    public class CourseCreateModels
     {
 
         public string Title { get; set; } = string.Empty;

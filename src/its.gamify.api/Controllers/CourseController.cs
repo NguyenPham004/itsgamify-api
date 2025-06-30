@@ -14,8 +14,8 @@ using its.gamify.core.Services.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace its.gamify.api.Controllers
-{
+ namespace its.gamify.api.Controllers
+ {
     [Route("api/[controller]")]
     [ApiController]
     public class CourseController : ControllerBase

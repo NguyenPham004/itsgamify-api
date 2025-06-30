@@ -1,3 +1,4 @@
+using its.gamify.core.Models;
 using its.gamify.core.Repositories;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
@@ -86,6 +87,7 @@ public class GenericRepository<TEntity>(
         return orderedQuery!;
     }
 
+
     private IQueryable<TEntity> PrepareQuery(
         bool withDeleted = false,
         Expression<Func<TEntity, bool>>? filter = null,
@@ -107,6 +109,68 @@ public class GenericRepository<TEntity>(
         return query;
     }
 
+    private IQueryable<TEntity> ApplyOrderingV2(
+     IQueryable<TEntity> query,
+     List<OrderByItem>? orderBy = null)
+    {
+        Console.WriteLine($"order by {orderBy.Count}");
+        if (orderBy == null || orderBy.Count == 0)
+        {
+            return query.OrderByDescending(x => x.CreatedDate);
+        }
+
+        var isFirstOrder = true;
+        IOrderedQueryable<TEntity>? orderedQuery = null;
+
+        foreach (var item in orderBy)
+        {
+            var propertyName = item.OrderColumn;
+            var isDescending = item.OrderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase);
+
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+            var property = Expression.Property(parameter, propertyName);
+            var lambda = Expression.Lambda<Func<TEntity, object>>(
+                Expression.Convert(property, typeof(object)), parameter);
+
+            if (isFirstOrder)
+            {
+
+                orderedQuery = isDescending
+                    ? query.OrderByDescending(lambda)
+                    : query.OrderBy(lambda);
+                isFirstOrder = false;
+            }
+            else
+            {
+                orderedQuery = isDescending
+                    ? orderedQuery!.ThenByDescending(lambda)
+                    : orderedQuery!.ThenBy(lambda);
+            }
+        }
+
+        return orderedQuery!;
+    }
+
+    private IQueryable<TEntity> PrepareQueryV2(
+           bool withDeleted = false,
+           Expression<Func<TEntity, bool>>? filter = null,
+           List<OrderByItem>? OrderBy = null,
+           bool asNoTracking = true,
+           params Expression<Func<TEntity, object>>[] includes)
+    {
+        var query = _dbSet.AsQueryable();
+
+        if (asNoTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        query = ApplyIncludes(query, includes);
+        query = ApplyBaseFilters(query, withDeleted, filter);
+        query = ApplyOrderingV2(query, OrderBy);
+
+        return query;
+    }
     #endregion
 
     #region Cursor Pagination Helpers
@@ -451,6 +515,41 @@ public class GenericRepository<TEntity>(
         };
 
         return (cursorPagination, items);
+    }
+
+    public async Task<(Pagination Pagination, List<TEntity> Entities)> ToPaginationV2(int pageIndex = 0,
+        int pageSize = 10,
+        bool withDeleted = false,
+        Expression<Func<TEntity, bool>>? filter = null,
+        List<OrderByItem>? OrderBy = null,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes)
+    {
+        pageIndex = Math.Max(0, pageIndex);
+        pageSize = Math.Max(1, pageSize);
+        Console.WriteLine($"pageIndex {pageIndex} pageSize {pageSize}");
+        var countQuery = ApplyBaseFilters(_dbSet.AsQueryable(), withDeleted, filter);
+
+        var dataQuery = PrepareQueryV2(withDeleted, filter, OrderBy, true, includes);
+
+        var countTask = await countQuery.CountAsync(cancellationToken);
+        var itemsTask = await dataQuery
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        //await Task.WhenAll(countTask, itemsTask);
+        var totalCount = countTask;
+        var items = itemsTask;
+
+        var pagination = new Pagination
+        {
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            TotalItemsCount = totalCount,
+        };
+
+        return (pagination, items);
     }
 
     #endregion
