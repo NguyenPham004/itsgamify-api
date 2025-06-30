@@ -1,5 +1,4 @@
-﻿using its.gamify.core;
-using its.gamify.core.Services;
+﻿using its.gamify.core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers

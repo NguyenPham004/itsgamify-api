@@ -1,6 +1,7 @@
 ﻿using its.gamify.core;
 using its.gamify.domains.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace its.gamify.api.Features.Courses.Queries
 {
@@ -17,7 +18,12 @@ namespace its.gamify.api.Features.Courses.Queries
             public async Task<Course> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
             {
                 return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    [x => x.CourseSections, x => x.Quarter, x => x.Category, x => x.LearningMaterials]))
+                    includeFunc: x => x.Include(course => course.LearningMaterials)
+                        .Include(x => x.Deparment)
+                        .Include(course => course.CourseSections)
+                            .ThenInclude(cs => cs.Lessons)
+                                .ThenInclude(ls => ls.Quizzes)
+                                    .ThenInclude(q => q.Questions)))
                      ?? throw new InvalidOperationException("Không tìm thấy Course với id " + request.Id);
             }
         }

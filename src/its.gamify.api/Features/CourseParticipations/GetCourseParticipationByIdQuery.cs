@@ -1,8 +1,5 @@
 using its.gamify.domains.Entities;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace its.gamify.core.Features.CourseParticipations.Queries
 {

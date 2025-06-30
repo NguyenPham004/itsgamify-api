@@ -32,8 +32,14 @@ namespace its.gamify.api.Features.Courses.Commands
                 {
                     RuleForEach(x => x.Model.CourseSectionCreate).NotNull().WithMessage("Module đang trống")
                         .SetValidator(new CourseSectionValidator());
-
                 });
+                When(x => x.Model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString(), () =>
+                {
+                    RuleFor(x => x.Model.DepartmentId).NotNull()
+                        .NotEmpty().WithMessage("Khoá học dành riêng cho phòng ban! Cần chọn phòng ban");
+                });
+
+
             }
             class CourseSectionValidator : AbstractValidator<CourseSectionCreateModel>
             {
@@ -88,11 +94,6 @@ namespace its.gamify.api.Features.Courses.Commands
             {
                 var course = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Model.Id)
                     ?? throw new InvalidOperationException("Không tìm thấy course với Id " + request.Model.Id);
-                if (request.Model.CourseSectionCreate?.Count > 0
-                    && course.Status == CourseStatusEnum.INITIAL.ToString())
-                {
-                    course.Status = CourseStatusEnum.CONTENT.ToString();
-                }
                 unitOfWork.Mapper.Map(request.Model, course);
 
                 foreach (var courseSection in request.Model.CourseSectionCreate ?? [])
@@ -113,17 +114,9 @@ namespace its.gamify.api.Features.Courses.Commands
                         CourseId = request.Model.Id,
                         FileIds = request.Model.LearningMaterialIds,
                     });
-                    course.Status = CourseStatusEnum.MATERIAL.ToString();
-
-
                 }
-
                 unitOfWork.CourseRepository.Update(course);
                 await unitOfWork.SaveChangesAsync();
-
-
-
-
                 return true;
 
 

@@ -1,6 +1,7 @@
 using its.gamify.core.Models;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Models;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace its.gamify.core.Repositories;
@@ -22,6 +23,7 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         params Expression<Func<TEntity, object>>[] includes);
 
 
+
     Task<List<TEntity>> WhereAsync(
         Expression<Func<TEntity, bool>> filter,
         bool withDeleted = false,
@@ -29,7 +31,11 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         CancellationToken cancellationToken = default,
         params Expression<Func<TEntity, object>>[] includes);
 
-
+    Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>> expression,
+        bool withDeleted = false,
+        CancellationToken cancellationToken = default,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null);
     Task<TEntity?> FirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> expression,
         bool withDeleted = false,
@@ -65,10 +71,24 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         int pageSize = 10,
         bool withDeleted = false,
         string? searchTerm = null,
-        List<string> searchFields = null,
+        List<string>? searchFields = null,
         Dictionary<string, bool>? sortOrders = null,
         CancellationToken cancellationToken = default,
         params Expression<Func<TEntity, object>>[] includes);
+    //public Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
+    //     FilterQuery? query,
+    //     bool withDeleted = false,
+    //     CancellationToken cancellationToken = default,
+    //     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null);
+    public Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
+         int pageIndex = 0,
+         int pageSize = 10,
+         bool withDeleted = false,
+         string? searchTerm = null,
+         List<string>? searchFields = null,
+         Dictionary<string, bool>? sortOrders = null,
+         CancellationToken cancellationToken = default,
+         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null);
     Task<(Pagination Pagination, List<TEntity> Entities)> ToPagination(
         int pageIndex = 0,
         int pageSize = 10,

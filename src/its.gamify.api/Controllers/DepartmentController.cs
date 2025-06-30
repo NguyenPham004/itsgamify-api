@@ -2,6 +2,7 @@
 using its.gamify.api.Features.Departments.Commands;
 using its.gamify.api.Features.Departments.Queries;
 using its.gamify.core.Models.Departments;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -45,32 +46,12 @@ namespace its.gamify.api.Controllers
 
         [HttpGet]
         [ProcessOrderBy]
-        public async Task<IActionResult> GetAll([FromQuery] DepartmentQueryDto queryDto)
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery filter)
         {
-            // var query = HttpContext.Request.Query;
-
-            // for (int i = 0; ; i++)
-            // {
-            //     var columnKey = $"order_by[{i}][order_column]";
-            //     var dirKey = $"order_by[{i}][order_dir]";
-
-            //     if (!query.ContainsKey(columnKey))
-            //         break;
-
-            //     Console.WriteLine($"columnKey {query[columnKey].ToString()}");
-            //     Console.WriteLine($"dirKey {query[dirKey].ToString()}");
-
-            //     queryDto.OrderBy.Add(new OrderByItem
-            //     {
-            //         OrderColumn = query[columnKey].ToString(),
-            //         OrderDir = query.ContainsKey(dirKey) ? query[dirKey].ToString() : "ASC"
-            //     });
-            // }
-
-            var result = await _departmentService.GetAll(queryDto);
-            return Ok(
-                new { data = result.Item2, pagination = result.Item1 }
-            );
+            return Ok(await mediator.Send(new GetAllDepartmentQuery()
+            {
+                Filter = filter
+            }));
         }
 
         [HttpPut]

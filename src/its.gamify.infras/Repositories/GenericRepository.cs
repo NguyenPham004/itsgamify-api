@@ -5,6 +5,7 @@ using its.gamify.domains.Entities;
 using its.gamify.domains.Models;
 using its.gamify.infras.Datas;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using System.Text.Json;
 
@@ -359,6 +360,136 @@ public class GenericRepository<TEntity>(
     }
 
     #endregion
+    public async Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
+        int pageIndex = 0,
+        int pageSize = 10,
+        bool withDeleted = false,
+        string? searchTerm = null,
+        List<string>? searchFields = null,
+        Dictionary<string, bool>? sortOrders = null,
+        CancellationToken cancellationToken = default,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null)
+    {
+        pageIndex = Math.Max(0, pageIndex);
+        pageSize = Math.Max(1, pageSize);
+
+        IQueryable<TEntity> query = _dbSet.AsQueryable();
+
+        // Apply includes
+        if (includeFunc != null)
+        {
+            query = includeFunc(query);
+            query = query.AsSplitQuery();
+        }
+
+
+        // Apply soft delete filter
+        if (!withDeleted)
+        {
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+            var deletedProperty = Expression.Property(parameter, "IsDeleted");
+            var notDeleted = Expression.Equal(deletedProperty, Expression.Constant(false));
+            var lambda = Expression.Lambda<Func<TEntity, bool>>(notDeleted, parameter);
+            query = query.Where(lambda);
+
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm) && searchFields != null)
+        {
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+            Expression? combined = null;
+
+            foreach (var field in searchFields)
+            {
+                var property = Expression.Property(parameter, field);
+                if (property.Type != typeof(string)) continue;
+
+                // Check if property is not null
+                var notNullCheck = Expression.NotEqual(property, Expression.Constant(null));
+
+                // Use Contains with StringComparison.OrdinalIgnoreCase
+                var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!;
+                var containsCall = Expression.Call(
+                   property,
+                   typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!,
+                   Expression.Constant(searchTerm)
+                );
+
+                var safeContains = Expression.AndAlso(notNullCheck, containsCall);
+                combined = combined == null ? safeContains : Expression.OrElse(combined, safeContains);
+            }
+
+            if (combined != null)
+            {
+                var lambda = Expression.Lambda<Func<TEntity, bool>>(combined, parameter);
+                query = query.Where(lambda);
+            }
+        }
+        // Apply composite sorting
+        if (sortOrders != null && sortOrders.Any())
+        {
+            IOrderedQueryable<TEntity>? orderedQuery = null;
+
+            foreach (var sort in sortOrders)
+            {
+                try
+                {
+                    var pascalKey = SnakeToPascal(sort.Key);
+                    var parameter = Expression.Parameter(typeof(TEntity), "x");
+                    var property = Expression.Property(parameter, pascalKey);
+                    var converted = Expression.Convert(property, typeof(object));
+                    var lambda = Expression.Lambda<Func<TEntity, object>>(converted, parameter);
+                    if (orderedQuery == null)
+                    {
+                        orderedQuery = sort.Value
+                            ? query.OrderByDescending(lambda)
+                            : query.OrderBy(lambda);
+                    }
+                    else
+                    {
+                        orderedQuery = sort.Value
+                            ? orderedQuery.ThenByDescending(lambda)
+                            : orderedQuery.ThenBy(lambda);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
+            }
+
+            query = orderedQuery ?? query;
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        var pagination = new Pagination
+        {
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            TotalItemsCount = totalCount,
+        };
+
+        return (pagination, items);
+    }
+    private static string SnakeToPascal(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        var parts = input.Split('_');
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (parts[i].Length > 0)
+                parts[i] = char.ToUpper(parts[i][0]) + parts[i].Substring(1);
+        }
+        return string.Concat(parts);
+    }
     private static string ConvertToSnakeCase(string pascalCase)
     {
         if (string.IsNullOrEmpty(pascalCase)) return string.Empty;
@@ -402,28 +533,7 @@ public class GenericRepository<TEntity>(
             query = query.Where(lambda);
         }
 
-        //// Apply dynamic search
-        //if (searchTerms != null && searchTerms.Any())
-        //{
-        //    var parameter = Expression.Parameter(typeof(TEntity), "x");
-        //    Expression? combined = null;
 
-        //    foreach (var term in searchTerms)
-        //    {
-        //        var property = Expression.Property(parameter, term.Key);
-        //        var toStringCall = Expression.Call(property, "ToString", null);
-        //        var containsCall = Expression.Call(
-        //            toStringCall,
-        //            typeof(string).GetMethod("Contains", new[] { typeof(string) })!,
-        //            Expression.Constant(term.Value)
-        //        );
-
-        //        combined = combined == null ? containsCall : Expression.AndAlso(combined, containsCall);
-        //    }
-
-        //    var lambda = Expression.Lambda<Func<TEntity, bool>>(combined!, parameter);
-        //    query = query.Where(lambda);
-        //}
         if (!string.IsNullOrWhiteSpace(searchTerm) && searchFields != null)
         {
             var parameter = Expression.Parameter(typeof(TEntity), "x");
@@ -464,7 +574,7 @@ public class GenericRepository<TEntity>(
             {
                 try
                 {
-                    var pascalKey = ConvertToSnakeCase(sort.Key);
+                    var pascalKey = SnakeToPascal(sort.Key);
                     var parameter = Expression.Parameter(typeof(TEntity), "x");
                     var property = Expression.Property(parameter, pascalKey);
                     var converted = Expression.Convert(property, typeof(object));
@@ -701,6 +811,7 @@ public class GenericRepository<TEntity>(
 
     #endregion
 
+
     #region Generic Function
 
     public async Task<TEntity> EnsureExistsIfIdNotEmpty(Guid id)
@@ -714,6 +825,21 @@ public class GenericRepository<TEntity>(
             return entity;
         }
         return null!;
+    }
+
+    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> expression,
+        bool withDeleted = false,
+        CancellationToken cancellationToken = default,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null)
+    {
+        IQueryable<TEntity> query = _dbSet.AsQueryable();
+        if (includeFunc != null)
+        {
+            query = includeFunc(query);
+            query = query.AsSplitQuery();
+        }
+        query = ApplyBaseFilters(query, withDeleted, expression);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
     #endregion
 }

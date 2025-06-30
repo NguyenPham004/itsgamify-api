@@ -21,14 +21,14 @@ public class Course : BaseEntity
     [JsonPropertyName("requirement")]
     public string Requirements { get; set; } = string.Empty;
     [JsonPropertyName("introduction_video")]
-    public string IntroVideo { get; set; }
+    public string IntroVideo { get; set; } = string.Empty;
 
     [JsonPropertyName("thumbnail_image")]
-    public string ThumbnailImage { get; set; }
+    public string ThumbnailImage { get; set; } = string.Empty;
 
     [JsonPropertyName("thumbnail_image_id")]
     public Guid ThumbnailId { get; set; } = Guid.Empty;
-    [JsonPropertyName("intro_video_id")]
+    [JsonPropertyName("introduction_video_id")]
     public Guid IntroVideoId { get; set; } = Guid.Empty;
     [JsonPropertyName("drafted")]
     public bool IsDraft { get; set; } = false;
@@ -50,5 +50,6 @@ public class Course : BaseEntity
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
     public Guid? DepartmentId { get; set; }
+    public Department? Deparment { get; set; } = null;
 
 }

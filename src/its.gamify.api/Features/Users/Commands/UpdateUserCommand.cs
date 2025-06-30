@@ -8,7 +8,7 @@ namespace its.gamify.api.Features.Users.Commands
     public class UpdateUserCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        public UserUpdateModel Model { get; set; } = new();
+        public UserCreateModel Model { get; set; } = new();
         class CommandHandler : IRequestHandler<UpdateUserCommand, bool>
         {
             private readonly IUnitOfWork unitOfWork;

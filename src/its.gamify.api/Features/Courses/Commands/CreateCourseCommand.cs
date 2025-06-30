@@ -46,6 +46,7 @@ namespace its.gamify.api.Features.Courses.Commands
                         Name = $"Quý {(int)(datetime.Month / 4) + 1} {datetime.Year}",
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
+                        Year = datetime.Year
                     };
                     await unitOfWork.QuarterRepository.AddAsync(quater);
                     await unitOfWork.SaveChangesAsync();

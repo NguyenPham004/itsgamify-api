@@ -19,6 +19,13 @@ namespace its.gamify.core.Services
 
         }
 
+        public Task ChangePassAsync(string email, string password)
+        {
+            return Task.CompletedTask;
+
+
+        }
+
         public async Task<AuthResponseModel> LoginAsync(string email, string password, CancellationToken cancellationToken)
         {
             var auth = new FirebaseAuthProvider(new Firebase.Auth.FirebaseConfig(appSetting.FirebaseConfig.ApiKey));

@@ -24,7 +24,7 @@ public class MapperConfigurationProfile : Profile
             .ForMember(x => x.RoleName, cfg => cfg.MapFrom(x => x.Role!.Name))
             .ReverseMap();
         CreateMap<User, UserUpdateModel>().ReverseMap();
-        CreateMap<User, UserCreateModel>().ForMember(x => x.DeptId, cfg => cfg.MapFrom(x => x.DepartmentId))
+        CreateMap<User, UserCreateModel>().ForMember(x => x.DepartmentId, cfg => cfg.MapFrom(x => x.DepartmentId))
             .ReverseMap();
 
         #endregion
@@ -32,7 +32,9 @@ public class MapperConfigurationProfile : Profile
         #region Course
         CreateMap<Course, CourseViewModel>().ReverseMap();
         CreateMap<Course, CourseCreateModels>().ReverseMap();
-        CreateMap<Course, CourseUpdateModel>().ReverseMap();
+        CreateMap<Course, CourseUpdateModel>().ReverseMap()
+            .ForMember(x => x.Status, cfg => cfg.MapFrom(x => x.Status ?? "UNDEFINED"))
+            .ForMember(x => x.IsDraft, cfg => cfg.MapFrom(x => x.IsDraft));
         #endregion
 
         #region Department

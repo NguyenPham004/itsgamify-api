@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Files.Commands;
 using its.gamify.core.Models.Files;
+using its.gamify.core.Models.ShareModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,13 @@ namespace its.gamify.api.Controllers
             });
 
             return Ok(res);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] FilterQuery filter)
+        {
+            //var res = await mediator.Send();
+            //return Ok(res);
+            return Ok();
         }
     }
 }

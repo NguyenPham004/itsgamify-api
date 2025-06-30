@@ -1,8 +1,5 @@
 ﻿using its.gamify.api.Features.Categories.Commands;
 using its.gamify.api.Features.Categories.Queries;
-using its.gamify.api.Features.QuizAnswers.Commands;
-using its.gamify.api.Features.Quizes.Commands;
-using its.gamify.core.Features.AvailablesData;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

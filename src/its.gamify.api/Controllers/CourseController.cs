@@ -1,14 +1,12 @@
 ﻿using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
-using its.gamify.api.Features.CourseSections.Commands;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.api.Features.LearningMaterials.Commands;
 using its.gamify.api.Features.Users.Queries;
 using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
-using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.LearningMaterials;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
@@ -52,31 +50,9 @@ namespace its.gamify.api.Controllers
                 filterQuery = query
             });
             return Ok(res);
-            /*if (result.Count() > 0) { return Ok(result); }
-            else return BadRequest();*/
 
         }
-        [HttpPost("{id}/course-sections")]
-        public async Task<IActionResult> CreateCourseSection([FromForm] CourseSectionCreateModel command,
 
-            [FromForm] List<IFormFile> files,
-            [FromRoute] Guid id)
-        {
-
-            return Ok(await mediator.Send(new UpsertCourseSectionCommand()
-            {
-                //CourseId = id,
-                //Lessons = command.Lessons.Select(x =>
-                //{
-                //    int index = command.Lessons.IndexOf(x);
-                //    x.File = new();
-                //    x.File.File = files[index];
-                //    return x;
-                //}).ToList(),
-                //Description = command.Description,
-                //Title = command.Title
-            }));
-        }
         [HttpGet("{id}/course-sections")]
         public async Task<IActionResult> GetCourseSectionByCourseId([FromRoute] Guid id)
         {

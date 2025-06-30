@@ -10,7 +10,7 @@ public class User : BaseEntity
     public string EmpployeeCode { get; set; } = string.Empty;
     [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
-    [JsonPropertyName("hashed_password")]
+    [JsonPropertyName("password")]
     public string? HashedPassword { get; set; } = string.Empty;
     [JsonPropertyName("salt")]
     public byte[]? Salt { get; set; } = null;
