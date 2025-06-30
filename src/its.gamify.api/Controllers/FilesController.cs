@@ -1,4 +1,5 @@
 ﻿using its.gamify.api.Features.Files.Commands;
+using its.gamify.api.Features.Files.Queries;
 using its.gamify.core.Models.Files;
 using its.gamify.core.Models.ShareModels;
 using MediatR;
@@ -30,9 +31,12 @@ namespace its.gamify.api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] FilterQuery filter)
         {
-            //var res = await mediator.Send();
-            //return Ok(res);
-            return Ok();
+            var res = await mediator.Send(new GetAllFileQuery()
+            {
+                filterQuery = filter
+            });
+            return Ok(res);
+
         }
     }
 }

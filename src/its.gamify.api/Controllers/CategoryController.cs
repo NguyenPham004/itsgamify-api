@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Categories.Commands;
 using its.gamify.api.Features.Categories.Queries;
+using its.gamify.core.Models.ShareModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +19,11 @@ namespace its.gamify.api.Controllers
         /// Get all Category
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 0,
-                                        [FromQuery] int pageSize = 10,
-                                        [FromQuery] string searchTerm = ""
-                                        )
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter)
         {
             var res = await mediator.Send(new GetAllCategoriesQuery()
             {
-                PageIndex = pageNumber,
-                SearchTerm = searchTerm,
-                PageSize = pageSize
+                Filter = Filter
             });
             return Ok(res);
 

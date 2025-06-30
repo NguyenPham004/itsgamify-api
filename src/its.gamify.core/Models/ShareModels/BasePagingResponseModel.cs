@@ -14,5 +14,8 @@ namespace its.gamify.core.Models.ShareModels
             this.Datas = datas;
             this.Pagination = pagination;
         }
+        public static BasePagingResponseModel<TData> CreateInstance(List<TData> datas, Pagination pagination)
+            => new BasePagingResponseModel<TData>(datas, pagination);
+
     }
 }

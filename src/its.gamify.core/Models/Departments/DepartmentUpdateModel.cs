@@ -5,6 +5,6 @@ namespace its.gamify.core.Models.Departments
     public class DepartmentUpdateModel : DepartmentCreateModel
     {
         [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
     }
 }

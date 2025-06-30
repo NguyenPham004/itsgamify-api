@@ -22,8 +22,8 @@ namespace its.gamify.core.Utilities
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Audience = "BloodDonation.Client",
-                Issuer = "BloodDonation.WebApi",
+                Audience = "its.gamify.client",
+                Issuer = "its.gamify",
                 Subject = new ClaimsIdentity(claimsList),
                 Expires = DateTime.UtcNow.AddDays(1000),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)

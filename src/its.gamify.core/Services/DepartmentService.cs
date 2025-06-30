@@ -95,7 +95,7 @@ public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsSe
     }
     public async Task<bool> Update(DepartmentUpdateModel item)
     {
-        var updatedItem = await _unitOfWork.DepartmentRepository.GetByIdAsync(item.Id);
+        var updatedItem = await _unitOfWork.DepartmentRepository.GetByIdAsync(item.Id ?? Guid.Empty);
         if (updatedItem != null)
         {
             updatedItem = (Department)_mapper.Map(item, typeof(DepartmentUpdateModel), typeof(Department));

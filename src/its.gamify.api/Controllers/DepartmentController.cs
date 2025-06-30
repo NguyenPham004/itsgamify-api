@@ -54,7 +54,7 @@ namespace its.gamify.api.Controllers
             }));
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] DepartmentUpdateModel updatedItem)
         {
             var result = await _departmentService.Update(updatedItem);

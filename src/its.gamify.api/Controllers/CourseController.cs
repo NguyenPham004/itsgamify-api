@@ -1,4 +1,5 @@
 ﻿using its.gamify.api.Features.CourseParticipations;
+using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
@@ -87,7 +88,7 @@ namespace its.gamify.api.Controllers
         /// <summary>
         /// Update course
         /// </summary>
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] CourseUpdateModel updatedItem)
         {
             var result = await mediator.Send(new UpdateCourseCommand()
@@ -109,21 +110,25 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-        //[HttpPost("{id}/course-participations")]
-        //public async async Task<IActionResult>([FromBody] Guid id)
-        //{
-        //    return Ok();
-        //}
+        [HttpPost("{id}/course-participations")]
+        public async Task<IActionResult> JoinCourse([FromRoute] Guid id)
+        {
+            var courseParticipation = await mediator.Send(new JoinCourseCommand()
+            {
+                Id = id
+            });
+            return Ok(courseParticipation);
+        }
         [HttpGet("{id}/course-participations")]
         public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] int pageIndex = 0)
+            [FromQuery] int? limit = 10,
+            [FromQuery] int? page = 0)
         {
             var result = await mediator.Send(new GetCourseParticipationByCourse()
             {
                 CourseId = id,
-                PageIndex = pageIndex,
-                PageSize = pageSize
+                PageIndex = page ?? 0,
+                PageSize = limit ?? 10
             });
             return Ok(result);
         }

@@ -2,11 +2,6 @@
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace its.gamify.core.Services
 {
@@ -58,7 +53,7 @@ namespace its.gamify.core.Services
         }
         public async Task<bool> Update(CourseUpdateModel item)
         {
-            var updatedItem = await _unitOfWork.CourseRepository.GetByIdAsync(item.Id);
+            var updatedItem = await _unitOfWork.CourseRepository.GetByIdAsync(item.Id ?? Guid.Empty);
             if (updatedItem != null)
             {
                 updatedItem = (Course)_mapper.Map(item, typeof(CourseUpdateModel), typeof(Course));

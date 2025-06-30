@@ -28,6 +28,10 @@ namespace its.gamify.api.Features.Courses.Commands
                     RuleFor(x => x.Model.Description).NotEmpty().WithMessage("Vui lòng nhập mô tả ngắn");
                     RuleFor(x => x.Model.LongDescription).NotEmpty().WithMessage("Vui lòng nhập mô tả");
                 });
+                When(x => x.Model.Status == CourseStatusEnum.MATERIAL.ToString(), () =>
+                {
+                    RuleFor(x => x.Model.LearningMaterialIds).NotEmpty().WithMessage("Vui lòng nhập");
+                });
                 When(x => x.Model.Status == CourseStatusEnum.CONTENT.ToString(), () =>
                 {
                     RuleForEach(x => x.Model.CourseSectionCreate).NotNull().WithMessage("Module đang trống")
@@ -100,7 +104,7 @@ namespace its.gamify.api.Features.Courses.Commands
                 {
                     await mediator.Send(new UpsertCourseSectionCommand()
                     {
-                        CourseId = request.Model.Id,
+                        CourseId = course.Id,
                         CreateId = courseSection.CreateId,
                         Description = courseSection.Description,
                         Lessons = courseSection.Lessons,
@@ -111,7 +115,7 @@ namespace its.gamify.api.Features.Courses.Commands
                 {
                     var learningMate = await mediator.Send(new UpsertLearningMaterials()
                     {
-                        CourseId = request.Model.Id,
+                        CourseId = course.Id,
                         FileIds = request.Model.LearningMaterialIds,
                     });
                 }

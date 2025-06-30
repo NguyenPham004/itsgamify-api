@@ -2,15 +2,12 @@
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
-using System.Linq.Expressions;
 
 namespace its.gamify.api.Features.Categories.Queries
 {
     public class GetAllCategoriesQuery : IRequest<BasePagingResponseModel<Category>>
     {
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
-        public string SearchTerm { get; set; } = string.Empty;
+        public FilterQuery? Filter { get; set; }
         class QueryHandler : IRequestHandler<GetAllCategoriesQuery, BasePagingResponseModel<Category>>
         {
             private readonly IUnitOfWork unitOfWork;
@@ -20,17 +17,13 @@ namespace its.gamify.api.Features.Categories.Queries
             }
             public async Task<BasePagingResponseModel<Category>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
             {
-                Expression<Func<Category, bool>>? filter = null;
+                var res = await unitOfWork.CategoryRepository.ToDynamicPagination(pageIndex: request.Filter?.Page ?? 0,
+                    pageSize: request.Filter?.Limit ?? 10,
+                    searchFields: ["Name"], searchTerm: request.Filter?.Q ?? string.Empty,
+                    sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"));
+                return BasePagingResponseModel<Category>.CreateInstance(res.Entities, res.Pagination);
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    filter = x =>
-                            x.Name.ToLower().Contains(request.SearchTerm.ToLower()) ||
-                            (!string.IsNullOrEmpty(x.Description) &&
-                             x.Description.ToLower().Contains(request.SearchTerm.ToLower()));
-                }
-                var categories = await unitOfWork.CategoryRepository.ToPagination(request.PageIndex, request.PageSize, false, filter);
-                return new BasePagingResponseModel<Category>(categories.Entities, categories.Pagination);
+
             }
         }
 

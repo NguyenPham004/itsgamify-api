@@ -16,7 +16,6 @@ namespace its.gamify.core.Services
         {
             this.appSetting = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<AppSetting>();
             this.unitOfWork = unitOfWork;
-
         }
 
         public Task ChangePassAsync(string email, string password)
