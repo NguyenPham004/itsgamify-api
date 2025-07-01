@@ -30,6 +30,9 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 var course = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id);
                 if (course is null) throw new InvalidOperationException($"Không tìm thấy khoá học với Id: {request.Id}");
                 if (currentUser is null) throw new InvalidOperationException($"Không tìm thấy người dùng hiện tại Id: " + claimService.CurrentUser);
+                // Check dup
+                var isDup = await unitOfWork.CourseParticipationRepository.FirstOrDefaultAsync(x => x.UserId == currentUser.Id && x.CourseId == course.Id);
+                if (isDup is not null) throw new InvalidOperationException("Người dùng đã join khoá học này rồi!");
 
                 if (course.Status != CourseStatusEnum.PUBLISHED.ToString() || course.IsDraft)
                     throw new InvalidOperationException("Khoá học chưa được publish hoặc khoá học là bản nháp! Không thể đăng ký");

@@ -71,12 +71,6 @@ namespace its.gamify.api.Features.Questions.Commands
                     current.Quiz = quiz!;
                     await unitOfWork.SaveChangesAsync();
                     res.Add(current);
-
-
-
-
-
-
                 }
                 return res;
             }

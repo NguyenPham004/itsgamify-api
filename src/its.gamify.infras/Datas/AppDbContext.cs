@@ -29,7 +29,6 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     public Microsoft.EntityFrameworkCore.DbSet<LearningMaterial> LearningMaterial { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<LeadearBoard> LeadearBoard { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<EmployeeMetric> EmployeeMetric { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Difficulty> Difficulty { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Department> Department { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<CourseSection> CourseSection { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<CourseReview> CourseReview { get; set; }
