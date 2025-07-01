@@ -5,9 +5,9 @@ using its.gamify.infras.Datas;
 
 namespace its.gamify.infras.Repositories
 {
-    public class WishListRepository : GenericRepository<WishList>, IWishListRepository
+    public class CourseCollectionRepository : GenericRepository<CourseCollection>, ICourseCollectionRepository
     {
-        public WishListRepository(AppDbContext context, ICurrentTime currentTime, IClaimsService claimsService)
+        public CourseCollectionRepository(AppDbContext context, ICurrentTime currentTime, IClaimsService claimsService)
             : base(context, currentTime, claimsService)
         {
         }

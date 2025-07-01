@@ -2,7 +2,7 @@
 
 namespace its.gamify.core.Repositories
 {
-    public interface IWishListRepository : IGenericRepository<WishList>
+    public interface ICourseCollectionRepository : IGenericRepository<CourseCollection>
     {
     }
 }

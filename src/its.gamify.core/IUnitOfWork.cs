@@ -23,7 +23,7 @@ namespace its.gamify.core
         public ILearningProgressRepository LearningProgressRepository { get; }
         public ICourseReviewRepository CourseReviewRepository { get; }
         public ICourseParticipationRepository CourseParticipationRepository { get; }
-        public IWishListRepository WishListRepository { get; }
+        public ICourseCollectionRepository CourseCollectionRepository { get; }
         public ICourseResultRepository CourseResultRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public IQuarterRepository QuarterRepository { get; }

@@ -1,4 +1,5 @@
-﻿using its.gamify.api.Features.CourseParticipations;
+﻿using its.gamify.api.Features.CourseCollections.Queries;
+using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
@@ -134,13 +135,13 @@ namespace its.gamify.api.Controllers
         }
 
         /// <summary>
-        /// Get course by Id
+        /// Get course collection by Id
         /// </summary>
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            return Ok(await mediator.Send(new GetCourseByIdQuery()
+            return Ok(await mediator.Send(new GetCourseCollectionByIdQuery()
             {
                 Id = id
             }));

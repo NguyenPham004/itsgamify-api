@@ -25,7 +25,6 @@ namespace its.gamify.core.Models.Users
         public Guid RoleId { get; set; }
         public string AvatarUrl { get; set; } = string.Empty;
         public DepartmentViewModel Department { get; set; } = new();
-
     }
 
 
