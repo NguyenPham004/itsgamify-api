@@ -22,8 +22,13 @@ namespace its.gamify.core.Models.Users
         public Guid DepartmentId { get; set; }
         [JsonPropertyName("role")]
         public string RoleName { get; set; } = string.Empty;
+
+        [JsonPropertyName("role_id")]
+        public Guid RoleId { get; set; }
         public DepartmentViewModel Department { get; set; } = new();
 
+        [JsonPropertyName("avatar_url")]
+        public string? AvatarUrl { get; set; }
     }
 
 
