@@ -26,7 +26,7 @@ namespace its.gamify.infras
         private readonly ILearningProgressRepository _learningProgressRepository;
         private readonly ICourseReviewRepository _courseReviewRepository;
         private readonly ICourseParticipationRepository _courseParticipationRepository;
-        private readonly IWishListRepository _wishListRepository;
+        private readonly ICourseCollectionRepository _courseCollectionRepository;
         private readonly ICourseResultRepository _courseResultRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly IQuarterRepository _quarterRepository;
@@ -63,7 +63,7 @@ namespace its.gamify.infras
             _learningProgressRepository = serviceProvider.GetRequiredService<ILearningProgressRepository>();
             _courseReviewRepository = serviceProvider.GetRequiredService<ICourseReviewRepository>();
             _courseParticipationRepository = serviceProvider.GetRequiredService<ICourseParticipationRepository>();
-            _wishListRepository = serviceProvider.GetRequiredService<IWishListRepository>();
+            _courseCollectionRepository = serviceProvider.GetRequiredService<ICourseCollectionRepository>();
             _courseResultRepository = serviceProvider.GetRequiredService<ICourseResultRepository>();
             _notificationRepository = serviceProvider.GetRequiredService<INotificationRepository>();
             _quarterRepository = serviceProvider.GetRequiredService<IQuarterRepository>();
@@ -91,7 +91,7 @@ namespace its.gamify.infras
         public ILearningProgressRepository LearningProgressRepository => _learningProgressRepository;
         public ICourseReviewRepository CourseReviewRepository => _courseReviewRepository;
         public ICourseParticipationRepository CourseParticipationRepository => _courseParticipationRepository;
-        public IWishListRepository WishListRepository => _wishListRepository;
+        public ICourseCollectionRepository CourseCollectionRepository => _courseCollectionRepository;
         public ICourseResultRepository CourseResultRepository => _courseResultRepository;
         public INotificationRepository NotificationRepository => _notificationRepository;
         public IQuarterRepository QuarterRepository => _quarterRepository;
@@ -335,13 +335,13 @@ namespace its.gamify.infras
             seededIds["PracticeTag"] = practiceTags.Select(pt => pt.Id).ToList();
 
             // Seed WishLists with FK to User and Course
-            var wishLists = new List<domains.Entities.WishList>
+            var wishLists = new List<domains.Entities.CourseCollection>
             {
-                new domains.Entities.WishList { Id = Guid.NewGuid(), Name = "Sample WishList", UserId = users[0].Id, CourseId = courses[0].Id }
+                new domains.Entities.CourseCollection { Id = Guid.NewGuid(), Name = "Sample WishList", UserId = users[0].Id, CourseId = courses[0].Id }
             };
-            if (!(await this._wishListRepository.GetAllAsync()).Any())
+            if (!(await this._courseCollectionRepository.GetAllAsync()).Any())
             {
-                await this._wishListRepository.AddRangeAsync(wishLists);
+                await this._courseCollectionRepository.AddRangeAsync(wishLists);
                 await this.SaveChangesAsync();
             }
             seededIds["WishList"] = wishLists.Select(w => w.Id).ToList();

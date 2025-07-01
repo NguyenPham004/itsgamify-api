@@ -1,6 +1,6 @@
 namespace its.gamify.domains.Entities;
 
-public class WishList : BaseEntity
+public class CourseCollection : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public Guid CourseId { get; set; }
