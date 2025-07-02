@@ -5,6 +5,7 @@ namespace its.gamify.domains.Entities;
 
 public class Lesson : BaseEntity
 {
+    public int Index { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string? Content { get; set; }
@@ -13,8 +14,8 @@ public class Lesson : BaseEntity
     public string Type { get; set; } = LearningMaterialType.VIDEO.ToString(); // e.g., Video, Article, Quiz
     [JsonPropertyName("video_url")]
     public string? Url { get; set; } = string.Empty; // Link to the lesson material
-
-    public ICollection<Practice> Practices { get; set; } = new List<Practice>();
+    [JsonPropertyName("practice")]
+    public ICollection<PracticeTag> Practices { get; set; } = new List<PracticeTag>();
     public Guid? LearningProgressId { get; set; }
     public virtual LearningProgress? LearningProgress { get; set; } = null!; // Navigation property to the learning progress this lesson belongs to
     [JsonPropertyName("quiz")]

@@ -1,5 +1,4 @@
-﻿using its.gamify.api.Features.CourseCollections.Queries;
-using its.gamify.api.Features.CourseParticipations;
+﻿using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
@@ -40,12 +39,6 @@ namespace its.gamify.api.Controllers
             if (result) return Ok("Delete Successfully");
             else return BadRequest("Deleted Failed");
         }
-        [HttpDelete("{id}/course-sections/{CourseSectionId}")]
-        public async Task<IActionResult> DelCourseSection()
-        {
-            await Task.CompletedTask;
-            return Ok();
-        }
 
 
         /// <summary>
@@ -83,6 +76,7 @@ namespace its.gamify.api.Controllers
                 CourseId = id
             }));
         }
+
         [HttpPost("{id}/learning-materials")]
         public async Task<IActionResult> CreateLearningMaterials([FromForm] LearningMaterialCreateModel command,
             [FromRoute] Guid id)
@@ -110,8 +104,10 @@ namespace its.gamify.api.Controllers
         /// Update course
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] CourseUpdateModel updatedItem)
+        public async Task<IActionResult> Update([FromRoute] Guid id,
+            [FromBody] CourseUpdateModel updatedItem)
         {
+            updatedItem.Id = id;
             var result = await mediator.Send(new UpdateCourseCommand()
             {
                 Model = updatedItem
@@ -154,6 +150,6 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-        
+
     }
 }

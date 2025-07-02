@@ -1,41 +1,39 @@
-using its.gamify.api.Features.Lessons.Commands;
+﻿using its.gamify.api.Features.CourseSections.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class LessonsController : ControllerBase
+    [Route("api/course-sections")]
+    public class CourseSectionsController : BaseController
     {
-        private readonly IMediator _mediator;
-        public LessonsController(IMediator mediator)
+        private readonly IMediator mediator;
+        public CourseSectionsController(IMediator mediator)
         {
-            _mediator = mediator;
+            this.mediator = mediator;
+
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DelLesson([FromQuery] Guid id)
+        public async Task<IActionResult> DelById([FromRoute] Guid id)
         {
-            await _mediator.Send(new DeleteLessonCommand()
+            var res = await mediator.Send(new DeleteCourseSectionByIdCommand()
             {
                 Id = id
             });
             return NoContent();
         }
+
         [HttpDelete]
         public async Task<IActionResult> DelRange([FromQuery] List<Guid> ids)
         {
             foreach (var id in ids)
             {
-                await _mediator.Send(new DeleteLessonCommand()
+                var res = await mediator.Send(new DeleteCourseSectionByIdCommand()
                 {
                     Id = id
                 });
             }
             return NoContent();
         }
-
-
-
     }
 }

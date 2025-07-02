@@ -25,9 +25,9 @@ namespace its.gamify.api.Features.Users.Queries
                     request.filterQuery?.Limit ?? 10,
                     searchTerm: request.filterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
                     sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
-                    includeFunc: x => x.Include(x => x.CourseSections)
-                        .ThenInclude(x => x.Lessons)
-                        .Include(x => x.LearningMaterials)
+                    includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                        .ThenInclude(x => x.Lessons.Where(x => !x.IsDeleted))
+                        .Include(x => x.LearningMaterials.Where(x => !x.IsDeleted))
                             .ThenInclude(x => x.File)
                         .Include(x => x.Deparment!)
                         .Include(x => x.Category));

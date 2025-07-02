@@ -27,7 +27,8 @@ namespace its.gamify.api.Features.Departments.Queries
                     searchTerm: request.Filter.Q,
                     sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
                     includeFunc: x => x.Include(d => d.Users!)
-                        .ThenInclude(u => u.Role!));
+                        .ThenInclude(u => u.Role!)
+                        .Include(x => x.Courses!));
                 var models = unitOfWork.Mapper.Map<List<DepartmentViewModel>>(res.Entities);
 
                 return new BasePagingResponseModel<DepartmentViewModel>(datas: models, pagination: res.Pagination);

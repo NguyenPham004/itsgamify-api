@@ -33,6 +33,7 @@ namespace its.gamify.api.Features.CourseSections.Commands
                         false,
                         cancellationToken,
                         [x => x.Lessons]);
+
                 }
                 var courseSection = isUpdate ? current : unitOfWork.Mapper.Map<CourseSection>(request);
 

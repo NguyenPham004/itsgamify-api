@@ -11,7 +11,7 @@ public enum LearningMaterialType
     /// Represents a document learning material.
     /// </summary>
     DOCUMENT = 2,
-
+    PRACTICE = 8,
     /// <summary>
     /// Represents an audio learning material.
     /// </summary>

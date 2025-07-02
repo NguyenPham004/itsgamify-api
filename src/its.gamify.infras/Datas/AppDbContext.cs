@@ -22,7 +22,7 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     public Microsoft.EntityFrameworkCore.DbSet<Question> Question { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Quarter> Quarter { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<PracticeTag> PracticeTag { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Practice> Practice { get; set; }
+
     public Microsoft.EntityFrameworkCore.DbSet<Notification> Notification { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Lesson> Lesson { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<LearningProgress> LearningProgress { get; set; }
@@ -51,7 +51,10 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        modelBuilder.Entity<PracticeTag>().HasOne(x => x.Lesson)
+            .WithMany(x => x.Practices)
+            .HasForeignKey(x => x.LessonId)
+            .OnDelete(DeleteBehavior.SetNull);
         modelBuilder.ApplyConfigurationsFromAssembly(its.gamify.infras.AssemblyReference.Assembly);
         Role[] roles = [new Role()
         {

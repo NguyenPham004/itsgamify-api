@@ -14,7 +14,7 @@ namespace its.gamify.infras
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository roleRepository;
-        private readonly IPracticeRepository _practiceRepository;
+
         private readonly IPracticeTagRepository practiceTagRepository;
         private readonly IBadgeRepository _badgeRepository;
         private readonly ICategoryRepository _categoryRepository;
@@ -52,7 +52,7 @@ namespace its.gamify.infras
             learningMaterialRepository = serviceProvider.GetRequiredService<ILearningMaterialRepository>();
             _courseRepository = courseRepository;
             practiceTagRepository = serviceProvider.GetRequiredService<IPracticeTagRepository>();
-            _practiceRepository = serviceProvider.GetRequiredService<IPracticeRepository>();
+
             _departmentRepository = departmentRepository;
             _badgeRepository = serviceProvider.GetRequiredService<IBadgeRepository>();
             _categoryRepository = serviceProvider.GetRequiredService<ICategoryRepository>();
@@ -81,7 +81,7 @@ namespace its.gamify.infras
         public IUserRepository UserRepository => _userRepository;
         public IDepartmentRepository DepartmentRepository => _departmentRepository;
         public IRoleRepository RoleRepository => roleRepository;
-        public IPracticeRepository PracticeRepository => _practiceRepository;
+
         public IPracticeTagRepository PracticeTagRepository => practiceTagRepository;
         public IBadgeRepository BadgeRepository => _badgeRepository;
         public ICategoryRepository CategoryRepository => _categoryRepository;
@@ -313,29 +313,12 @@ namespace its.gamify.infras
             }
             seededIds["QuizAnswer"] = quizAnswers.Select(qa => qa.Id).ToList();
 
-            // Seed Practices with FK to Course and CourseSection
-            var practices = new List<domains.Entities.Practice>
-            {
-                new domains.Entities.Practice { Id = Guid.NewGuid(), Title = "Sample Practice", Description = "Description", CourseId = courses[0].Id, CourseSectionId = courseSections[0].Id }
-            };
-            if (!(await this._practiceRepository.GetAllAsync()).Any())
-            {
-                await this._practiceRepository.AddRangeAsync(practices);
-                await this.SaveChangesAsync();
-            }
-            seededIds["Practice"] = practices.Select(p => p.Id).ToList();
+
+
 
             // Seed PracticeTags with FK to Practice
-            var practiceTags = new List<domains.Entities.PracticeTag>
-            {
-                new domains.Entities.PracticeTag { Id = Guid.NewGuid(), TagName = "Sample Tag", PracticeId = practices[0].Id }
-            };
-            if (!(await this.practiceTagRepository.GetAllAsync()).Any())
-            {
-                await this.practiceTagRepository.AddRangeAsync(practiceTags);
-                await this.SaveChangesAsync();
-            }
-            seededIds["PracticeTag"] = practiceTags.Select(pt => pt.Id).ToList();
+
+
 
             // Seed WishLists with FK to User and Course
             var wishLists = new List<domains.Entities.CourseCollection>

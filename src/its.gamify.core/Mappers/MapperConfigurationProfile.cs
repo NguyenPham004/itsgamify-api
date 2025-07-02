@@ -6,6 +6,7 @@ using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Models.DifficultyLevels;
 using its.gamify.core.Models.Lessons;
+using its.gamify.core.Models.Practices;
 using its.gamify.core.Models.Quarters;
 using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.QuizAnswers;
@@ -13,6 +14,7 @@ using its.gamify.core.Models.Quizes;
 using its.gamify.core.Models.QuizResults;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 
 namespace its.gamify.core.Mappers;
 public class MapperConfigurationProfile : Profile
@@ -40,6 +42,8 @@ public class MapperConfigurationProfile : Profile
 
         #region Department
         CreateMap<Department, DepartmentViewModel>().ForMember(x => x.EmployeeCount, cfg => cfg.MapFrom(c => c.Users!.Count))
+                .ForMember(x => x.CourseCount, cfg => cfg.MapFrom(d => d.Courses!.Count))
+                .ForMember(x => x.Leader, cfg => cfg.MapFrom(x => x.Users.FirstOrDefault(x => x.Role!.Name == RoleEnum.LEADER.ToString())))
                 .ReverseMap();
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
@@ -69,5 +73,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<CourseCollection, CourseCollectionCreateModel>().ReverseMap();
         CreateMap<CourseCollection, CourseCollectionUpdateModel>().ReverseMap();
         CreateMap<CourseCollection, CourseCollectionViewModel>().ReverseMap();
+
+        CreateMap<PracticeTag, PracticeUpsertModel>().ReverseMap();
     }
 }

@@ -1,7 +1,9 @@
-﻿using its.gamify.api.Features.Questions.Commands;
+﻿using its.gamify.api.Features.Practices.Commands;
+using its.gamify.api.Features.Questions.Commands;
 using its.gamify.core;
 using its.gamify.core.Models.Lessons;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 
 namespace its.gamify.api.Features.Lessons.Commands
@@ -54,7 +56,16 @@ namespace its.gamify.api.Features.Lessons.Commands
                         });
                         entity.Quizzes = [questions.First().Quiz];
                     }
-
+                    if (lesson.Type == LessonType.PRACTICE.ToString()
+                        && lesson.Practices?.Count > 0)
+                    {
+                        var practices = await mediator.Send(new UpsertPracticeCommand()
+                        {
+                            LessonId = entity?.Id ?? Guid.Empty,
+                            PracticeTags = lesson.Practices
+                        });
+                        entity!.Practices = practices;
+                    }
                     res.Add(entity!);
                 }
                 return res;
