@@ -15,7 +15,7 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<FileEntity> File { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<User> User { get => user; set => user = value; }
     public Microsoft.EntityFrameworkCore.DbSet<Role> Role { get => role; set => role = value; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseCollection> WishList { get; set; }
+    public Microsoft.EntityFrameworkCore.DbSet<CourseCollection> CourseCollection { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<QuizResult> QuizResult { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<QuizAnswer> QuizAnswer { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Quiz> Quiz { get; set; }
@@ -39,6 +39,7 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
     public Microsoft.EntityFrameworkCore.DbSet<Challenge> Challenge { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Category> Category { get; set; }
     public Microsoft.EntityFrameworkCore.DbSet<Badge> Badge { get; set; }
+    public Microsoft.EntityFrameworkCore.DbSet<CourseMetric> CourseMetric { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
