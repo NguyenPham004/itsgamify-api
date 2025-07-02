@@ -11,5 +11,7 @@ public class LearningMaterial : BaseEntity
 
     public Guid CourseId { get; set; }
     public virtual Course Course { get; set; } = null!; // Navigation property to the course this material belongs to
+    public Guid FileId { get; set; }
+    public virtual FileEntity? File { get; set; }
 
 }

@@ -1,9 +1,6 @@
 using its.gamify.core;
 using its.gamify.domains.Entities;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace its.gamify.api.Features.CourseCollections.Queries
 {

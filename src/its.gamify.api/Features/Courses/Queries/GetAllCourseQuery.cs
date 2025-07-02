@@ -28,7 +28,9 @@ namespace its.gamify.api.Features.Users.Queries
                     includeFunc: x => x.Include(x => x.CourseSections)
                         .ThenInclude(x => x.Lessons)
                         .Include(x => x.LearningMaterials)
-                        .Include(x => x.Deparment!));
+                            .ThenInclude(x => x.File)
+                        .Include(x => x.Deparment!)
+                        .Include(x => x.Category));
                 return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);
             }
 

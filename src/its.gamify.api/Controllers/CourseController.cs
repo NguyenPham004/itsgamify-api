@@ -2,7 +2,6 @@
 using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
-using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.api.Features.LearningMaterials.Commands;
 using its.gamify.api.Features.Users.Queries;
@@ -40,6 +39,13 @@ namespace its.gamify.api.Controllers
             if (result) return Ok("Delete Successfully");
             else return BadRequest("Deleted Failed");
         }
+        [HttpDelete("{id}/course-sections/{CourseSectionId}")]
+        public async Task<IActionResult> DelCourseSection()
+        {
+            await Task.CompletedTask;
+            return Ok();
+        }
+
 
         /// <summary>
         /// Get all course

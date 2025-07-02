@@ -21,13 +21,17 @@ namespace its.gamify.api.Features.Files.Commands
             public async Task<FileEntity> Handle(UploadFileCommand request, CancellationToken cancellationToken)
             {
                 var res = await firebaseService.UploadFileAsync(request.File, "its-gamify/storage");
+                var fileSize = request.File.Length;
                 if (!string.IsNullOrEmpty(res.url))
                 {
                     var file = new domains.Entities.FileEntity()
                     {
                         Id = Guid.NewGuid(),
                         FileName = res.fileName,
-                        Url = res.url
+                        Url = res.url,
+                        ContentType = request.File.ContentType,
+                        Extension = Path.GetExtension(res.fileName).Replace(".", ""),
+                        Size = fileSize,
                     };
                     await unitOfWork.FileRepository.AddAsync(file);
                     await unitOfWork.SaveChangesAsync();

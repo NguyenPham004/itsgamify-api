@@ -1,4 +1,4 @@
-using its.gamify.core.Models;
+﻿using its.gamify.core.Models;
 using its.gamify.core.Repositories;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
@@ -577,6 +577,7 @@ public class GenericRepository<TEntity>(
                     var pascalKey = SnakeToPascal(sort.Key);
                     var parameter = Expression.Parameter(typeof(TEntity), "x");
                     var property = Expression.Property(parameter, pascalKey);
+                    if (property.Type == typeof(object)) throw new Exception("Key không hỗ trợ query");
                     var converted = Expression.Convert(property, typeof(object));
                     var lambda = Expression.Lambda<Func<TEntity, object>>(converted, parameter);
 

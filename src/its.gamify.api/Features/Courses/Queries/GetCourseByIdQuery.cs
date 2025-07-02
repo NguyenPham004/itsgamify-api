@@ -18,8 +18,9 @@ namespace its.gamify.api.Features.Courses.Queries
             public async Task<Course> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
             {
                 return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    includeFunc: x => x.Include(course => course.LearningMaterials)
+                    includeFunc: x => x.Include(course => course.LearningMaterials).ThenInclude(x => x.File)
                         .Include(x => x.Deparment)
+                        .Include(x => x.Category)
                         .Include(course => course.CourseSections)
                             .ThenInclude(cs => cs.Lessons)
                                 .ThenInclude(ls => ls.Quizzes)
