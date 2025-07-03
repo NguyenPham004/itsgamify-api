@@ -1,6 +1,4 @@
-﻿using its.gamify.api.Features.Questions.Queries;
-using its.gamify.core;
-using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.core;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;

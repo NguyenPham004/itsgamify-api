@@ -1,5 +1,4 @@
 ﻿using its.gamify.core;
-using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -15,7 +14,7 @@ namespace its.gamify.api.Features.Users.Queries
         class QueryHandler : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<Course>>
         {
             private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork, Ultils data)
+            public QueryHandler(IUnitOfWork unitOfWork)
             {
                 this.unitOfWork = unitOfWork;
             }
