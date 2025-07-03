@@ -22,19 +22,19 @@ namespace its.gamify.api.Features.Courses.Commands
                 When(x => x.Model.Status == CourseStatusEnum.INITIAL.ToString(), () =>
                 {
                     RuleFor(x => x.Model.Title).NotEmpty().WithMessage("Vui lòng nhập tiêu đề");
-                    RuleFor(x => x.Model.ThumbNailImageId).NotEmpty().WithMessage("Vui lòng nhập ảnh thumbnail");
-                    RuleFor(x => x.Model.IntroductionVideoId).NotEmpty().WithMessage("Vui lòng nhập intro video");
+                    RuleFor(x => x.Model.ThumbnailId).NotEmpty().WithMessage("Vui lòng nhập ảnh thumbnail");
+                    RuleFor(x => x.Model.IntroVideoId).NotEmpty().WithMessage("Vui lòng nhập intro video");
                     RuleFor(x => x.Model.CategoryId).NotEmpty().WithMessage("Vui lòng chọn danh mục");
                     RuleFor(x => x.Model.Description).NotEmpty().WithMessage("Vui lòng nhập mô tả ngắn");
                     RuleFor(x => x.Model.LongDescription).NotEmpty().WithMessage("Vui lòng nhập mô tả");
                 });
-                When(x => x.Model.Status == CourseStatusEnum.MATERIAL.ToString(), () =>
-                {
-                    RuleFor(x => x.Model.LearningMaterialIds).NotEmpty().WithMessage("Vui lòng nhập");
-                });
+                // When(x => x.Model.Status == CourseStatusEnum.MATERIAL.ToString(), () =>
+                // {
+                //     RuleFor(x => x.Model.LearningMaterialIds).NotEmpty().WithMessage("Vui lòng nhập");
+                // });
                 When(x => x.Model.Status == CourseStatusEnum.CONTENT.ToString(), () =>
                 {
-                    RuleForEach(x => x.Model.CourseSectionCreate).NotNull().WithMessage("Module đang trống")
+                    RuleForEach(x => x.Model.CourseSections).NotNull().WithMessage("Module đang trống")
                         .SetValidator(new CourseSectionValidator());
                 });
                 When(x => x.Model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString(), () =>
@@ -45,17 +45,18 @@ namespace its.gamify.api.Features.Courses.Commands
 
 
             }
-            class CourseSectionValidator : AbstractValidator<CourseSectionCreateModel>
+            class CourseSectionValidator : AbstractValidator<CourseSectionUpdateModel>
             {
                 public CourseSectionValidator()
                 {
 
                     RuleFor(x => x.Description).NotEmpty().WithMessage("Mô tả của module đang trống");
                     RuleFor(x => x.Title).NotEmpty().WithMessage("Tiêu đề của module đang trống");
+                    RuleFor(x => x.OrderedNumber).NotEmpty().WithMessage("Số thứ tự của module đang trống");
                     RuleForEach(x => x.Lessons).NotEmpty().SetValidator(new LessonValidator());
                 }
             }
-            class LessonValidator : AbstractValidator<LessonCreateModel>
+            class LessonValidator : AbstractValidator<LessonUpdateModel>
             {
                 public LessonValidator()
                 {
@@ -100,27 +101,24 @@ namespace its.gamify.api.Features.Courses.Commands
                     ?? throw new InvalidOperationException("Không tìm thấy course với Id " + request.Model.Id);
                 unitOfWork.Mapper.Map(request.Model, course);
 
-                foreach (var courseSection in request.Model.CourseSectionCreate ?? [])
+                course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.Model.ThumbnailId)
+                    ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
+                course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.Model.IntroVideoId)
+                    ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id ")).Url;
+
+                unitOfWork.CourseRepository.Update(course);
+                await unitOfWork.SaveChangesAsync();
+
+                foreach (var courseSection in request.Model.CourseSections ?? [])
                 {
                     await mediator.Send(new UpsertCourseSectionCommand()
                     {
-                        CourseId = course.Id,
-                        CreateId = courseSection.CreateId,
-                        Description = courseSection.Description,
-                        Lessons = courseSection.Lessons,
-                        Title = courseSection.Title,
-                    });
+                        Model = courseSection,
+                        SectionId = courseSection.Id
+                    }, cancellationToken);
                 }
-                if (request.Model.LearningMaterialIds?.Count > 0)
-                {
-                    var learningMate = await mediator.Send(new UpsertLearningMaterials()
-                    {
-                        CourseId = course.Id,
-                        FileIds = request.Model.LearningMaterialIds,
-                    });
-                }
-                unitOfWork.CourseRepository.Update(course);
-                await unitOfWork.SaveChangesAsync();
+
+
                 return true;
 
 

@@ -18,29 +18,29 @@ namespace its.gamify.api.Features.LearningMaterials.Commands
             public async Task<List<LearningMaterial>> Handle(UpsertLearningMaterials request, CancellationToken cancellationToken)
             {
                 var res = new List<LearningMaterial>();
-                foreach (var entity in request.FileIds)
-                {
-                    var file = await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == entity)
-                        ?? throw new InvalidOperationException("Không tìm thấy file với Id " + entity);
-                    var learningMate = await unitOfWork.LearningMaterialRepository.FirstOrDefaultAsync(x => x.Url == file.Url);
+                // foreach (var entity in request.FileIds)
+                // {
+                //     var file = await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == entity)
+                //         ?? throw new InvalidOperationException("Không tìm thấy file với Id " + entity);
+                //     var learningMate = await unitOfWork.LearningMaterialRepository.FirstOrDefaultAsync(x => x.Url == file.Url);
 
-                    if (learningMate == null)
-                    {
-                        learningMate = new LearningMaterial()
-                        {
-                            Url = file.Url,
-                            CourseId = request.CourseId,
-                            Title = "",
-                            Type = "",
-                            Description = ""
-                        };
-                        await unitOfWork.LearningMaterialRepository.AddAsync(learningMate);
-                        await unitOfWork.SaveChangesAsync();
+                //     if (learningMate == null)
+                //     {
+                //         learningMate = new LearningMaterial()
+                //         {
+                //             Url = file.Url,
+                //             CourseId = request.CourseId,
+                //             Title = "",
+                //             Type = "",
+                //             Description = ""
+                //         };
+                //         await unitOfWork.LearningMaterialRepository.AddAsync(learningMate);
+                //         await unitOfWork.SaveChangesAsync();
 
 
-                    }
-                    res.Add(learningMate);
-                }
+                //     }
+                //     res.Add(learningMate);
+                // }
                 return res;
             }
         }

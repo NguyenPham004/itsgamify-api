@@ -28,6 +28,7 @@
     <ProjectReference Include="..\its.gamify.infras\its.gamify.infras.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\Practices\Queries\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>

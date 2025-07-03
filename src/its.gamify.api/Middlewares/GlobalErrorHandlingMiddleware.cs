@@ -16,7 +16,7 @@ public class GlobalErrorHandlingMiddleware : IMiddleware
     {
 
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = 500;
+        context.Response.StatusCode = exception.GetType() == typeof(InvalidOperationException) ? 400 : 500;
         return context.Response.WriteAsync(exception.Message);
 
     }

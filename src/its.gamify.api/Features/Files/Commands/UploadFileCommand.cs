@@ -33,6 +33,13 @@ namespace its.gamify.api.Features.Files.Commands
                         Extension = Path.GetExtension(res.fileName).Replace(".", ""),
                         Size = fileSize,
                     };
+                    // Check Duplicate Link 
+                    var fileExists = await unitOfWork.FileRepository.WhereAsync(x => x.FileName == res.fileName);
+                    foreach (var fileInDb in fileExists)
+                    {
+                        fileInDb.Url = res.url;
+                        unitOfWork.FileRepository.Update(fileInDb);
+                    }
                     await unitOfWork.FileRepository.AddAsync(file);
                     await unitOfWork.SaveChangesAsync();
                     return file;

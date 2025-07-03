@@ -39,14 +39,11 @@ public class Course : BaseEntity
     public virtual ICollection<CourseReview> CourseReviews { get; set; } = [];
     [JsonPropertyName("modules")]
     public virtual ICollection<CourseSection> CourseSections { get; set; } = [];
-    public virtual ICollection<Practice> Practices { get; set; } = [];
+
     [JsonPropertyName("learning_materials")]
     public virtual ICollection<LearningMaterial> LearningMaterials { get; set; } = [];
     public Guid QuarterId { get; set; }
     public virtual Quarter Quarter { get; set; } = null!;
-
-
-    public virtual ICollection<CourseCollection> WishLists { get; set; } = [];
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
     public Guid? DepartmentId { get; set; }

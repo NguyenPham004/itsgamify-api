@@ -5,7 +5,9 @@ using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Models.DifficultyLevels;
+using its.gamify.core.Models.LearningMaterials;
 using its.gamify.core.Models.Lessons;
+using its.gamify.core.Models.Practices;
 using its.gamify.core.Models.Quarters;
 using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.QuizAnswers;
@@ -13,8 +15,10 @@ using its.gamify.core.Models.Quizes;
 using its.gamify.core.Models.QuizResults;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 
 namespace its.gamify.core.Mappers;
+
 public class MapperConfigurationProfile : Profile
 {
     public MapperConfigurationProfile()
@@ -35,14 +39,38 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Course, CourseCreateModels>().ReverseMap();
         CreateMap<Course, CourseUpdateModel>().ReverseMap()
             .ForMember(x => x.Status, cfg => cfg.MapFrom(x => x.Status ?? "UNDEFINED"))
-            .ForMember(x => x.IsDraft, cfg => cfg.MapFrom(x => x.IsDraft));
+            .ForMember(x => x.IsDraft, cfg => cfg.MapFrom(x => x.IsDraft))
+            .ForMember(x => x.CourseSections, cfg => cfg.Ignore());
         #endregion
 
         #region Department
         CreateMap<Department, DepartmentViewModel>().ForMember(x => x.EmployeeCount, cfg => cfg.MapFrom(c => c.Users!.Count))
+                .ForMember(x => x.CourseCount, cfg => cfg.MapFrom(d => d.Courses!.Count))
+                .ForMember(x => x.Leader, cfg => cfg.MapFrom(x => x.Users!.FirstOrDefault(x => x.Role!.Name == ROLE.LEADER)))
                 .ReverseMap();
         CreateMap<Department, DepartmentCreateModel>().ReverseMap();
         CreateMap<Department, DepartmentUpdateModel>().ReverseMap();
+        #endregion
+
+        #region CourseSection
+        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap();
+        CreateMap<CourseSection, CourseSectionUpdateModel>()
+            .ForMember(x => x.Lessons, op => op.Ignore())
+            .ReverseMap();
+
+        #endregion
+
+
+        #region Lesson
+        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
+        CreateMap<Lesson, LessonUpdateModel>()
+            .ForMember(x => x.QuestionModels, op => op.Ignore())
+            .ReverseMap();
+
+        #endregion
+
+        #region Learning material
+        CreateMap<LearningMaterial, LearningMaterialCreateModel>().ReverseMap();
         #endregion
 
         CreateMap<Category, CategoryCreateModel>().ReverseMap();
@@ -50,8 +78,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Category, CategoryUpdateModel>().ReverseMap();
 
         CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
-        CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap();
-        CreateMap<Lesson, LessonCreateModel>().ReverseMap();
+
         CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizUpdateModel>().ReverseMap();
@@ -69,5 +96,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<CourseCollection, CourseCollectionCreateModel>().ReverseMap();
         CreateMap<CourseCollection, CourseCollectionUpdateModel>().ReverseMap();
         CreateMap<CourseCollection, CourseCollectionViewModel>().ReverseMap();
+
+        CreateMap<PracticeTag, PracticeUpsertModel>().ReverseMap();
     }
 }

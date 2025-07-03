@@ -2,8 +2,10 @@ namespace its.gamify.domains.Entities;
 
 public class PracticeTag : BaseEntity
 {
-    public string TagName { get; set; } = string.Empty;
-    public Guid PracticeId { get; set; }
-    public virtual Practice Practice { get; set; } = null!;
-    
+    public string Question { get; set; } = string.Empty;
+    public string Answer { get; set; } = string.Empty;
+
+    public Guid? LessonId { get; set; }
+    public virtual Lesson? Lesson { get; set; }
+
 }

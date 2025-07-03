@@ -40,8 +40,7 @@ namespace its.gamify.api.Features.Users.Commands
                     await authService.SignUpAsync(user.Email, request.Model.HashedPassword);
                 if (await unitOfWork.SaveChangesAsync())
                 {
-                    return unitOfWork.Mapper.Map<UserViewModel>(await unitOfWork.UserRepository.GetByIdAsync(user.Id,
-                        false, cancellationToken, x => x.Department!));
+                    return unitOfWork.Mapper.Map<UserViewModel>(user);
                 }
                 else return null;
             }

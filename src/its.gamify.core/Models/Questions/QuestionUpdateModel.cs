@@ -9,8 +9,6 @@ namespace its.gamify.core.Models.Questions
 
     public class QuestionUpsertModel
     {
-        [JsonPropertyName("id")]
-        public Guid? CreateId { get; set; }
         public string Content { get; set; } = string.Empty;
         [JsonPropertyName("answer_a")]
         public string OptionA { get; set; } = string.Empty;
@@ -24,6 +22,7 @@ namespace its.gamify.core.Models.Questions
         public string CorrectAnswer { get; set; } = string.Empty;
         [JsonPropertyName("description")]
         public string Explanation { get; set; } = string.Empty;
+        public int Index { get; set; }
     }
 
 }

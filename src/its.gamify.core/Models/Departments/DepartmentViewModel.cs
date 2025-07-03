@@ -16,5 +16,7 @@ namespace its.gamify.core.Models.Departments
         public User? Leader { get; set; }
         [JsonPropertyName("employee_count")]
         public int EmployeeCount { get; set; }
+        [JsonPropertyName("course_count")]
+        public int CourseCount { get; set; }
     }
 }

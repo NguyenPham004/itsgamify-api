@@ -4,7 +4,6 @@ namespace its.gamify.core.Models.Files
 {
     public class FileCreateModel
     {
-        public IFormFile File { get; set; }
-
+        public required IFormFile File { get; set; }
     }
 }

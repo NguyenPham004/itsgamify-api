@@ -32,9 +32,13 @@ public class FirebaseService : IFirebaseService
             var auth = authProvider;
 
             var a = ServiceAccount;
+            var extension = Path.GetExtension(file.FileName);
+            var newFileName = $"{Guid.NewGuid()}{extension}";
 
             string folder = string.IsNullOrEmpty(directory) ? "assets" : directory;
-            var cancellation = FirebaseStorage.Child(folder).Child(file.FileName)
+            var cancellation = FirebaseStorage
+                .Child(folder)
+                .Child(newFileName)
                 .PutAsync(fs, CancellationToken.None);
             try
             {
