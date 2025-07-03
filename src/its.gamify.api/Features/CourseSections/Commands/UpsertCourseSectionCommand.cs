@@ -7,12 +7,13 @@ using MediatR;
 
 namespace its.gamify.api.Features.CourseSections.Commands
 {
-    public class UpsertCourseSectionCommand : CourseSectionCreateModel, IRequest<CourseSection>
+    public class UpsertCourseSectionCommand : IRequest<CourseSection>
     {
-        public Guid CourseId { get; set; }
+        public required CourseSectionUpdateModel Model { get; set; }
+        public required Guid SectionId { get; set; }
         class CommandHandler : IRequestHandler<UpsertCourseSectionCommand, CourseSection>
         {
-            private readonly IUnitOfWork unitOfWork;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IFirebaseService firebaseSerivce;
             private readonly IMediator mediator;
             public CommandHandler(IUnitOfWork unitOfWork,
@@ -21,41 +22,29 @@ namespace its.gamify.api.Features.CourseSections.Commands
             {
                 this.mediator = mediator;
                 this.firebaseSerivce = firebaseService;
-                this.unitOfWork = unitOfWork;
+                this._unitOfWork = unitOfWork;
             }
             public async Task<CourseSection> Handle(UpsertCourseSectionCommand request, CancellationToken cancellationToken)
             {
-                bool isUpdate = request.CreateId != null;
-                CourseSection? current = null;
-                if (isUpdate)
-                {
-                    current = await unitOfWork.CourseSectionRepository.GetByIdAsync(request.CreateId!.Value,
-                        false,
-                        cancellationToken,
-                        [x => x.Lessons]);
+                CourseSection course_section = await _unitOfWork.CourseSectionRepository.GetByIdAsync(request.SectionId) ?? throw new Exception();
 
+                _unitOfWork.Mapper.Map(request.Model, course_section);
+
+                course_section.Id = request.SectionId;
+
+                _unitOfWork.CourseSectionRepository.Update(course_section);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                if (request.Model.Lessons != null && request.Model.Lessons.Count != 0)
+                {
+                    await mediator.Send(new UpsertLessonsCommand()
+                    {
+                        Models = request.Model.Lessons
+                    }, cancellationToken);
                 }
-                var courseSection = isUpdate ? current : unitOfWork.Mapper.Map<CourseSection>(request);
 
-                courseSection!.CourseId = request.CourseId;
-                courseSection.Lessons = [];
-
-                if (isUpdate)
-                {
-                    unitOfWork.CourseSectionRepository.Update(courseSection);
-                }
-                else
-                    await unitOfWork.CourseSectionRepository.AddAsync(courseSection);
-
-                await unitOfWork.SaveChangesAsync();
-                var lessons = await mediator.Send(new UpsertLessonsCommand()
-                {
-                    Models = request.Lessons ?? [],
-                    CourseSectionId = courseSection.Id
-                });
-
-                courseSection.Lessons = lessons;
-                return courseSection;
+                return course_section;
 
             }
         }

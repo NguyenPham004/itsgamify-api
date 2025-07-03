@@ -1,6 +1,7 @@
 ﻿using its.gamify.api.Features.Practices.Commands;
 using its.gamify.api.Features.Quizes.Commands;
 using its.gamify.core;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,28 +22,22 @@ namespace its.gamify.api.Features.Lessons.Commands
             }
             public async Task<bool> Handle(DeleteLessonCommand request, CancellationToken cancellationToken)
             {
-                var lesson = await unitOfWork.LessonRepository.FirstOrDefaultAsync(x => x.Id == request.Id, includeFunc: x => x.Include(q => q.Quizzes));
+                var lesson = await unitOfWork.LessonRepository.FirstOrDefaultAsync(x => x.Id == request.Id);
                 if (lesson != null)
                 {
                     unitOfWork.LessonRepository.SoftRemove(lesson);
-                    if (lesson.Quizzes?.Count > 0)
+                    await unitOfWork.SaveChangesAsync();
+                    if (lesson.Type == LearningMaterialType.QUIZ.ToString())
                     {
-                        foreach (var item in lesson.Quizzes)
+                        var quiz = await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.LessonId == lesson.Id)
+                            ?? throw new Exception("Can not finding quiz");
+                        var tmp = await unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
+
+                        if (tmp.Count > 0)
                         {
-                            await mediator.Send(new DeleteQuizCommand()
-                            {
-                                Id = item.Id,
-                            });
-                        }
-                    }
-                    if (lesson.Practices?.Count > 0)
-                    {
-                        foreach (var item in lesson.Practices)
-                        {
-                            await mediator.Send(new DeletePracticeCommand()
-                            {
-                                Id = item.Id,
-                            });
+                            unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
+                            await unitOfWork.SaveChangesAsync();
+
                         }
                     }
                     return true;

@@ -1,5 +1,5 @@
-﻿using its.gamify.core;
-using its.gamify.core.IntegrationServices.Interfaces;
+﻿using its.gamify.api.Features.Files.Commands;
+using its.gamify.core;
 using its.gamify.core.Models.LearningMaterials;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -8,32 +8,41 @@ namespace its.gamify.api.Features.LearningMaterials.Commands
 {
     public class CreateLearningMaterialCommand : IRequest<LearningMaterial>
     {
-        public LearningMaterialCreateModel Model { get; set; }
-        public Guid CourseId { get; set; }
+        public required LearningMaterialCreateModel Model { get; set; }
+
         class CommandHandler : IRequestHandler<CreateLearningMaterialCommand, LearningMaterial>
         {
-            private readonly IUnitOfWork unitOfWork;
-            private readonly IFirebaseService firebaseService;
+            private readonly IUnitOfWork _unitOfWork;
+            private readonly IMediator _mediator;
+
             public CommandHandler(IUnitOfWork unitOfWork,
-                IFirebaseService firebaseService)
+                IMediator mediator)
             {
-                this.firebaseService = firebaseService;
-                this.unitOfWork = unitOfWork;
+                this._mediator = mediator;
+                this._unitOfWork = unitOfWork;
             }
             public async Task<LearningMaterial> Handle(CreateLearningMaterialCommand request, CancellationToken cancellationToken)
             {
-                var fileRes = await firebaseService.UploadFileAsync(request.Model.File.File, request.Model.File.Directory ?? string.Empty);
-                var learningMate = new LearningMaterial()
+
+
+                var file = await _mediator.Send(new UploadFileCommand()
                 {
-                    Title = request.Model.Title,
-                    CourseId = request.CourseId,
-                    Type = request.Model.Type,
-                    Description = request.Model.Description,
-                    Url = fileRes.url
+                    File = request.Model.File,
+                }, cancellationToken);
+
+                var material = new LearningMaterial
+                {
+                    Name = file.FileName,
+                    Size = file.Size.ToString(),
+                    Type = file.Extension,
+                    Url = file.Url,
+                    FileId = file.Id,
+                    CourseId = request.Model.CourseId
                 };
-                await unitOfWork.LearningMaterialRepository.AddAsync(learningMate);
-                await unitOfWork.SaveChangesAsync();
-                return learningMate;
+
+                await _unitOfWork.LearningMaterialRepository.AddAsync(material, cancellationToken);
+                await _unitOfWork.SaveChangesAsync();
+                return material;
             }
         }
     }

@@ -14,7 +14,7 @@ namespace its.gamify.api.Controllers
             _mediator = mediator;
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DelLesson([FromQuery] Guid id)
+        public async Task<IActionResult> DelById([FromRoute] Guid id)
         {
             await _mediator.Send(new DeleteLessonCommand()
             {
@@ -22,20 +22,26 @@ namespace its.gamify.api.Controllers
             });
             return NoContent();
         }
-        [HttpDelete]
-        public async Task<IActionResult> DelRange([FromQuery] List<Guid> ids)
+
+        [HttpPost]
+        public async Task<IActionResult> Createlesson([FromBody] CreateLessonCommand command,
+              [FromServices] IMediator mediator)
         {
-            foreach (var id in ids)
-            {
-                await _mediator.Send(new DeleteLessonCommand()
-                {
-                    Id = id
-                });
-            }
-            return NoContent();
+            var result = await mediator.Send(command);
+            return Ok(result);
         }
 
-
-
+        // [HttpDelete]
+        // public async Task<IActionResult> DelRange([FromQuery] List<Guid> ids)
+        // {
+        //     foreach (var id in ids)
+        //     {
+        //         await _mediator.Send(new DeleteLessonCommand()
+        //         {
+        //             Id = id
+        //         });
+        //     }
+        //     return NoContent();
+        // }
     }
 }

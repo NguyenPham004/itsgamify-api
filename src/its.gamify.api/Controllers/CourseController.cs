@@ -77,16 +77,6 @@ namespace its.gamify.api.Controllers
             }));
         }
 
-        [HttpPost("{id}/learning-materials")]
-        public async Task<IActionResult> CreateLearningMaterials([FromForm] LearningMaterialCreateModel command,
-            [FromRoute] Guid id)
-        {
-            return Ok(await mediator.Send(new CreateLearningMaterialCommand()
-            {
-                CourseId = id,
-                Model = command
-            }));
-        }
 
         [HttpGet("{id}/learning-materials")]
         public async Task<IActionResult> GetLearningMaterials([FromRoute] Guid id,

@@ -57,32 +57,16 @@ namespace its.gamify.api.Features.Courses.Commands
             {
                 var course = unitOfWork.Mapper.Map<Course>(request);
                 course.Status = CourseStatusEnum.INITIAL.ToString();
-                course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.ThumbNailImageId)
+                course.ThumbnailImage = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.ThumbnailId)
                     ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
-                course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.IntroductionVideoId)
-                    ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id " + request.IntroductionVideoId)).Url;
-                course.ThumbnailId = request.ThumbNailImageId;
-                course.IntroVideoId = request.IntroductionVideoId;
+                course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.IntroVideoId)
+                    ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id " + request.IntroVideoId)).Url;
+                course.ThumbnailId = request.ThumbnailId;
+                course.IntroVideoId = request.IntroVideoId;
                 var quarter = await UpsertQuarter(DateTime.Now);
                 course.QuarterId = quarter.Id;
-                await unitOfWork.CourseRepository.AddAsync(course);
+                await unitOfWork.CourseRepository.AddAsync(course, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
-                if (request.CourseSectionCreate?.Count > 0)
-                {
-                    for (int i = 0; i < request.CourseSectionCreate.Count; i++)
-                    {
-                        var section = request.CourseSectionCreate[i];
-
-                        var courseSection = await mediator.Send(new UpsertCourseSectionCommand()
-                        {
-                            CourseId = course.Id,
-                            Description = section.Description,
-                            Lessons = section.Lessons,
-                            Title = section.Title,
-                        });
-
-                    }
-                }
                 return course;
             }
         }

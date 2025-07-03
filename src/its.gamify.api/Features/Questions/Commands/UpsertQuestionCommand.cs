@@ -31,48 +31,32 @@ namespace its.gamify.api.Features.Questions.Commands
             }
             public async Task<List<Question>> Handle(UpsertQuestionCommand request, CancellationToken cancellationToken)
             {
-                var res = new List<Question>();
-                var isUpdate = request.QuestionUpsertModels.Any(x => x.CreateId is not null);
-                Quiz? quiz = null;
-                if (isUpdate)
-                {
-                    var question = await unitOfWork.QuestionRepository.GetByIdAsync(request.QuestionUpsertModels.FirstOrDefault(x => x.CreateId != Guid.Empty)!.CreateId ?? Guid.Empty);
-                    quiz = await unitOfWork.QuizRepository.GetByIdAsync(question!.QuizId);
 
-                }
-                else
+                Quiz? quiz = await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.LessonId == request.LessonId);
+
+                if (quiz != null)
                 {
-                    quiz = await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.LessonId == request
-                        .LessonId);
-                    if (quiz is null)
+                    var tmp = await unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
+                    if (tmp.Count > 0)
                     {
-                        quiz = await GetQuiz(request.LessonId,
-                request.QuestionUpsertModels.Count / 2, request.QuestionUpsertModels.Count);
-                    }
+                        unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
+                        await unitOfWork.SaveChangesAsync();
 
+                    }
                 }
 
-                foreach (var question in request.QuestionUpsertModels)
+                quiz ??= await GetQuiz(request.LessonId, 10, request.QuestionUpsertModels.Count);
+                var questions = unitOfWork.Mapper.Map<List<Question>>(request.QuestionUpsertModels);
+
+                foreach (var question in questions)
                 {
-                    bool isUpdateQuestion = question.CreateId != null;
-                    Question? current = null;
-                    if (isUpdate)
-                    {
-                        current = await unitOfWork.QuestionRepository.GetByIdAsync(question.CreateId ?? Guid.Empty);
-                        unitOfWork.Mapper.Map(question, current);
-                        unitOfWork.QuestionRepository.Update(current ?? throw new Exception("Mapping Question trong quiz"));
-                    }
-                    else
-                    {
-                        current = unitOfWork.Mapper.Map<Question>(question);
-                        current.QuizId = quiz!.Id;
-                        await unitOfWork.QuestionRepository.AddAsync(current ?? throw new InvalidOperationException("Có lỗi xảy ra khi mapping question"));
-                    }
-                    current.Quiz = quiz!;
-                    await unitOfWork.SaveChangesAsync();
-                    res.Add(current);
+                    question.QuizId = quiz.Id;
                 }
-                return res;
+
+                await unitOfWork.QuestionRepository.AddRangeAsync(questions, cancellationToken);
+                await unitOfWork.SaveChangesAsync();
+
+                return questions;
             }
 
         }

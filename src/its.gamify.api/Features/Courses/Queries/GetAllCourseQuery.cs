@@ -26,9 +26,6 @@ namespace its.gamify.api.Features.Users.Queries
                     searchTerm: request.filterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
                     sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
                     includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
-                        .ThenInclude(x => x.Lessons.Where(x => !x.IsDeleted))
-                        .Include(x => x.LearningMaterials.Where(x => !x.IsDeleted))
-                            .ThenInclude(x => x.File)
                         .Include(x => x.Deparment!)
                         .Include(x => x.Category));
                 return new BasePagingResponseModel<Course>(datas: res.Entities, pagination: res.Pagination);

@@ -1,14 +1,14 @@
-﻿using its.gamify.core.Models.Files;
+﻿using System.Text.Json.Serialization;
+using its.gamify.core.Models.Files;
 using its.gamify.domains.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace its.gamify.core.Models.LearningMaterials
 {
     public class LearningMaterialCreateModel
     {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Type { get; set; } = LearningMaterialType.UNDEFINED.ToString();// e.g., Video, Article, Quiz
-        public FileUploadRequestModel File { get; set; }
-
+        public required IFormFile File { get; set; }
+        [JsonPropertyName("course_id")]
+        public Guid CourseId { get; set; }
     }
 }

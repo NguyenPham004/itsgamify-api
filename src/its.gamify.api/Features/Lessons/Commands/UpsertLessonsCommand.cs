@@ -10,8 +10,7 @@ namespace its.gamify.api.Features.Lessons.Commands
 {
     public class UpsertLessonsCommand : IRequest<List<Lesson>>
     {
-        public Guid CourseSectionId { get; set; }
-        public List<LessonCreateModel> Models { get; set; } = [];
+        public List<LessonUpdateModel> Models { get; set; } = [];
         class CommandHandler : IRequestHandler<UpsertLessonsCommand, List<Lesson>>
         {
             private readonly IMediator mediator;
@@ -24,52 +23,31 @@ namespace its.gamify.api.Features.Lessons.Commands
             }
             public async Task<List<Lesson>> Handle(UpsertLessonsCommand request, CancellationToken cancellationToken)
             {
-                var res = new List<Lesson>();
-                foreach (var lesson in request.Models)
-                {
-                    var isUpdate = lesson.CreateId != null;
-                    Lesson? current = null;
-                    if (isUpdate)
-                    {
-                        current = await unitOfWork.LessonRepository.FirstOrDefaultAsync(x => x.Id == lesson.CreateId);
-                        unitOfWork.Mapper.Map(lesson, current);
-                    }
 
-                    var entity = isUpdate ? current : unitOfWork.Mapper.Map<Lesson>(lesson);
-                    if (isUpdate)
-                    {
-                        unitOfWork.LessonRepository.Update(entity!);
-                    }
-                    else
-                    {
-                        entity!.CourseSectionId = request.CourseSectionId;
-                        await unitOfWork.LessonRepository.AddAsync(entity!);
-                    }
+                var res = new List<Lesson>();
+                foreach (var model in request.Models)
+                {
+                    Lesson lesson = await unitOfWork.LessonRepository.FirstOrDefaultAsync(x => x.Id == model.Id)
+                        ?? throw new Exception("Not found lesson");
+                    unitOfWork.Mapper.Map(model, lesson);
+                    unitOfWork.LessonRepository.Update(lesson);
                     await unitOfWork.SaveChangesAsync();
-                    if (lesson.QuestionModels?.Count > 0)
+                    res.Add(lesson);
+
+                    if (lesson.Type == LESSON_TYPES.QUIZ && model.QuestionModels?.Count > 0)
                     {
                         var questions = await mediator.Send(new UpsertQuestionCommand()
                         {
-                            LessonId = entity!.Id,
-                            QuestionUpsertModels = lesson.QuestionModels
+                            LessonId = lesson.Id,
+                            QuestionUpsertModels = model.QuestionModels
 
-                        });
-                        entity.Quizzes = [questions.First().Quiz];
+                        }, cancellationToken);
                     }
-                    if (lesson.Type == LessonType.PRACTICE.ToString()
-                        && lesson.Practices?.Count > 0)
-                    {
-                        var practices = await mediator.Send(new UpsertPracticeCommand()
-                        {
-                            LessonId = entity?.Id ?? Guid.Empty,
-                            PracticeTags = lesson.Practices
-                        });
-                        entity!.Practices = practices;
-                    }
-                    res.Add(entity!);
                 }
                 return res;
+
             }
+
         }
     }
 }

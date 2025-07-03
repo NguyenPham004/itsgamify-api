@@ -7,12 +7,19 @@ namespace its.gamify.core.Models.CourseSections
 {
     public class CourseSectionCreateModel
     {
-        [JsonPropertyName("id")]
-        public Guid? CreateId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [JsonPropertyName("course_id")]
+        public Guid CourseId { get; set; }
+        public int OrderedNumber { get; set; }
+    }
+
+    public class CourseSectionUpdateModel : CourseSectionCreateModel
+    {
+        public Guid Id { get; set; }
         [JsonPropertyName("lessons")]
-        public List<LessonCreateModel>? Lessons { get; set; }
+        public List<LessonUpdateModel>? Lessons { get; set; }
+
     }
     public class JsonModelBinder : IModelBinder
     {
