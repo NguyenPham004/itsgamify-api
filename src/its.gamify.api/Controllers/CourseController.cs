@@ -1,14 +1,13 @@
 ﻿using its.gamify.api.Features.CourseCollections.Commands;
 using its.gamify.api.Features.CourseCollections.Queries;
+using its.gamify.api.Features.CourseMetrics;
 using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.api.Features.LearningMaterials.Commands;
-using its.gamify.api.Features.Quizes.Commands;
 using its.gamify.api.Features.Users.Queries;
-using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.CourseCollections;
 using its.gamify.core.Models.Courses;
@@ -26,12 +25,10 @@ namespace its.gamify.api.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly IMediator mediator;
-        private Ultils data;
-        public CourseController(ICourseService courseService, IMediator mediator, Ultils data)
+        public CourseController(ICourseService courseService, IMediator mediator)
         {
             _courseService = courseService;
             this.mediator = mediator;
-            this.data = data;
         }
         /// <summary>
         /// Delete course
@@ -225,6 +222,31 @@ namespace its.gamify.api.Controllers
             var result = await mediator.Send(command);
             return Ok(result);
         }
+        /// <summary>
+        /// Get all course metric
+        /// </summary>
+        [HttpGet("course-metric")]
+        public async Task<IActionResult> GetAllCourseMetric([FromQuery] FilterQuery query)
+        {
+            var res = await mediator.Send(new GetAllCourseMetricQuery()
+            {
+                filterQuery = query
+            });
+            return Ok(res);
 
+        }
+        /// <summary>
+        /// Get course metric by Id
+        /// </summary>
+
+        [HttpGet("{id}/course-metric/{idCourseMetric}")]
+        public async Task<IActionResult> GetCourseMetricById([FromRoute] Guid id)
+        {
+            return Ok(await mediator.Send(new GetCourseMetricByIdQuery()
+            {
+                Id = id
+            }));
+
+        }
     }
 }
