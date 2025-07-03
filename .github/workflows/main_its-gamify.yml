@@ -17,7 +17,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Update appsettings.json with CON_STRING
+        run: |
+          $appsettings = "src/its.gamify.api/appsettings.json"
+          (Get-Content $appsettings) -replace '"DefaultConnection":\s*""', '"DefaultConnection": "${{ secrets.CON_STRING }}"' | Set-Content $appsettings
+        shell: pwsh
+        
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
