@@ -22,7 +22,7 @@ namespace its.gamify.core.Models.Lessons
     {
         public Guid Id { get; set; }
         [JsonPropertyName("video_url")]
-        public string? VideoUrl { get; set; } = string.Empty;
+        public string? Url { get; set; } = string.Empty;
         [JsonPropertyName("quiz")]
         public List<QuestionUpsertModel>? QuestionModels { get; set; }
 

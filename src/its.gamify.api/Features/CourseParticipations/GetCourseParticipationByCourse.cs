@@ -1,6 +1,9 @@
-﻿using its.gamify.core;
+﻿using System.Linq.Expressions;
+using its.gamify.core;
 using its.gamify.core.Models.ShareModels;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 
 namespace its.gamify.api.Features.CourseParticipations
@@ -13,16 +16,27 @@ namespace its.gamify.api.Features.CourseParticipations
         class QueryHandler : IRequestHandler<GetCourseParticipationByCourse, BasePagingResponseModel<CourseParticipation>>
         {
             private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
+            private readonly IClaimsService _claimService;
+            public QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService)
             {
                 this.unitOfWork = unitOfWork;
+                _claimService = claimsService;
             }
             public async Task<BasePagingResponseModel<CourseParticipation>> Handle(GetCourseParticipationByCourse request, CancellationToken cancellationToken)
             {
-                var res = await unitOfWork.CourseParticipationRepository.ToPagination(pageIndex: request.PageIndex, pageSize: request.PageSize,
-                     filter: x => x.CourseId == request.CourseId, cancellationToken: cancellationToken,
-                    includes: [x => x.Course, x => x.User]);
-                return new BasePagingResponseModel<CourseParticipation>(res.Entities, res.Pagination);
+
+                Expression<Func<CourseParticipation, bool>> filter = x =>
+                            x.CourseId == request.CourseId &&
+                           (_claimService.CurrentRole != ROLE.EMPLOYEE || x.UserId == _claimService.CurrentUser);
+
+                var (Pagination, Entities) = await unitOfWork.CourseParticipationRepository.ToPagination(
+                    pageIndex: request.PageIndex,
+                    pageSize: request.PageSize,
+                    filter: filter,
+                    cancellationToken: cancellationToken,
+                    includes: [x => x.Course, x => x.User]
+                );
+                return new BasePagingResponseModel<CourseParticipation>(Entities, Pagination);
             }
         }
 
