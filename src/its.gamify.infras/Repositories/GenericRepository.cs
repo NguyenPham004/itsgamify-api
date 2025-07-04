@@ -361,14 +361,15 @@ public class GenericRepository<TEntity>(
 
     #endregion
     public async Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
-        int pageIndex = 0,
-        int pageSize = 10,
-        bool withDeleted = false,
-        string? searchTerm = null,
-        List<string>? searchFields = null,
-        Dictionary<string, bool>? sortOrders = null,
-        CancellationToken cancellationToken = default,
-        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null)
+         int pageIndex = 0,
+         int pageSize = 10,
+         bool withDeleted = false,
+         string? searchTerm = null,
+         List<string>? searchFields = null,
+         Dictionary<string, bool>? sortOrders = null,
+         Expression<Func<TEntity, bool>>? filter = null,
+         CancellationToken cancellationToken = default,
+         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null)
     {
         pageIndex = Math.Max(0, pageIndex);
         pageSize = Math.Max(1, pageSize);
@@ -392,6 +393,11 @@ public class GenericRepository<TEntity>(
             var lambda = Expression.Lambda<Func<TEntity, bool>>(notDeleted, parameter);
             query = query.Where(lambda);
 
+        }
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
         }
 
         if (!string.IsNullOrWhiteSpace(searchTerm) && searchFields != null)

@@ -75,6 +75,7 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
         Dictionary<string, bool>? sortOrders = null,
         CancellationToken cancellationToken = default,
         params Expression<Func<TEntity, object>>[] includes);
+
     //public Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
     //     FilterQuery? query,
     //     bool withDeleted = false,
@@ -87,6 +88,7 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
          string? searchTerm = null,
          List<string>? searchFields = null,
          Dictionary<string, bool>? sortOrders = null,
+         Expression<Func<TEntity, bool>>? filter = null,
          CancellationToken cancellationToken = default,
          Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? includeFunc = null);
     Task<(Pagination Pagination, List<TEntity> Entities)> ToPagination(
