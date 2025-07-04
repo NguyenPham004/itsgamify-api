@@ -12,6 +12,7 @@ using its.gamify.core.Models.LearningMaterials;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -126,16 +127,17 @@ namespace its.gamify.api.Controllers
             });
             return Ok(courseParticipation);
         }
+
+
         [HttpGet("{id}/course-participations")]
-        public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id,
-            [FromQuery] int? limit = 10,
-            [FromQuery] int? page = 0)
+        [Authorize]
+        public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id)
         {
             var result = await mediator.Send(new GetCourseParticipationByCourse()
             {
                 CourseId = id,
-                PageIndex = page ?? 0,
-                PageSize = limit ?? 10
+                PageIndex = 0,
+                PageSize = 10
             });
             return Ok(result);
         }

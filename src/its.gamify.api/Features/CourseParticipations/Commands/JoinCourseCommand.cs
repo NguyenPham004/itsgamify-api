@@ -34,7 +34,7 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 var isDup = await unitOfWork.CourseParticipationRepository.FirstOrDefaultAsync(x => x.UserId == currentUser.Id && x.CourseId == course.Id);
                 if (isDup is not null) throw new InvalidOperationException("Người dùng đã join khoá học này rồi!");
 
-                if (course.Status != CourseStatusEnum.PUBLISHED.ToString() || course.IsDraft)
+                if (course.Status != COURSE_STATUS.PUBLISHED || course.IsDraft)
                     throw new InvalidOperationException("Khoá học chưa được publish hoặc khoá học là bản nháp! Không thể đăng ký");
                 var courseParticipation = new CourseParticipation()
                 {
@@ -44,7 +44,7 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 };
                 switch (course.CourseType)
                 {
-                    case nameof(CourseTypeEnum.DEPARTMENTONLY):
+                    case COURSE_TYPE.DEPARTMENTONLY:
                         // Check exist in Dept
                         if (course.DepartmentId != currentUser.DepartmentId)
                         {
@@ -52,7 +52,7 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                         }
                         else
                             break;
-                    case nameof(CourseTypeEnum.LEADERONLY):
+                    case COURSE_TYPE.LEADERONLY:
                         // check role is leader
                         if (currentUser.Role?.Name != RoleEnum.LEADER.ToString())
                         {
@@ -61,7 +61,7 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                         else
                             break;
                 }
-                await unitOfWork.CourseParticipationRepository.AddAsync(courseParticipation);
+                await unitOfWork.CourseParticipationRepository.AddAsync(courseParticipation, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
                 return courseParticipation;
             }

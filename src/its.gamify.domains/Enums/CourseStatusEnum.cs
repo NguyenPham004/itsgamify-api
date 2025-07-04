@@ -22,3 +22,19 @@ public enum CourseTypeEnum
     ALL,
     DEPARTMENTONLY
 }
+
+public static class COURSE_STATUS
+{
+    public const string INITIAL = "INITIAL";
+    public const string CONTENT = "CONTENT";
+    public const string MATERIAL = "MATERIAL";
+    public const string CONFIRM = "CONFIRM";
+    public const string PUBLISHED = "PUBLISHED";
+}
+
+public static class COURSE_TYPE
+{
+    public const string LEADERONLY = "LEADERONLY";
+    public const string ALL = "ALL";
+    public const string DEPARTMENTONLY = "DEPARTMENTONLY";
+}

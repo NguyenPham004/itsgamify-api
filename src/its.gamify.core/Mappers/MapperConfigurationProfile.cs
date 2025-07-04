@@ -38,6 +38,7 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Course, CourseViewModel>().ReverseMap();
         CreateMap<Course, CourseCreateModels>().ReverseMap();
         CreateMap<Course, CourseUpdateModel>().ReverseMap()
+            .ForMember(x => x.DurationInHours, cfg => cfg.MapFrom(c => c.CourseSections!.Sum(s => s.Lessons!.Sum(x => x.DurationInMinutes))))
             .ForMember(x => x.Status, cfg => cfg.MapFrom(x => x.Status ?? "UNDEFINED"))
             .ForMember(x => x.IsDraft, cfg => cfg.MapFrom(x => x.IsDraft))
             .ForMember(x => x.CourseSections, cfg => cfg.Ignore());
