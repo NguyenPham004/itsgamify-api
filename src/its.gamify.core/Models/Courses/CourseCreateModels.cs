@@ -42,7 +42,8 @@ public class CourseUpdateModel : CourseCreateModels
     public string? Status { get; set; }
     [JsonPropertyName("drafted")]
     public bool? IsDraft { get; set; } = false;
-
+    [JsonPropertyName("is_update_module")]
+    public bool IsUpdateModule { get; set; } = false;
     [JsonPropertyName("modules")]
     public List<CourseSectionUpdateModel>? CourseSections { get; set; }
 }
