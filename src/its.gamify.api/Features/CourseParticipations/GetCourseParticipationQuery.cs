@@ -23,7 +23,7 @@ namespace its.gamify.core.Features.CourseParticipations.Queries
                 var items = await unitOfWork.CourseParticipationRepository.ToDynamicPagination(
                     pageIndex: 0,
                     pageSize: 3,
-                    searchTerm: claimsService.CurrentUser.ToString(), searchFields: ["UserId"],
+                    filter: x => x.UserId == claimsService.CurrentUser,
                     includeFunc: x => x
                         .Include(x => x.User)
                         .Include(x => x.Course!)

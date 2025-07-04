@@ -21,7 +21,8 @@ namespace its.gamify.api.Controllers
         {
             var result = await _mediator.Send(new GetCourseParticipationQuery());
             if (result == null || result.Datas == null || result.Datas.Count == 0)
-                throw new InvalidOperationException("Danh sách CourseParticipation trống");
+                return Ok();
+            // throw new InvalidOperationException("Danh sách CourseParticipation trống");
             return Ok(result);
         }
 
