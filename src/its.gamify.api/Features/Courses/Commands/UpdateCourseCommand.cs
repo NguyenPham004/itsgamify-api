@@ -62,7 +62,7 @@ namespace its.gamify.api.Features.Courses.Commands
                 {
                     When(x => x.Type == LearningMaterialType.VIDEO.ToString(), () =>
                     {
-                        RuleFor(x => x.VideoUrl).NotEmpty().WithMessage("Video Url đang trống");
+                        RuleFor(x => x.Url).NotEmpty().WithMessage("Video Url đang trống");
                     });
                     When(x => x.Type == LearningMaterialType.DOCUMENT.ToString(), () =>
                     {
