@@ -3,9 +3,9 @@
     public class CourseMetric:BaseEntity
     {
         public Guid CourseId { get; set; }
-        public int SaveCount { get; set; }
-        public int CompletionCount { get; set; }
-        public int ReviewCount { get; set;}
-        public double StartRating { get; set; } 
+        public int SaveCount { get; set; } = 0;
+        public int CompletionCount { get; set; } = 0;
+        public int ReviewCount { get; set; } = 0;
+        public double StartRating { get; set; } = 0;    
     }
 }

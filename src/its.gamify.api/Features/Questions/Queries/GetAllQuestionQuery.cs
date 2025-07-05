@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using its.gamify.api.Features.Users.Queries;
-using its.gamify.core;
-using its.gamify.core.Features.AvailablesData;
+﻿using its.gamify.core;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
