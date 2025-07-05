@@ -1,27 +1,36 @@
 using its.gamify.core.Models.ShareModels;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace its.gamify.core.Features.CourseParticipations.Queries
 {
     public class GetCourseParticipationQuery : IRequest<BasePagingResponseModel<CourseParticipation>>
     {
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
+
         public class QueryHandler : IRequestHandler<GetCourseParticipationQuery, BasePagingResponseModel<CourseParticipation>>
         {
             private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
+            private readonly IClaimsService claimsService;
+            public QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService)
             {
                 this.unitOfWork = unitOfWork;
+                this.claimsService = claimsService;
             }
             public async Task<BasePagingResponseModel<CourseParticipation>> Handle(GetCourseParticipationQuery request, CancellationToken cancellationToken)
             {
-                var items = await unitOfWork.CourseParticipationRepository.ToPagination(
-                    pageIndex: request.PageIndex,
-                    pageSize: request.PageSize,
-                    includes: [x => x.User, x => x.Course, x => x.CourseResult!, x => x.CourseReview!],
+                var items = await unitOfWork.CourseParticipationRepository.ToDynamicPagination(
+                    pageIndex: 0,
+                    pageSize: 3,
+                    filter: x => x.UserId == claimsService.CurrentUser,
+                    includeFunc: x => x
+                        .Include(x => x.User)
+                        .Include(x => x.Course!)
+                            .ThenInclude(x => x.Category)
+                        .Include(x => x.CourseResult!),
                     cancellationToken: cancellationToken);
+
                 return new BasePagingResponseModel<CourseParticipation>(items.Entities, items.Pagination);
             }
         }

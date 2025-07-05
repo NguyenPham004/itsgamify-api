@@ -109,13 +109,17 @@ namespace its.gamify.api.Features.Courses.Commands
                 unitOfWork.CourseRepository.Update(course);
                 await unitOfWork.SaveChangesAsync();
 
-                foreach (var courseSection in request.Model.CourseSections ?? [])
+                if (request.Model.IsUpdateModule)
                 {
-                    await mediator.Send(new UpsertCourseSectionCommand()
+                    foreach (var courseSection in request.Model.CourseSections ?? [])
                     {
-                        Model = courseSection,
-                        SectionId = courseSection.Id
-                    }, cancellationToken);
+                        await mediator.Send(new UpsertCourseSectionCommand()
+                        {
+                            Model = courseSection,
+                            SectionId = courseSection.Id
+                        }, cancellationToken);
+                    }
+
                 }
 
 

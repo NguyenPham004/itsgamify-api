@@ -34,7 +34,7 @@ public class User : BaseEntity
     public virtual ICollection<Badge>? Badges { get; set; }
     public virtual ICollection<CourseResult> CourseResults { get; set; } = new List<CourseResult>();
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
-    public Guid DepartmentId { get; set; }
+    public Guid? DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
 
     #endregion

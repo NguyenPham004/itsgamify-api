@@ -2,6 +2,7 @@
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace its.gamify.api.Features.CourseSections.Queries
@@ -21,11 +22,15 @@ namespace its.gamify.api.Features.CourseSections.Queries
             public async Task<BasePagingResponseModel<CourseSection>> Handle(GetCourseSectionByCourseIdQuery request, CancellationToken cancellationToken)
             {
                 List<(Expression<Func<CourseSection, object>> OrderBy, bool IsDescending)>? orderByList = [(x => x.OrderedNumber, false)];
-                var res = await unitOfWork.CourseSectionRepository.ToPagination(pageIndex: request.PageIndex,
-                      pageSize: request.PageSize,
+                var res = await unitOfWork.CourseSectionRepository.ToDynamicPagination(
+                      pageIndex: request.PageIndex,
+                      pageSize: 1000,
                       filter: x => x.CourseId == request.CourseId,
-                      orderByList: orderByList,
-                      cancellationToken: cancellationToken);
+                      includeFunc: x => x.Include(x => x.Lessons.Where(x => !x.IsDeleted))
+                                            .ThenInclude(x => x.Quizzes.Where(x => !x.IsDeleted))
+                                                .ThenInclude(q => q.Questions.Where(x => !x.IsDeleted))
+                                        .Include(x => x.Lessons.Where(x => !x.IsDeleted))
+                                            .ThenInclude(x => x.Practices.Where(x => !x.IsDeleted)));
                 return new BasePagingResponseModel<CourseSection>(res.Entities, res.Pagination);
             }
         }
