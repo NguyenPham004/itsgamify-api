@@ -47,7 +47,7 @@ namespace its.gamify.api.Controllers
         {
             var res = await mediator.Send(new GetAllCourseQuery()
             {
-                filterQuery = query
+                FilterQuery = query
             });
             return Ok(res);
 

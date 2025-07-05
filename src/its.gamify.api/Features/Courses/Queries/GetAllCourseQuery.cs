@@ -13,7 +13,7 @@ namespace its.gamify.api.Features.Users.Queries
 
     public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
     {
-        public FilterQuery? filterQuery { get; set; }
+        public FilterQuery? FilterQuery { get; set; }
 
         class QueryHandler : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<Course>>
         {
@@ -38,11 +38,11 @@ namespace its.gamify.api.Features.Users.Queries
                     x.IsDraft == false &&
                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
 
-                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.filterQuery?.Page ?? 0,
-                        request.filterQuery?.Limit ?? 10,
+                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.FilterQuery?.Page ?? 0,
+                        request.FilterQuery?.Limit ?? 10,
                         filter: filter,
-                        searchTerm: request.filterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
-                        sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
+                        searchTerm: request.FilterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
+                        sortOrders: request.FilterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
                         includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                             .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                             .Include(x => x.Deparment!)
@@ -55,11 +55,11 @@ namespace its.gamify.api.Features.Users.Queries
                                 x.IsDraft == false &&
                                 x.DepartmentId == user.DepartmentId;
 
-                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.filterQuery?.Page ?? 0,
-                        request.filterQuery?.Limit ?? 10,
+                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.FilterQuery?.Page ?? 0,
+                        request.FilterQuery?.Limit ?? 10,
                         filter: filter,
-                        searchTerm: request.filterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
-                        sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
+                        searchTerm: request.FilterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
+                        sortOrders: request.FilterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
                         includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                             .Include(x => x.Deparment!)
                             .Include(x => x.Category));
@@ -67,10 +67,10 @@ namespace its.gamify.api.Features.Users.Queries
 
                 else
                 {
-                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.filterQuery?.Page ?? 0,
-                    request.filterQuery?.Limit ?? 10,
-                    searchTerm: request.filterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
-                    sortOrders: request.filterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
+                    res = await unitOfWork.CourseRepository.ToDynamicPagination(request.FilterQuery?.Page ?? 0,
+                    request.FilterQuery?.Limit ?? 10,
+                    searchTerm: request.FilterQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
+                    sortOrders: request.FilterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
                     includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.Deparment!)
                         .Include(x => x.Category));
