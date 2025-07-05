@@ -1,11 +1,10 @@
-﻿using its.gamify.api.Features.CourseParticipations;
+using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.api.Features.LearningMaterials.Commands;
 using its.gamify.api.Features.Users.Queries;
-using its.gamify.core.Features.AvailablesData;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.LearningMaterials;
@@ -23,12 +22,10 @@ namespace its.gamify.api.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly IMediator mediator;
-        private Ultils data;
-        public CourseController(ICourseService courseService, IMediator mediator, Ultils data)
+        public CourseController(ICourseService courseService, IMediator mediator)
         {
             _courseService = courseService;
             this.mediator = mediator;
-            this.data = data;
         }
         /// <summary>
         /// Delete course
@@ -50,7 +47,7 @@ namespace its.gamify.api.Controllers
         {
             var res = await mediator.Send(new GetAllCourseQuery()
             {
-                filterQuery = query
+                FilterQuery = query
             });
             return Ok(res);
 

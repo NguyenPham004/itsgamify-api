@@ -63,8 +63,6 @@ public static class ServiceCollectionExtensions
         // services.AddDbContext<AppDbContext>(options => options.USeSqlServer(
         //     services.BuildServiceProvider().GetRequiredService<IConfiguration>()
         //         .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
-
-        services.AddHttpContextAccessor();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.Scan(scan =>
@@ -88,7 +86,8 @@ public static class ServiceCollectionExtensions
                 ValidateIssuer = true,
                 ValidIssuer = "its.gamify",
                 ValidAudience = "its.gamify.client",
-                ValidateAudience = true
+                ValidateAudience = true,
+                ValidateLifetime = true,
             };
         });
 

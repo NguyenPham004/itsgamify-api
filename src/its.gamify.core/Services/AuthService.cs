@@ -5,6 +5,10 @@ using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace its.gamify.core.Services
 {
@@ -33,6 +37,23 @@ namespace its.gamify.core.Services
             if (user is not null && userInDb is not null)
             {
                 string newToken = TokenGenerator.GenerateToken(user: userInDb, role: userInDb.Role?.Name ?? string.Empty);
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userInDb.Id.ToString()),
+                    new Claim(ClaimTypes.Email, userInDb.Email.ToString())
+                };
+
+                var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("VERYSTRONGPASSWORD_CHANGEMEIFYOUNEED"));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: "its.gamify",
+                    audience: "its.gamify.client",
+                    claims: claims,
+                    expires: DateTime.Now.AddHours(1),
+                    signingCredentials: creds
+                );
+
                 return new AuthResponseModel
                 {
                     Token = newToken,
