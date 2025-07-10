@@ -34,7 +34,11 @@ namespace its.gamify.api.Features.CourseParticipations
                     pageSize: request.PageSize,
                     filter: filter,
                     cancellationToken: cancellationToken,
-                    includes: [x => x.Course, x => x.User]
+                    includes: [
+                        x => x.Course,
+                        x => x.User,
+                        x => x.LearningProgresses.Where(x=>!x.IsDeleted)
+                    ]
                 );
                 return new BasePagingResponseModel<CourseParticipation>(Entities, Pagination);
             }

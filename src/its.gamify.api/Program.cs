@@ -28,6 +28,7 @@ builder.Services.AddControllers(options =>
 // Add services to the container.
 var configuration = builder.Configuration
     .Get<AppSetting>() ?? throw new Exception("Null configuration");
+
 builder.Services.AddCoreServices(appSetting: configuration);
 
 

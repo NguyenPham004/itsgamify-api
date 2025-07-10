@@ -5,23 +5,21 @@ using MediatR;
 
 namespace its.gamify.api.Features.Questions.Commands
 {
-    public class UpsertQuestionCommand : IRequest<List<Question>>
+    public class UpsertQuestionCommand : IRequest<Guid>
     {
-        public Guid LessonId { get; set; } = Guid.Empty;
+        public Guid QuizId { get; set; } = Guid.Empty;
         public List<QuestionUpsertModel> QuestionUpsertModels { get; set; } = [];
-        class CommandHandler : IRequestHandler<UpsertQuestionCommand, List<Question>>
+        class CommandHandler : IRequestHandler<UpsertQuestionCommand, Guid>
         {
             private readonly IUnitOfWork unitOfWork;
             public CommandHandler(IUnitOfWork unitOfWork)
             {
                 this.unitOfWork = unitOfWork;
             }
-            private async Task<Quiz> GetQuiz(Guid lessonId, int passMarks,
-                int totalQuestions)
+            private async Task<Quiz> GetQuiz(int passMarks, int totalQuestions)
             {
                 var quiz = new Quiz()
                 {
-                    LessonId = lessonId,
                     PassedMarks = passMarks,
                     TotalQuestions = totalQuestions
                 };
@@ -29,10 +27,10 @@ namespace its.gamify.api.Features.Questions.Commands
                 await unitOfWork.SaveChangesAsync();
                 return quiz;
             }
-            public async Task<List<Question>> Handle(UpsertQuestionCommand request, CancellationToken cancellationToken)
+            public async Task<Guid> Handle(UpsertQuestionCommand request, CancellationToken cancellationToken)
             {
 
-                Quiz? quiz = await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.LessonId == request.LessonId);
+                Quiz? quiz = await unitOfWork.QuizRepository.GetByIdAsync(request.QuizId);
 
                 if (quiz != null)
                 {
@@ -45,7 +43,7 @@ namespace its.gamify.api.Features.Questions.Commands
                     }
                 }
 
-                quiz ??= await GetQuiz(request.LessonId, 10, request.QuestionUpsertModels.Count);
+                quiz ??= await GetQuiz(10, request.QuestionUpsertModels.Count);
                 var questions = unitOfWork.Mapper.Map<List<Question>>(request.QuestionUpsertModels);
 
                 foreach (var question in questions)
@@ -56,7 +54,7 @@ namespace its.gamify.api.Features.Questions.Commands
                 await unitOfWork.QuestionRepository.AddRangeAsync(questions, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
 
-                return questions;
+                return quiz.Id;
             }
 
         }
