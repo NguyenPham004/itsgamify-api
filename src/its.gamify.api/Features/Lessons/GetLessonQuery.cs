@@ -20,7 +20,7 @@ namespace its.gamify.core.Features.Lessons.Queries
                 var lessons = await unitOfWork.LessonRepository.ToPagination(
                     pageIndex: request.PageIndex,
                     pageSize: request.PageSize,
-                    includes: [x => x.LearningProgress, x => x.CourseSection],
+                    // includes: [x => x.LearningProgress, x => x.CourseSection],
                     cancellationToken: cancellationToken);
                 return new BasePagingResponseModel<Lesson>(lessons.Entities, lessons.Pagination);
             }

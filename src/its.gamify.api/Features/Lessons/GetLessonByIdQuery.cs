@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -6,16 +7,23 @@ namespace its.gamify.core.Features.Lessons.Queries
     public class GetLessonByIdQuery : IRequest<Lesson>
     {
         public Guid Id { get; set; }
-        public class QueryHandler : IRequestHandler<GetLessonByIdQuery, Lesson>
+        public class QueryHandler(IUnitOfWork _unitOfWork) : IRequestHandler<GetLessonByIdQuery, Lesson>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<Lesson> Handle(GetLessonByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.LessonRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                Expression<Func<Lesson, object>>[] includes = [
+                    x => x.Quiz!,
+                    x => x.Quiz!.Questions.Where(x=>!x.IsDeleted)
+                ];
+
+                return await _unitOfWork
+                    .LessonRepository
+                    .GetByIdAsync(
+                        request.Id,
+                        cancellationToken: cancellationToken,
+                        includes: includes
+                    ) ?? throw new Exception("can not find lesson");
             }
         }
     }

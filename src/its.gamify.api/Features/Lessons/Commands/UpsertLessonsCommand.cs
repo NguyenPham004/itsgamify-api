@@ -25,24 +25,28 @@ namespace its.gamify.api.Features.Lessons.Commands
             {
 
                 var res = new List<Lesson>();
+
                 foreach (var model in request.Models)
                 {
                     Lesson lesson = await unitOfWork.LessonRepository.FirstOrDefaultAsync(x => x.Id == model.Id)
                         ?? throw new Exception("Not found lesson");
                     unitOfWork.Mapper.Map(model, lesson);
-                    unitOfWork.LessonRepository.Update(lesson);
-                    await unitOfWork.SaveChangesAsync();
-                    res.Add(lesson);
 
-                    if (lesson.Type == LESSON_TYPES.QUIZ && model.QuestionModels?.Count > 0)
+                    if (model.Type == LESSON_TYPES.QUIZ && model.QuestionModels?.Count > 0)
                     {
-                        var questions = await mediator.Send(new UpsertQuestionCommand()
+                        lesson.QuizId = await mediator.Send(new UpsertQuestionCommand()
                         {
-                            LessonId = lesson.Id,
+                            QuizId = model.QuizId ?? Guid.Empty,
                             QuestionUpsertModels = model.QuestionModels
 
                         }, cancellationToken);
                     }
+
+                    unitOfWork.LessonRepository.Update(lesson);
+                    await unitOfWork.SaveChangesAsync();
+                    res.Add(lesson);
+
+
                 }
                 return res;
 

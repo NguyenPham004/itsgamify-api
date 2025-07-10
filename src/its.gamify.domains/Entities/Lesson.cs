@@ -15,10 +15,12 @@ public class Lesson : BaseEntity
     public string? Url { get; set; } = string.Empty; // Link to the lesson material
     [JsonPropertyName("practice")]
     public ICollection<PracticeTag> Practices { get; set; } = [];
-    public Guid? LearningProgressId { get; set; }
-    public virtual LearningProgress? LearningProgress { get; set; } = null!; // Navigation property to the learning progress this lesson belongs to
+
+    [JsonPropertyName("quiz_id")]
+    public Guid? QuizId { get; set; }
     [JsonPropertyName("quiz")]
-    public ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
+    public virtual Quiz? Quiz { get; set; }
+
     [JsonPropertyName("module_id")]
     public Guid? CourseSectionId { get; set; }
     public virtual CourseSection CourseSection { get; set; } = null!; // Navigation property to the course section this lesson belongs to

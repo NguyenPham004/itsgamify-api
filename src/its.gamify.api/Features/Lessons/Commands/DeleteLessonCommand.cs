@@ -14,8 +14,7 @@ namespace its.gamify.api.Features.Lessons.Commands
         {
             private readonly IUnitOfWork unitOfWork;
             private readonly IMediator mediator;
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IMediator mediator)
+            public CommandHandler(IUnitOfWork unitOfWork, IMediator mediator)
             {
                 this.mediator = mediator;
                 this.unitOfWork = unitOfWork;
@@ -29,7 +28,7 @@ namespace its.gamify.api.Features.Lessons.Commands
                     await unitOfWork.SaveChangesAsync();
                     if (lesson.Type == LearningMaterialType.QUIZ.ToString())
                     {
-                        var quiz = await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.LessonId == lesson.Id)
+                        var quiz = await unitOfWork.QuizRepository.GetByIdAsync(lesson.QuizId!.Value)
                             ?? throw new Exception("Can not finding quiz");
                         var tmp = await unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
 

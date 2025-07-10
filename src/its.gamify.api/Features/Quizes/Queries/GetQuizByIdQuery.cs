@@ -17,8 +17,7 @@ namespace its.gamify.api.Features.Quizes.Queries
             }
             public async Task<Quiz> Handle(GetQuizByIdQuery request, CancellationToken cancellationToken)
             {
-                return (await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    [x => x.Lesson, x=>x.Challenge]))
+                return (await unitOfWork.QuizRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken))
                      ?? throw new InvalidOperationException("Không tìm thấy Quiz với id " + request.Id);
             }
         }

@@ -25,10 +25,10 @@ namespace its.gamify.api.Features.Quizes.Queries
                 if (!string.IsNullOrEmpty(request.Search))
                 {
                     filter = x =>
-                            x.LessonId.Equals(Guid.Parse(request.Search)) ||
+                             // x.LessonId.Equals(Guid.Parse(request.Search)) ||
                              x.ChallengIdId.Equals(Guid.Parse(request.Search));
                 }
-                var res = await unitOfWork.QuizRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.Challenge, x=>x.Lesson]);
+                var res = await unitOfWork.QuizRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter);
 
                 return new BasePagingResponseModel<Quiz>(datas: res.Entities, pagination: res.Pagination);
             }

@@ -16,6 +16,6 @@ public class CourseParticipation : BaseEntity
     public Guid CourseId { get; set; }
     public virtual Course Course { get; set; } = null!;
     public virtual CourseResult? CourseResult { get; set; }
-    public ICollection<LearningProgress> LearningProgresses { get; set; } = new List<LearningProgress>();
+    public ICollection<LearningProgress> LearningProgresses { get; set; } = [];
     public virtual CourseReview? CourseReview { get; set; }
 }
