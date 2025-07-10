@@ -74,6 +74,13 @@ public class MapperConfigurationProfile : Profile
         CreateMap<LearningMaterial, LearningMaterialCreateModel>().ReverseMap();
         #endregion
 
+        #region Learning progress
+        CreateMap<LearningProgress, LearningProgessUpsertModel>()
+            .ForMember(x => x.Type, op => op.Ignore())
+            .ReverseMap();
+        #endregion
+
+
         CreateMap<Category, CategoryCreateModel>().ReverseMap();
         CreateMap<Category, CategoryViewModel>().ReverseMap();
         CreateMap<Category, CategoryUpdateModel>().ReverseMap();
