@@ -14,5 +14,6 @@ public class LearningProgress : BaseEntity
     public Guid LessonId { get; set; }
     public virtual Lesson Lesson { get; set; } = default!;
 
+    public Guid? QuizResultId { get; set; }
     public virtual QuizResult? QuizResult { get; set; } = null!;
 }

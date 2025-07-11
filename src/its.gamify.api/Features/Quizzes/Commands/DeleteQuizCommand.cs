@@ -2,7 +2,7 @@
 using its.gamify.core;
 using MediatR;
 
-namespace its.gamify.api.Features.Quizes.Commands
+namespace its.gamify.api.Features.Quizzes.Commands
 {
     public class DeleteQuizCommand : IRequest<bool>
     {

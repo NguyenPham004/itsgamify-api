@@ -4,7 +4,7 @@ using its.gamify.domains.Entities;
 using MediatR;
 using System.Linq.Expressions;
 
-namespace its.gamify.api.Features.Quizes.Queries
+namespace its.gamify.api.Features.Quizzes.Queries
 {
     public class GetAllQuizQuery : IRequest<BasePagingResponseModel<Quiz>>
     {

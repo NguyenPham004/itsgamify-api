@@ -1,4 +1,4 @@
-﻿using its.gamify.api.Features.Quizes.Queries;
+﻿using its.gamify.api.Features.Quizzes.Queries;
 using its.gamify.core;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
@@ -27,7 +27,7 @@ namespace its.gamify.api.Features.QuizResults.Queries
                 {
                     filter = x => x..Contains(request.Search);
                 }*/
-                var res = await unitOfWork.QuizResultRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.LearningProgress!]);
+                var res = await unitOfWork.QuizResultRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter);
 
                 return new BasePagingResponseModel<QuizResult>(datas: res.Entities, pagination: res.Pagination);
             }

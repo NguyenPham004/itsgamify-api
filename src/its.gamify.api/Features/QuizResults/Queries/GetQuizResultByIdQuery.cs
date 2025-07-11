@@ -1,4 +1,4 @@
-﻿using its.gamify.api.Features.Quizes.Queries;
+﻿using its.gamify.api.Features.Quizzes.Queries;
 using its.gamify.core;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -17,8 +17,7 @@ namespace its.gamify.api.Features.QuizResults.Queries
             }
             public async Task<QuizResult> Handle(GetQuizResultByIdQuery request, CancellationToken cancellationToken)
             {
-                return (await unitOfWork.QuizResultRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    [x => x.LearningProgress!]))
+                return (await unitOfWork.QuizResultRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken))
                      ?? throw new InvalidOperationException("Không tìm thấy Quiz result với id " + request.Id);
             }
         }

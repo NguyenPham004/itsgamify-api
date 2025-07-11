@@ -6,7 +6,7 @@ using its.gamify.core.Models.Quizes;
 using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.Quizes.Commands
+namespace its.gamify.api.Features.Quizzes.Commands
 {
     public class CreateQuizCommand : QuizCreateModel, IRequest<Quiz>
     {
@@ -15,9 +15,9 @@ namespace its.gamify.api.Features.Quizes.Commands
         {
             public CommandValidation()
             {
-                RuleFor(x=>x.TotalMarks).GreaterThanOrEqualTo(0).WithMessage("Total mark must be larger than or equal 0");
-                RuleFor(x=>x.PassedMarks).GreaterThanOrEqualTo(0).WithMessage("Passed mark must be larger than or equal 0");
-                RuleFor(x=>x.TotalQuestions).GreaterThan(0).WithMessage("Total question must be larger than 0");
+                RuleFor(x => x.TotalMark).GreaterThanOrEqualTo(0).WithMessage("Total mark must be larger than or equal 0");
+                RuleFor(x => x.PassedMark).GreaterThanOrEqualTo(0).WithMessage("Passed mark must be larger than or equal 0");
+                RuleFor(x => x.TotalQuestion).GreaterThan(0).WithMessage("Total question must be larger than 0");
             }
         }
         class CommandHandler : IRequestHandler<CreateQuizCommand, Quiz>

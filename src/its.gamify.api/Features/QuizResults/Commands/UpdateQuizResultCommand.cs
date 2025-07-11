@@ -15,7 +15,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
         {
             public CommandValidate()
             {
-                RuleFor(x => x.Model.Score).GreaterThanOrEqualTo(0).WithMessage("Score must be larger or equal than 0");
+                // RuleFor(x => x.Model.Score).GreaterThanOrEqualTo(0).WithMessage("Score must be larger or equal than 0");
             }
         }
         class CommandHandler : IRequestHandler<UpdateQuizResultCommand, bool>

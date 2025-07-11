@@ -1,5 +1,5 @@
 ﻿using its.gamify.api.Features.Practices.Commands;
-using its.gamify.api.Features.Quizes.Commands;
+using its.gamify.api.Features.Quizzes.Commands;
 using its.gamify.core;
 using its.gamify.domains.Enums;
 using MediatR;

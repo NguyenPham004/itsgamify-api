@@ -9,50 +9,49 @@ namespace its.gamify.api.Features.Questions.Commands
     {
         public Guid QuizId { get; set; } = Guid.Empty;
         public List<QuestionUpsertModel> QuestionUpsertModels { get; set; } = [];
-        class CommandHandler : IRequestHandler<UpsertQuestionCommand, Guid>
+        public double Duration { get; set; }
+        class CommandHandler(IUnitOfWork _unitOfWork) : IRequestHandler<UpsertQuestionCommand, Guid>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
-            private async Task<Quiz> GetQuiz(int passMarks, int totalQuestions)
+
+            private async Task<Quiz> GetQuiz(int totalMark, int totalQuestions, double duration)
             {
                 var quiz = new Quiz()
                 {
-                    PassedMarks = passMarks,
+                    TotalMark = totalMark,
+                    Duration = duration,
+                    PassedMark = totalMark / 2,
                     TotalQuestions = totalQuestions
                 };
-                await unitOfWork.QuizRepository.AddAsync(quiz);
-                await unitOfWork.SaveChangesAsync();
+                await _unitOfWork.QuizRepository.AddAsync(quiz);
+                await _unitOfWork.SaveChangesAsync();
                 return quiz;
             }
             public async Task<Guid> Handle(UpsertQuestionCommand request, CancellationToken cancellationToken)
             {
 
-                Quiz? quiz = await unitOfWork.QuizRepository.GetByIdAsync(request.QuizId);
+                Quiz? quiz = await _unitOfWork.QuizRepository.GetByIdAsync(request.QuizId);
 
                 if (quiz != null)
                 {
-                    var tmp = await unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
+                    var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
                     if (tmp.Count > 0)
                     {
-                        unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
-                        await unitOfWork.SaveChangesAsync();
+                        _unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
+                        await _unitOfWork.SaveChangesAsync();
 
                     }
                 }
 
-                quiz ??= await GetQuiz(10, request.QuestionUpsertModels.Count);
-                var questions = unitOfWork.Mapper.Map<List<Question>>(request.QuestionUpsertModels);
+                quiz ??= await GetQuiz(10, request.QuestionUpsertModels.Count, request.Duration);
+                var questions = _unitOfWork.Mapper.Map<List<Question>>(request.QuestionUpsertModels);
 
                 foreach (var question in questions)
                 {
                     question.QuizId = quiz.Id;
                 }
 
-                await unitOfWork.QuestionRepository.AddRangeAsync(questions, cancellationToken);
-                await unitOfWork.SaveChangesAsync();
+                await _unitOfWork.QuestionRepository.AddRangeAsync(questions, cancellationToken);
+                await _unitOfWork.SaveChangesAsync();
 
                 return quiz.Id;
             }

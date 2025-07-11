@@ -36,6 +36,7 @@ namespace its.gamify.api.Features.Lessons.Commands
                     {
                         lesson.QuizId = await mediator.Send(new UpsertQuestionCommand()
                         {
+                            Duration = lesson.DurationInMinutes,
                             QuizId = model.QuizId ?? Guid.Empty,
                             QuestionUpsertModels = model.QuestionModels
 

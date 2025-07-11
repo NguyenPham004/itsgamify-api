@@ -5,7 +5,7 @@ using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.Quizes;
 using MediatR;
 
-namespace its.gamify.api.Features.Quizes.Commands
+namespace its.gamify.api.Features.Quizzes.Commands
 {
     public class UpdateQuizCommand : IRequest<bool>
     {
@@ -15,9 +15,9 @@ namespace its.gamify.api.Features.Quizes.Commands
         {
             public CommandValidate()
             {
-                RuleFor(x => x.Model.TotalMarks).GreaterThanOrEqualTo(0).WithMessage("Total mark must be larger than or equal 0");
-                RuleFor(x => x.Model.PassedMarks).GreaterThanOrEqualTo(0).WithMessage("Passed mark must be larger than or equal 0");
-                RuleFor(x => x.Model.TotalQuestions).GreaterThan(0).WithMessage("Total question must be larger than 0");
+                RuleFor(x => x.Model.TotalMark).GreaterThanOrEqualTo(0).WithMessage("Total mark must be larger than or equal 0");
+                RuleFor(x => x.Model.PassedMark).GreaterThanOrEqualTo(0).WithMessage("Passed mark must be larger than or equal 0");
+                RuleFor(x => x.Model.TotalQuestion).GreaterThan(0).WithMessage("Total question must be larger than 0");
             }
         }
         class CommandHandler : IRequestHandler<UpdateQuizCommand, bool>
