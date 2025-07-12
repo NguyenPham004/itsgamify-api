@@ -9,7 +9,7 @@ namespace its.gamify.api.Features.Departments.Queries
 {
     public class GetAllDepartmentQuery : IRequest<BasePagingResponseModel<DepartmentViewModel>>
     {
-        public FilterQuery Filter { get; set; }
+        public required FilterQuery Filter { get; set; }
 
         class QueryHandler : IRequestHandler<GetAllDepartmentQuery, BasePagingResponseModel<DepartmentViewModel>>
         {

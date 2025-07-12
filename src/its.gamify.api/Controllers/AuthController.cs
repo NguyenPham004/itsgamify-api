@@ -4,13 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    public class AuthController : BaseController
+    public class AuthController(IAuthService authService) : BaseController
     {
-        private IAuthService authService;
-        public AuthController(IAuthService authService)
-        {
-            this.authService = authService;
-        }
+        private readonly IAuthService authService = authService;
+
         [HttpPost("google/{token}")]
         public async Task<IActionResult> LoginGoogleAsync([FromRoute] string token)
         {

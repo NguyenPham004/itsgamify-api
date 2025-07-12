@@ -36,6 +36,5 @@ namespace its.gamify.core
         public ILearningMaterialRepository LearningMaterialRepository { get; }
         public ICourseMetricRepository CourseMetricRepository { get; }
         Task<bool> SaveChangesAsync();
-        Task SeedData();
     }
 }

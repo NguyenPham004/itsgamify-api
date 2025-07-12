@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\its.gamify.domains\its.gamify.domains.csproj" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>

@@ -35,7 +35,7 @@ namespace its.gamify.api.Features.LearningMaterials.Commands
                 //             Description = ""
                 //         };
                 //         await unitOfWork.LearningMaterialRepository.AddAsync(learningMate);
-                //         await unitOfWork.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync();
 
 
                 //     }

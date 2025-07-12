@@ -11,19 +11,11 @@ namespace its.gamify.api.Features.CourseSections.Commands
     {
         public required CourseSectionUpdateModel Model { get; set; }
         public required Guid SectionId { get; set; }
-        class CommandHandler : IRequestHandler<UpsertCourseSectionCommand, CourseSection>
+        class CommandHandler(IUnitOfWork _unitOfWork,
+            IMediator mediator
+        ) : IRequestHandler<UpsertCourseSectionCommand, CourseSection>
         {
-            private readonly IUnitOfWork _unitOfWork;
-            private readonly IFirebaseService firebaseSerivce;
-            private readonly IMediator mediator;
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IFirebaseService firebaseService,
-                IMediator mediator)
-            {
-                this.mediator = mediator;
-                this.firebaseSerivce = firebaseService;
-                this._unitOfWork = unitOfWork;
-            }
+
             public async Task<CourseSection> Handle(UpsertCourseSectionCommand request, CancellationToken cancellationToken)
             {
                 CourseSection course_section = await _unitOfWork.CourseSectionRepository.GetByIdAsync(request.SectionId) ?? throw new Exception();

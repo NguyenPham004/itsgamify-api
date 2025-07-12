@@ -1,5 +1,8 @@
+using its.gamify.api.Middlewares;
 using its.gamify.api.Validations;
+using its.gamify.core.GlobalExceptionHandling;
 using its.gamify.core.Mappers;
+using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Models;
 using its.gamify.infras.Datas;
 using MediatR;
@@ -8,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scrutor;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -20,6 +24,7 @@ public static class ServiceCollectionExtensions
     /// Todo: Swagger Generation
     /// </summary>
     /// <param name="services"></param>
+    /// <param name="appSetting"></param>
     /// <returns></returns>
     public static IServiceCollection AddCoreServices(this IServiceCollection services,
         AppSetting appSetting)
@@ -58,11 +63,10 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddHttpContextAccessor();
+
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
             appSetting.ConnectionStrings["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
-        // services.AddDbContext<AppDbContext>(options => options.USeSqlServer(
-        //     services.BuildServiceProvider().GetRequiredService<IConfiguration>()
-        //         .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.Scan(scan =>
@@ -91,8 +95,43 @@ public static class ServiceCollectionExtensions
             };
         });
 
-        // AutoMapper
-        services.AddAutoMapper(typeof(MapperConfigurationProfile));
+        services.AddAutoMapper(typeof(MapperConfigurationProfile).Assembly);
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
+
+        services.AddControllers(options =>
+        {
+            options.ModelBinderProviders.Insert(0, new OrderParamListBinderProvider());
+        }).AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
+        });
+
+        services.AddControllers();
+
+        services.AddRouting(x => x.LowercaseUrls = true);
+
+        services.AddHttpClient();
+
+        services.AddSingleton<GlobalErrorHandlingMiddleware>();
+
+        services.AddSingleton(appSetting);
+
+        services.AddOpenApi();
+
+        services.AddSingleton<GlobalErrorHandlingMiddleware>();
+        services.AddSingleton<PerformanceMiddleware>();
+        services.AddSingleton<Stopwatch>();
+
         return services;
     }
     private static Assembly[] getAssemblies()

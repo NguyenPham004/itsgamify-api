@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace its.gamify.core.Services;
 
-public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService) : IDepartmentService
+public class DepartmentService(IMapper mapper, IUnitOfWork unitOfWork) : IDepartmentService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
