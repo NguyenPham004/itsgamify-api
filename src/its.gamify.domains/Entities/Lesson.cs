@@ -12,7 +12,10 @@ public class Lesson : BaseEntity
     public int DurationInMinutes { get; set; }
     public string Type { get; set; } = LearningMaterialType.VIDEO.ToString(); // e.g., Video, Article, Quiz
     [JsonPropertyName("video_url")]
-    public string? Url { get; set; } = string.Empty; // Link to the lesson material
+    public string? Url { get; set; } = string.Empty;
+    public List<FileEntity>? ImageFiles { get; set; }
+
+
     [JsonPropertyName("practice")]
     public ICollection<PracticeTag> Practices { get; set; } = [];
 
@@ -20,6 +23,7 @@ public class Lesson : BaseEntity
     public Guid? QuizId { get; set; }
     [JsonPropertyName("quiz")]
     public virtual Quiz? Quiz { get; set; }
+
 
     [JsonPropertyName("module_id")]
     public Guid? CourseSectionId { get; set; }

@@ -1,5 +1,6 @@
 ﻿
 using its.gamify.core.Models.Questions;
+using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using System.Text.Json.Serialization;
 
@@ -16,6 +17,7 @@ public class LessonCreateModel
     public string? Content { get; set; }
     [JsonPropertyName("module_id")]
     public Guid? CourseSectionId { get; set; }
+    public List<FileEntity>? ImageFiles { get; set; }
 }
 
 public class LessonUpdateModel : LessonCreateModel
