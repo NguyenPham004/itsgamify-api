@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Users.Commands;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using MediatR;
 
 namespace its.gamify.api.Features.Courses.Commands
@@ -17,13 +18,13 @@ namespace its.gamify.api.Features.Courses.Commands
 
             public async Task<bool> Handle(DeleteCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id);
-                if (course is not null)
-                {
-                    unitOfWork.CourseRepository.SoftRemove(course);
-                    return await unitOfWork.SaveChangesAsync();
-                }
-                else throw new InvalidOperationException("Course not found");
+                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id)
+                    ?? throw new BadRequestException("Khóa học không tồn tại!");
+
+                unitOfWork.CourseRepository.SoftRemove(course);
+                return await unitOfWork.SaveChangesAsync();
+
+
             }
         }
 

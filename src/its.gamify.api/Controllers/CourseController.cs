@@ -18,24 +18,21 @@ namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]s")]
     [ApiController]
-    public class CourseController : ControllerBase
+    public class CourseController(IMediator mediator) : ControllerBase
     {
-        private readonly ICourseService _courseService;
-        private readonly IMediator mediator;
-        public CourseController(ICourseService courseService, IMediator mediator)
-        {
-            _courseService = courseService;
-            this.mediator = mediator;
-        }
+        private readonly IMediator mediator = mediator;
+
         /// <summary>
         /// Delete course
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _courseService.Delete(id);
-            if (result) return Ok("Delete Successfully");
-            else return BadRequest("Deleted Failed");
+            await mediator.Send(new DeleteCourseCommand()
+            {
+                Id = id
+            });
+            return NoContent();
         }
 
 
