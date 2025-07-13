@@ -33,6 +33,10 @@ namespace its.gamify.api.Features.Questions.Commands
 
                 if (quiz != null)
                 {
+                    quiz.TotalQuestions = request.QuestionUpsertModels.Count;
+                    quiz.Duration = request.Duration;
+                    _unitOfWork.QuizRepository.Update(quiz);
+
                     var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
                     if (tmp.Count > 0)
                     {

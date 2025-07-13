@@ -1,6 +1,4 @@
 ﻿using FluentValidation;
-using its.gamify.api.Features.CourseSections.Commands;
-using its.gamify.api.Features.LearningMaterials.Commands;
 using its.gamify.core;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
@@ -108,20 +106,6 @@ namespace its.gamify.api.Features.Courses.Commands
 
                 unitOfWork.CourseRepository.Update(course);
                 await unitOfWork.SaveChangesAsync();
-
-                if (request.Model.IsUpdateModule)
-                {
-                    foreach (var courseSection in request.Model.CourseSections ?? [])
-                    {
-                        await mediator.Send(new UpsertCourseSectionCommand()
-                        {
-                            Model = courseSection,
-                            SectionId = courseSection.Id
-                        }, cancellationToken);
-                    }
-
-                }
-
 
                 return true;
 

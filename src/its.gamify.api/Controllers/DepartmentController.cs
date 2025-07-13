@@ -8,8 +8,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 
 
 namespace its.gamify.api.Controllers
@@ -17,32 +15,19 @@ namespace its.gamify.api.Controllers
 
     [Route("api/[controller]s")]
     [ApiController]
-    public class DepartmentController : ControllerBase
+    public class DepartmentController(IMediator mediator) : ControllerBase
     {
-        private readonly IDepartmentService _departmentService;
-        private readonly IMediator mediator;
-        public DepartmentController(IDepartmentService DepartmentService, IMediator mediator)
-        {
-            _departmentService = DepartmentService;
-            this.mediator = mediator;
-        }
-        /// <summary>
-        /// Delete Department
-        /// </summary>
+        private readonly IMediator mediator = mediator;
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _departmentService.Delete(id);
-            if (result) return Ok("Delete Successfully");
-            else return BadRequest("Deleted Failed");
-        }
-        [HttpDelete]
-        public async Task<IActionResult> DeleteRage([FromBody] List<Guid> ids)
-        {
-            var result = await _departmentService.DeleteRange(ids);
+            await mediator.Send(new DeleteDepartmentCommand
+            {
+                Id = id
+            });
             return NoContent();
         }
-
 
         [HttpGet]
         [ProcessOrderBy]
@@ -55,23 +40,23 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] DepartmentUpdateModel updatedItem)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] DepartmentUpdateModel updatedItem)
         {
-            var result = await _departmentService.Update(updatedItem);
-            if (result) return Ok("Cập nhật thành công");
-            else return BadRequest();
+            await mediator.Send(new UpdateDepartmentCommand
+            {
+                Id = id,
+                Model = updatedItem
+            });
+            return Ok();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DepartmentCreateModel createItem)
         {
-            var result = await _departmentService.Create(createItem);
-            if (result is null)
+            return Ok(await mediator.Send(new CreateDepartmentCommand
             {
-                return BadRequest("Can not create Department");
-
-            }
-            else return Ok(result);
+                Model = createItem
+            }));
         }
 
 
