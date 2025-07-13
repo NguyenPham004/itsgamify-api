@@ -20,6 +20,7 @@ namespace its.gamify.api.Features.Departments.Commands
                         throw new Exception("Không tìm thấy department!");
 
                 _unitOfWork.Mapper.Map(request.Model, updatedItem);
+                _unitOfWork.DepartmentRepository.Update(updatedItem);
                 return await _unitOfWork.SaveChangesAsync();
             }
         }

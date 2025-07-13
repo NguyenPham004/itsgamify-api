@@ -18,7 +18,7 @@ namespace its.gamify.api.Features.Departments.Commands
             {
                 var exist = await _unitOfWork.DepartmentRepository.WhereAsync(x => x.Name == request.Model.Name);
                 if (exist.Count != 0) throw new BadRequestException("Phòng ban đã tồn tại");
-                var createItem = _unitOfWork.Mapper.Map<Department>(request.Model.Name);
+                var createItem = _unitOfWork.Mapper.Map<Department>(request.Model);
                 await _unitOfWork.DepartmentRepository.AddAsync(createItem, cancellationToken);
                 await _unitOfWork.SaveChangesAsync();
                 return createItem;
