@@ -83,16 +83,8 @@ namespace its.gamify.api.Features.Courses.Commands
 
         }
 
-        class CommandHandler : IRequestHandler<UpdateCourseCommand, bool>
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateCourseCommand, bool>
         {
-            private readonly IUnitOfWork unitOfWork;
-            private readonly IMediator mediator;
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IMediator mediator)
-            {
-                this.mediator = mediator;
-                this.unitOfWork = unitOfWork;
-            }
             public async Task<bool> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
             {
                 var course = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Model.Id)
@@ -103,6 +95,11 @@ namespace its.gamify.api.Features.Courses.Commands
                     ?? throw new InvalidOperationException("Không tìm thấy image thumbnail")).Url;
                 course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.Model.IntroVideoId)
                     ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id ")).Url;
+
+                if (course.CourseType != CourseTypeEnum.DEPARTMENTONLY.ToString())
+                {
+                    course.DepartmentId = null;
+                }
 
                 unitOfWork.CourseRepository.Update(course);
                 await unitOfWork.SaveChangesAsync();

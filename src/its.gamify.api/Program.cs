@@ -1,3 +1,4 @@
+using Hangfire;
 using its.gamify.api;
 using its.gamify.api.Middlewares;
 using its.gamify.core.GlobalExceptionHandling;
@@ -24,6 +25,9 @@ app.UseMiddleware<PerformanceMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+
+app.UseHangfireDashboard("/hangfire");
+
 app.MapOpenApi();
 app.UseAuthentication();
 app.UseAuthorization();

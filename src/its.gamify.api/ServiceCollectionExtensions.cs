@@ -1,3 +1,4 @@
+using Hangfire;
 using its.gamify.api.Middlewares;
 using its.gamify.api.Validations;
 using its.gamify.core.GlobalExceptionHandling;
@@ -132,6 +133,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PerformanceMiddleware>();
         services.AddSingleton<Stopwatch>();
 
+        services.AddHangfire(config => config.UseInMemoryStorage());
+        services.AddHangfireServer();
         return services;
     }
     private static Assembly[] getAssemblies()
