@@ -1,4 +1,6 @@
+using Hangfire;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Lessons;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
@@ -13,10 +15,42 @@ namespace its.gamify.api.Features.LearningProgresses.Commands
 
 
         class CommandHandler(
-            IUnitOfWork _unitOfWork
+            IUnitOfWork _unitOfWork,
+             IBackgroundJobClient _backgroundJobClient
         ) : IRequestHandler<UpsertProgressCommand, LearningProgress>
         {
 
+            public async Task CompletedCourse(Guid participationId)
+            {
+                var participation = await _unitOfWork
+                    .CourseParticipationRepository
+                    .GetByIdAsync(participationId, includes: x => x.LearningProgresses.Where(x => !x.IsDeleted))
+                ?? throw new BadRequestException("Chưa tham gia khóa học");
+
+                var modules = await _unitOfWork
+                    .CourseSectionRepository
+                    .WhereAsync(x => x.CourseId == participation.CourseId, includes: x => x.Lessons.Where(x => !x.IsDeleted));
+
+                int totalLessons = modules.Sum(module => module.Lessons.Count);
+                int completedLesson = participation.LearningProgresses.Where(x => x.Status == PROGRESS_STATUS.COMPLETED).Count();
+                if (totalLessons == completedLesson)
+                {
+                    participation.Status = COURSE_PARTICIPATION_STATUS.COMPLETED;
+                    _unitOfWork.CourseParticipationRepository.Update(participation);
+                    var course_result = new CourseResult
+                    {
+                        Scrore = 10,
+                        IsPassed = true,
+                        CompletedDate = DateTime.UtcNow,
+                        CourseId = participation.CourseId,
+                        UserId = participation.UserId,
+                        CourseParticipationId = participation.Id
+                    };
+
+                    await _unitOfWork.CourseResultRepository.AddAsync(course_result);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
 
             public async Task<LearningProgress> Handle(UpsertProgressCommand request, CancellationToken cancellationToken)
             {
@@ -52,7 +86,7 @@ namespace its.gamify.api.Features.LearningProgresses.Commands
                 }
 
                 await _unitOfWork.SaveChangesAsync();
-
+                _backgroundJobClient.Enqueue(() => CompletedCourse(request.Model.CourseParticipationId!));
                 return progress;
 
             }
