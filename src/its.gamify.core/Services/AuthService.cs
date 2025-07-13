@@ -37,22 +37,6 @@ namespace its.gamify.core.Services
             if (user is not null && userInDb is not null)
             {
                 string newToken = TokenGenerator.GenerateToken(user: userInDb, role: userInDb.Role?.Name ?? string.Empty);
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userInDb.Id.ToString()),
-                    new Claim(ClaimTypes.Email, userInDb.Email.ToString())
-                };
-
-                var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("VERYSTRONGPASSWORD_CHANGEMEIFYOUNEED"));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                var token = new JwtSecurityToken(
-                    issuer: "its.gamify",
-                    audience: "its.gamify.client",
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(1),
-                    signingCredentials: creds
-                );
 
                 return new AuthResponseModel
                 {
