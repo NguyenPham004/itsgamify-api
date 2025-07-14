@@ -8,6 +8,8 @@ using its.gamify.domains.Models;
 using its.gamify.infras.Datas;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -135,6 +137,24 @@ public static class ServiceCollectionExtensions
 
         services.AddHangfire(config => config.UseInMemoryStorage());
         services.AddHangfireServer();
+
+        services.Configure<FormOptions>(options =>
+        {
+            options.ValueLengthLimit = int.MaxValue;
+            options.MultipartBodyLengthLimit = int.MaxValue;
+            options.MultipartHeadersLengthLimit = int.MaxValue;
+        });
+
+
+        services.Configure<KestrelServerOptions>(options =>
+        {
+            options.Limits.MaxRequestBodySize = int.MaxValue;
+        });
+
+        services.Configure<IISServerOptions>(options =>
+        {
+            options.MaxRequestBodySize = int.MaxValue;
+        });
         return services;
     }
     private static Assembly[] getAssemblies()

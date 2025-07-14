@@ -8,6 +8,6 @@ public class Quiz : BaseEntity
     public double Duration { get; set; } = 0;
     public virtual ICollection<Question> Questions { get; set; } = [];
     public virtual ICollection<QuizResult> QuizResults { get; set; } = [];
-    public Guid? ChallengIdId { get; set; }
+    public Guid? ChallengeId { get; set; }
     public virtual Challenge? Challenge { get; set; } = null!;
 }

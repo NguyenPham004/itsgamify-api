@@ -26,7 +26,7 @@ namespace its.gamify.api.Features.Quizzes.Queries
                 {
                     filter = x =>
                              // x.LessonId.Equals(Guid.Parse(request.Search)) ||
-                             x.ChallengIdId.Equals(Guid.Parse(request.Search));
+                             x.ChallengeId.Equals(Guid.Parse(request.Search));
                 }
                 var res = await unitOfWork.QuizRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter);
 
