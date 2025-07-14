@@ -66,7 +66,7 @@ public class S3Service(AppSetting _appSetting) : IS3Service
 
         await transferUtility.UploadAsync(uploadRequest);
 
-        var url = $"{_appSetting.AWSConfig.S3BaseObjectUrl}/{objName}";
+        var url = $"{_appSetting.AWSConfig.S3BaseObjectUrl}?fileName={objName}&expiryMinutes=60";
 
         return (objName, url);
     }
