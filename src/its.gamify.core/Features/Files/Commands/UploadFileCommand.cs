@@ -1,6 +1,7 @@
 ﻿using its.gamify.core;
 using its.gamify.core.IntegrationServices.Interfaces;
 using its.gamify.core.Models.Files;
+using its.gamify.core.Services;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -8,40 +9,38 @@ namespace its.gamify.api.Features.Files.Commands
 {
     public class UploadFileCommand : FileCreateModel, IRequest<FileEntity>
     {
-        class CommandHandler : IRequestHandler<UploadFileCommand, FileEntity>
+        class CommandHandler(
+            IS3Service _s3Service,
+            IUnitOfWork _unitOfWork
+        ) : IRequestHandler<UploadFileCommand, FileEntity>
         {
-            private readonly IFirebaseService firebaseService;
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IFirebaseService firebaseService,
-                IUnitOfWork unitOfwork)
-            {
-                this.unitOfWork = unitOfwork;
-                this.firebaseService = firebaseService;
-            }
+
             public async Task<FileEntity> Handle(UploadFileCommand request, CancellationToken cancellationToken)
             {
-                var res = await firebaseService.UploadFileAsync(request.File, "its-gamify/storage");
+                var (fileName, url) = await _s3Service.UploadFileAsync(request.File);
                 var fileSize = request.File.Length;
-                if (!string.IsNullOrEmpty(res.url))
+                if (!string.IsNullOrEmpty(url))
                 {
                     var file = new domains.Entities.FileEntity()
                     {
                         Id = Guid.NewGuid(),
-                        FileName = res.fileName,
-                        Url = res.url,
+                        FileName = fileName,
+                        Url = url,
                         ContentType = request.File.ContentType,
-                        Extension = Path.GetExtension(res.fileName).Replace(".", ""),
+                        Extension = Path.GetExtension(fileName).Replace(".", ""),
                         Size = fileSize,
                     };
                     // Check Duplicate Link 
-                    var fileExists = await unitOfWork.FileRepository.WhereAsync(x => x.FileName == res.fileName);
+                    var fileExists = await _unitOfWork.FileRepository.WhereAsync(x => x.FileName == fileName);
                     foreach (var fileInDb in fileExists)
                     {
-                        fileInDb.Url = res.url;
-                        unitOfWork.FileRepository.Update(fileInDb);
+                        fileInDb.Url = url;
+                        _unitOfWork.FileRepository.Update(fileInDb);
                     }
-                    await unitOfWork.FileRepository.AddAsync(file);
-                    await unitOfWork.SaveChangesAsync();
+
+                    await _unitOfWork.FileRepository.AddAsync(file, cancellationToken);
+                    await _unitOfWork.SaveChangesAsync();
+
                     return file;
                 }
                 else

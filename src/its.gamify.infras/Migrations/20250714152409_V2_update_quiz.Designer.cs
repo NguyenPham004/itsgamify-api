@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using its.gamify.infras.Datas;
@@ -12,9 +13,11 @@ using its.gamify.infras.Datas;
 namespace its.gamify.infras.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250714152409_V2_update_quiz")]
+    partial class V2_update_quiz
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1185,6 +1188,9 @@ namespace its.gamify.infras.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ChallengId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("ChallengeId")
                         .HasColumnType("uuid");
 
@@ -1364,56 +1370,56 @@ namespace its.gamify.infras.Migrations
                         {
                             Id = new Guid("71874fd3-1892-4d92-a77f-c85c0d16b8db"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(4383),
+                            CreatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(1357),
                             Description = "",
                             IsDeleted = false,
                             Name = "EMPLOYEE",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(4390)
+                            UpdatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(1360)
                         },
                         new
                         {
                             Id = new Guid("620d170e-c32e-4443-b450-32848c1eb5e9"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5169),
+                            CreatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2077),
                             Description = "",
                             IsDeleted = false,
                             Name = "LEADER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5169)
+                            UpdatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2078)
                         },
                         new
                         {
                             Id = new Guid("3b72db68-b2c6-40d8-859e-b4996f8535a1"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5184),
+                            CreatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2093),
                             Description = "",
                             IsDeleted = false,
                             Name = "TRAININGSTAFF",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5185)
+                            UpdatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2093)
                         },
                         new
                         {
                             Id = new Guid("f7fa7c6b-f76a-4b95-8711-517eb8205a1a"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5187),
+                            CreatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2096),
                             Description = "",
                             IsDeleted = false,
                             Name = "MANAGER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5188)
+                            UpdatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2096)
                         },
                         new
                         {
                             Id = new Guid("b002d347-66b9-4722-9547-5b2165abaa9f"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5201),
+                            CreatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2098),
                             Description = "",
                             IsDeleted = false,
                             Name = "ADMIN",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 14, 15, 38, 35, 141, DateTimeKind.Utc).AddTicks(5201)
+                            UpdatedDate = new DateTime(2025, 7, 14, 15, 24, 8, 545, DateTimeKind.Utc).AddTicks(2098)
                         });
                 });
 
