@@ -5,7 +5,7 @@ using its.gamify.core.Services;
 using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.Files.Commands
+namespace its.gamify.core.Features.Files.Commands
 {
     public class UploadFileCommand : FileCreateModel, IRequest<FileEntity>
     {
