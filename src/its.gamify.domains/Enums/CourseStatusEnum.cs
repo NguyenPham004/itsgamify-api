@@ -38,3 +38,11 @@ public static class COURSE_TYPE
     public const string ALL = "ALL";
     public const string DEPARTMENTONLY = "DEPARTMENTONLY";
 }
+
+public static class COURSE_CLASSIFY
+{
+    public const string ALL = "ALL";
+    public const string ENROLLED = "ENROLLED";
+    public const string SAVED = "SAVED";
+
+}
