@@ -26,6 +26,9 @@ jobs:
           (Get-Content $appsettings) -replace '"S3SecretKey":\s*""', '"S3SecretKey": "${{ secrets.S3_SECRET_KEY }}"' | Set-Content $appsettings
           (Get-Content $appsettings) -replace '"S3BucketName":\s*""', '"S3BucketName": "${{ secrets.S3_BUCKET_NAME }}"' | Set-Content $appsettings
           (Get-Content $appsettings) -replace '"S3BaseObjectUrl":\s*""', '"S3BaseObjectUrl": "${{ secrets.S3_BASE_OBJECT_URL }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ServiceAccountAdmin":\s*""', '"ServiceAccountAdmin": "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ADMIN }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ServiceAccountPass":\s*""', '"S3BaseObjectUrl": "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PASS }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ApiKey":\s*""', '"ApiKey": "${{ secrets.FIREBASE_API_KEY }}"' | Set-Content $appsettings
         shell: pwsh
         
       - name: Set up .NET Core
