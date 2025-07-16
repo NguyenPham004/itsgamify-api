@@ -125,4 +125,9 @@ namespace its.gamify.core.Models.ShareModels
         }
     }
 
+    public class CourseQuery: FilterQuery
+    {
+        public string Classify { get; set; } = string.Empty;
+    }
+
 }

@@ -9,9 +9,9 @@ namespace its.gamify.core.Models.Quizes
 {
     public class QuizCreateModel
     {
-        public double TotalMarks { get; set; } = 0.0;
-        public double PassedMarks { get; set; } = 0.0;
-        public int TotalQuestions { get; set; } = 0;
+        public double TotalMark { get; set; } = 0.0;
+        public double PassedMark { get; set; } = 0.0;
+        public int TotalQuestion { get; set; } = 0;
         public Guid LessonId { get; set; }
         public Guid ChallengIdId { get; set; }
     }

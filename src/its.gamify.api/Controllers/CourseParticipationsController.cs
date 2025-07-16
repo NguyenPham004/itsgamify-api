@@ -44,16 +44,15 @@ namespace its.gamify.api.Controllers
 
         [HttpGet("classify-course")]
         [Authorize]
-        public async Task<IActionResult> ClassifyCourse([FromQuery] FilterQuery query, [FromQuery] string classify)
+        public async Task<IActionResult> ClassifyCourse([FromQuery] CourseQuery query)
         {
             var result = await _mediator.Send(new ClassifyCourseQuery()
             {
                 FilterQuery = query,
-                Classfy = classify
             });
             return Ok(result);
         }
-        [HttpGet("category")]
+        /*[HttpGet("category")]
         [Authorize]
         public async Task<IActionResult> GetCourseParticipatedByCategory([FromQuery] FilterQuery query, [FromQuery] Guid categoryId)
         {
@@ -63,6 +62,6 @@ namespace its.gamify.api.Controllers
                 CategoryId = categoryId
             });
             return Ok(result);
-        }
+        }*/
     }
 }

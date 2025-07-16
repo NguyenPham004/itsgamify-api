@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace its.gamify.core.Models.Quizes
 {
-    public class QuizViewModel:QuizCreateModel
+    public class QuizViewModel : QuizCreateModel
     {
     }
 }

@@ -39,6 +39,12 @@ public static class COURSE_TYPE
     public const string DEPARTMENTONLY = "DEPARTMENTONLY";
 }
 
+public static class COURSE_PARTICIPATION_STATUS
+{
+    public const string COMPLETED = "COMPLETED";
+    public const string IN_PROGRESS = "IN_PROGRESS";
+}
+
 public static class COURSE_CLASSIFY
 {
     public const string ALL = "ALL";

@@ -1,4 +1,6 @@
 using its.gamify.api.Features.Lessons.Commands;
+using its.gamify.core.Features.Lessons.Queries;
+using its.gamify.core.Models.Lessons;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,13 +8,10 @@ namespace its.gamify.api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LessonsController : ControllerBase
+    public class LessonsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-        public LessonsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DelById([FromRoute] Guid id)
         {
@@ -31,17 +30,11 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-        // [HttpDelete]
-        // public async Task<IActionResult> DelRange([FromQuery] List<Guid> ids)
-        // {
-        //     foreach (var id in ids)
-        //     {
-        //         await _mediator.Send(new DeleteLessonCommand()
-        //         {
-        //             Id = id
-        //         });
-        //     }
-        //     return NoContent();
-        // }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
+        {
+
+            return Ok(await _mediator.Send(new GetLessonByIdQuery() { Id = id }));
+        }
     }
 }

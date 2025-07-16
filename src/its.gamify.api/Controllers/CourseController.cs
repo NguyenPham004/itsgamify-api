@@ -1,41 +1,30 @@
-using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
-using its.gamify.api.Features.LearningMaterials.Commands;
-using its.gamify.api.Features.Users.Queries;
+using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
-using its.gamify.core.Models.LearningMaterials;
-using its.gamify.core.Models.ShareModels;
-using its.gamify.core.Services.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]s")]
     [ApiController]
-    public class CourseController : ControllerBase
+    public class CourseController(IMediator mediator) : ControllerBase
     {
-        private readonly ICourseService _courseService;
-        private readonly IMediator mediator;
-        public CourseController(ICourseService courseService, IMediator mediator)
-        {
-            _courseService = courseService;
-            this.mediator = mediator;
-        }
         /// <summary>
         /// Delete course
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _courseService.Delete(id);
-            if (result) return Ok("Delete Successfully");
-            else return BadRequest("Deleted Failed");
+            await mediator.Send(new DeleteCourseCommand()
+            {
+                Id = id
+            });
+            return NoContent();
         }
 
 
@@ -43,11 +32,11 @@ namespace its.gamify.api.Controllers
         /// Get all course
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] FilterQuery query)
+        public async Task<IActionResult> GetAll([FromQuery] CourseQuery query)
         {
             var res = await mediator.Send(new GetAllCourseQuery()
             {
-                FilterQuery = query
+                CourseQuery = query
             });
             return Ok(res);
 

@@ -1,25 +1,18 @@
-﻿using its.gamify.core.Services;
+﻿using its.gamify.core.Features.Roles;
+using its.gamify.core.Services;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    public class RolesController(IRoleService roleService) : BaseController
+    public class RolesController(IMediator _mediator) : BaseController
     {
-        private readonly IRoleService _roleService = roleService;
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _roleService.GetAllAsync();
             return Ok(
-                new { data = result.Item2, pagination = result.Item1 }
+                await _mediator.Send(new GetAllRolesQuery())
             );
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateRoleModel model)
-        {
-            var result = await _roleService.CreateAsync(model);
-            return Ok(result);
         }
     }
 }

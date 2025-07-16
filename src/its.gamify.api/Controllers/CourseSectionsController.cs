@@ -24,19 +24,6 @@ namespace its.gamify.api.Controllers
             return NoContent();
         }
 
-        // [HttpDelete]
-        // public async Task<IActionResult> DelRange([FromQuery] List<Guid> ids)
-        // {
-        //     foreach (var id in ids)
-        //     {
-        //         var res = await mediator.Send(new DeleteCourseSectionByIdCommand()
-        //         {
-        //             Id = id
-        //         });
-        //     }
-        //     return NoContent();
-        // }
-
         [HttpPost]
         public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionCommand command,
         [FromServices] IMediator mediator)

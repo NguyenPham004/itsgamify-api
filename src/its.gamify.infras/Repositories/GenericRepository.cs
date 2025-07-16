@@ -114,7 +114,6 @@ public class GenericRepository<TEntity>(
      IQueryable<TEntity> query,
      List<OrderByItem>? orderBy = null)
     {
-        Console.WriteLine($"order by {orderBy.Count}");
         if (orderBy == null || orderBy.Count == 0)
         {
             return query.OrderByDescending(x => x.CreatedDate);
