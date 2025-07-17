@@ -1,3 +1,4 @@
+using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.Courses.Queries;
@@ -6,6 +7,7 @@ using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -113,9 +115,5 @@ namespace its.gamify.api.Controllers
             });
             return Ok(courseParticipation);
         }
-
-
-        
-
     }
 }

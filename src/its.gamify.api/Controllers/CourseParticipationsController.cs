@@ -29,17 +29,6 @@ namespace its.gamify.api.Controllers
             // throw new InvalidOperationException("Danh sách CourseParticipation trống");
             return Ok(result);
         }
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id)
-        {
-            var result = await _mediator.Send(new GetCourseParticipationByCourse()
-            {
-                CourseId = id,
-                PageIndex = 0,
-                PageSize = 10
-            });
-            return Ok(result);
-        }
+        
     }
 }
