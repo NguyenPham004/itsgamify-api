@@ -115,5 +115,18 @@ namespace its.gamify.api.Controllers
             });
             return Ok(courseParticipation);
         }
+
+        [HttpGet("{id}/course-participations")]
+        [Authorize]
+        public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id)
+        {
+            var result = await mediator.Send(new GetCourseParticipationByCourse()
+            {
+                CourseId = id,
+                PageIndex = 0,
+                PageSize = 10
+            });
+            return Ok(result);
+        }
     }
 }
