@@ -16,7 +16,8 @@ namespace its.gamify.core.Features.Courses.Queries;
 
 public class CourseQuery : FilterQuery
 {
-    public string? Categories { get; set; } = string.Empty;
+    public string? Classify { get; set; } = string.Empty;
+    public string? Category { get; set; } = string.Empty;
 }
 public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 {
@@ -48,14 +49,38 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
             {
-                filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
+                if (request.CourseQuery?.Classify == COURSE_CLASSIFY.ENROLLED.ToString())
+                {
+                    filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
                     x.IsDraft == false &&
-                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
+                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId)) &&
+                    x.CourseParticipations.Any(u => u.UserId == user.Id && u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
+                }
+                else if (request.CourseQuery?.Classify == COURSE_CLASSIFY.SAVED.ToString())
+                {
+                    List<CourseCollection> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == user.Id).ToList();
 
-                includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                    filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
+                    x.IsDraft == false &&
+                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId)) &&
+                    x.CourseParticipations.Any(u => u.UserId == user.Id)
+                    && collections.Any(x => x.UserId == user.Id);
+                }
+                else
+                {
+                    filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
+                    x.IsDraft == false &&
+                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId)) &&
+                    x.CourseParticipations.Any(u => u.UserId == user.Id);
+                }
+                res = await unitOfWork.CourseRepository.ToDynamicPagination(request.CourseQuery?.Page ?? 0,
+                    request.CourseQuery?.Limit ?? 10,
+                    filter: filter,
+                    sortOrders: request.CourseQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
+                    includeFunc: x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                         .Include(x => x.Deparment!)
-                        .Include(x => x.Category);
+                        .Include(x => x.Category));
 
             }
 
@@ -70,9 +95,9 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                         .Include(x => x.Category);
             }
 
-            if (!string.IsNullOrEmpty(request.CourseQuery?.Categories))
+            if (!string.IsNullOrEmpty(request.CourseQuery?.Category))
             {
-                var categoryIds = JsonConvert.DeserializeObject<List<Guid>>(request.CourseQuery.Categories);
+                var categoryIds = JsonConvert.DeserializeObject<List<Guid>>(request.CourseQuery.Category);
                 if (categoryIds != null && categoryIds.Count != 0)
                 {
                     Expression<Func<Course, bool>> filter_cate = x => categoryIds != null && categoryIds.Count != 0 && categoryIds.Contains(x.CategoryId);

@@ -41,27 +41,5 @@ namespace its.gamify.api.Controllers
             });
             return Ok(result);
         }
-
-        [HttpGet("classify-course")]
-        [Authorize]
-        public async Task<IActionResult> ClassifyCourse([FromQuery] CourseQuery query)
-        {
-            var result = await _mediator.Send(new ClassifyCourseQuery()
-            {
-                FilterQuery = query,
-            });
-            return Ok(result);
-        }
-        /*[HttpGet("category")]
-        [Authorize]
-        public async Task<IActionResult> GetCourseParticipatedByCategory([FromQuery] FilterQuery query, [FromQuery] Guid categoryId)
-        {
-            var result = await _mediator.Send(new GetCourseByCategoryQuery()
-            {
-                FilterQuery = query,
-                CategoryId = categoryId
-            });
-            return Ok(result);
-        }*/
     }
 }
