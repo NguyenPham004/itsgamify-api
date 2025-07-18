@@ -16,7 +16,7 @@ public class Lesson : BaseEntity
     public List<FileEntity>? ImageFiles { get; set; }
 
 
-    [JsonPropertyName("practice")]
+    [JsonPropertyName("practices")]
     public ICollection<PracticeTag> Practices { get; set; } = [];
 
     [JsonPropertyName("quiz_id")]

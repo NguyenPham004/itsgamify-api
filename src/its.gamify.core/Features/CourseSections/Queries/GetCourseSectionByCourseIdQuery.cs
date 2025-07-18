@@ -15,18 +15,15 @@ namespace its.gamify.api.Features.CourseSections.Queries
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
         public Guid CourseId { get; set; } = Guid.Empty;
-        class QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<GetCourseSectionByCourseIdQuery, BasePagingResponseModel<CourseSection>>
+        class QueryHandler(IUnitOfWork _unitOfWork, IClaimsService _claimsService) : IRequestHandler<GetCourseSectionByCourseIdQuery, BasePagingResponseModel<CourseSection>>
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-            private readonly IClaimsService _claimsService = claimsService;
-
             public async Task<BasePagingResponseModel<CourseSection>> Handle(GetCourseSectionByCourseIdQuery request, CancellationToken cancellationToken)
             {
                 List<(Expression<Func<CourseSection, object>> OrderBy, bool IsDescending)>? orderByList = [(x => x.OrderedNumber, false)];
 
                 (Pagination Pagination, List<CourseSection> Entities)? res = null;
 
-                if (_claimsService.CurrentRole == ROLE.EMPLOYEE)
+                if (_claimsService.CurrentRole == ROLE.EMPLOYEE || _claimsService.CurrentRole == ROLE.LEADER)
                 {
                     res = await _unitOfWork.CourseSectionRepository.ToDynamicPagination(
                         pageIndex: request.PageIndex,
@@ -45,7 +42,8 @@ namespace its.gamify.api.Features.CourseSections.Queries
                         pageIndex: request.PageIndex,
                         pageSize: 1000,
                         filter: x => x.CourseId == request.CourseId,
-                        includeFunc: x => x.Include(x => x.Lessons.Where(x => !x.IsDeleted))
+                        includeFunc: x => x
+                                        .Include(x => x.Lessons.Where(x => !x.IsDeleted))
                                             .ThenInclude(x => x.Quiz)
                                                 .ThenInclude(q => q!.Questions.Where(x => !x.IsDeleted))
                                         .Include(x => x.Lessons.Where(x => !x.IsDeleted))
