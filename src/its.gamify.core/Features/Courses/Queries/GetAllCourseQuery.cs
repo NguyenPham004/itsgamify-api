@@ -49,7 +49,12 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
                    x.IsDraft == false &&
-                   (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId)) ;
+                   (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
+
+                includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                       .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
+                       .Include(x => x.Deparment!)
+                       .Include(x => x.Category);
 
             }
 
@@ -75,7 +80,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             }
             if (!string.IsNullOrEmpty(request.CourseQuery?.Classify) && (_claimSerivce.CurrentRole == ROLE.EMPLOYEE || _claimSerivce.CurrentRole == ROLE.LEADER))
             {
-                Expression<Func<Course, bool>> filter_classify = null;
+                Expression<Func<Course, bool>>? filter_classify = null;
                 if (request.CourseQuery?.Classify == COURSE_CLASSIFY.ENROLLED.ToString())
                 {
                     filter_classify = x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
@@ -83,7 +88,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                 }
                 else if (request.CourseQuery?.Classify == COURSE_CLASSIFY.SAVED.ToString())
                 {
-                    List<Guid> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == user.Id).Select(x => x.UserId).ToList();
+                    List<Guid> collections = [.. (await unitOfWork.CourseCollectionRepository.WhereAsync(x => x.UserId == user.Id)).Select(x => x.UserId)];
                     filter_classify = x => collections != null && collections.Count != 0 && collections.Contains(user.Id);
                     filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
                 }
