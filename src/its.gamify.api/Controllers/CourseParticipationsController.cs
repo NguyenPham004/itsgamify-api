@@ -26,6 +26,5 @@ namespace its.gamify.api.Controllers
             return Ok(result);
         }
 
-
     }
 }

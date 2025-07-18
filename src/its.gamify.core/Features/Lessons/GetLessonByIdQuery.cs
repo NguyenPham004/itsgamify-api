@@ -14,7 +14,8 @@ namespace its.gamify.core.Features.Lessons.Queries
             {
                 Expression<Func<Lesson, object>>[] includes = [
                     x => x.Quiz!,
-                    x => x.Quiz!.Questions.Where(x=>!x.IsDeleted)
+                    x => x.Quiz!.Questions.Where(x=>!x.IsDeleted),
+                    x=>x.Practices.Where(x=>!x.IsDeleted)
                 ];
 
                 return await _unitOfWork

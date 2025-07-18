@@ -44,3 +44,11 @@ public static class COURSE_PARTICIPATION_STATUS
     public const string COMPLETED = "COMPLETED";
     public const string IN_PROGRESS = "IN_PROGRESS";
 }
+
+public static class COURSE_CLASSIFY
+{
+    public const string ALL = "ALL";
+    public const string ENROLLED = "ENROLLED";
+    public const string SAVED = "SAVED";
+
+}
