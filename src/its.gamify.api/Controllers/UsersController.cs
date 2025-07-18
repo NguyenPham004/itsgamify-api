@@ -68,7 +68,7 @@ namespace its.gamify.api.Controllers
             return res ? NoContent() : StatusCode(500);
 
         }
-        [HttpGet("{id}/course-result")]
+        [HttpGet("{id}/course-results")]
         public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] FilterQuery query)
         {
 
