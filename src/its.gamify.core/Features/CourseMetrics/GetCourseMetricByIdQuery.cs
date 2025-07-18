@@ -1,5 +1,6 @@
 ﻿using its.gamify.core;
-using its.gamify.core.Features.CourseResults.Queries;
+using its.gamify.core.Features.CourseResults;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -17,7 +18,7 @@ namespace its.gamify.api.Features.CourseMetrics
             }
             public async Task<CourseMetric> Handle(GetCourseMetricByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.CourseMetricRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.CourseMetricRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken) ?? throw new BadRequestException("");
             }
         }
     }

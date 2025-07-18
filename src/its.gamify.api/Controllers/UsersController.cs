@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Users.Commands;
 using its.gamify.api.Features.Users.Queries;
+using its.gamify.core.Features.CourseResults;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Models.Users;
 using MediatR;
@@ -66,6 +67,16 @@ namespace its.gamify.api.Controllers
             });
             return res ? NoContent() : StatusCode(500);
 
+        }
+        [HttpGet("{id}/course-result")]
+        public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] FilterQuery query)
+        {
+
+            return Ok(await mediator.Send(new GetCourseResultByUserIdQuery()
+            {
+                UserId = id,
+                FilterQuery = query
+            }));
         }
 
     }
