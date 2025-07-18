@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
@@ -42,19 +43,20 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                     .Include(x => x.Category);
 
             (Pagination Pagination, List<Course> Entities)? res = null;
-            var user = await unitOfWork.UserRepository.GetByIdAsync(_claimSerivce.CurrentUser) ?? throw new Exception("Can not find user");
+
+            var user = await unitOfWork.UserRepository.GetByIdAsync(_claimSerivce.CurrentUser) ?? throw new BadRequestException("Không tìm thấy người dùng!");
 
 
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                   x.IsDraft == false &&
-                   (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
+                    x.IsDraft == false &&
+                    (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
 
                 includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
-                       .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
-                       .Include(x => x.Deparment!)
-                       .Include(x => x.Category);
+                        .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
+                        .Include(x => x.Deparment!)
+                        .Include(x => x.Category);
 
             }
 
@@ -78,15 +80,16 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                     filter = filter != null ? FilterCustom.CombineFilters(filter, filter_cate) : filter_cate;
                 }
             }
+
             if (!string.IsNullOrEmpty(request.CourseQuery?.Classify) && (_claimSerivce.CurrentRole == ROLE.EMPLOYEE || _claimSerivce.CurrentRole == ROLE.LEADER))
             {
                 Expression<Func<Course, bool>>? filter_classify = null;
-                if (request.CourseQuery?.Classify == COURSE_CLASSIFY.ENROLLED.ToString())
+                if (request.CourseQuery?.Classify == COURSE_CLASSIFY.ENROLLED)
                 {
                     filter_classify = x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
                     filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
                 }
-                else if (request.CourseQuery?.Classify == COURSE_CLASSIFY.SAVED.ToString())
+                else if (request.CourseQuery?.Classify == COURSE_CLASSIFY.SAVED)
                 {
                     List<Guid> collections = [.. (await unitOfWork.CourseCollectionRepository.WhereAsync(x => x.UserId == user.Id)).Select(x => x.UserId)];
                     filter_classify = x => collections != null && collections.Count != 0 && collections.Contains(user.Id);
