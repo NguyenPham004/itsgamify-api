@@ -1,10 +1,11 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace its.gamify.core.Features.CourseResults.Queries
+namespace its.gamify.core.Features.CourseResults
 {
     public class GetCourseResultByIdQuery : IRequest<CourseResult>
     {
@@ -18,7 +19,12 @@ namespace its.gamify.core.Features.CourseResults.Queries
             }
             public async Task<CourseResult> Handle(GetCourseResultByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.CourseResultRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.CourseResultRepository
+                    .GetByIdAsync(
+                        request.Id,
+                        cancellationToken: cancellationToken,
+                        includes: [x => x.User, x => x.Course, x => x.CourseParticipation]
+                    ) ?? throw new BadRequestException("Không tìm thấy chứng chỉ!");
             }
         }
     }

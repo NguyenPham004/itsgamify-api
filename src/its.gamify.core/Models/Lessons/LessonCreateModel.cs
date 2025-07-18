@@ -1,4 +1,5 @@
 ﻿
+using its.gamify.core.Models.Practices;
 using its.gamify.core.Models.Questions;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
@@ -30,8 +31,8 @@ public class LessonUpdateModel : LessonCreateModel
     [JsonPropertyName("questions")]
     public List<QuestionUpsertModel>? QuestionModels { get; set; }
 
-    // [JsonPropertyName("practice")]
-    // public List<PracticeUpsertModel>? Practices { get; set; }
+    [JsonPropertyName("practices")]
+    public List<PracticeUpsertModel>? Practices { get; set; }
 
 }
 

@@ -1,3 +1,4 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 using System;
@@ -18,7 +19,7 @@ namespace its.gamify.core.Features.ChallengeParticipations.Queries
             }
             public async Task<ChallengeParticipation> Handle(GetChallengeParticipationByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.ChallengeParticipationRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.ChallengeParticipationRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken) ?? throw new BadRequestException("");
             }
         }
     }
