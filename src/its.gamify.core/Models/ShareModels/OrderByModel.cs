@@ -38,7 +38,7 @@ namespace its.gamify.core.Models.ShareModels
                 .ToList();
 
             // If no order_by parameters found, don't bind anything
-            if (!orderByKeys.Any())
+            if (orderByKeys.Count == 0)
             {
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
@@ -76,7 +76,7 @@ namespace its.gamify.core.Models.ShareModels
 
                 foreach (var item in group)
                 {
-                    var value = request.Query[item.Key].FirstOrDefault();
+                    var value = request.Query[item!.Key].FirstOrDefault();
                     // Skip empty values - don't process empty order parameters
                     if (string.IsNullOrWhiteSpace(value)) continue;
 
@@ -99,7 +99,7 @@ namespace its.gamify.core.Models.ShareModels
             }
 
             // If we parsed parameters but none were valid, don't bind
-            if (!orderParams.Any())
+            if (orderParams.Count == 0)
             {
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
@@ -115,7 +115,7 @@ namespace its.gamify.core.Models.ShareModels
     // Model Binder Provider
     public class OrderParamListBinderProvider : IModelBinderProvider
     {
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        public IModelBinder? GetBinder(ModelBinderProviderContext context)
         {
             if (context.Metadata.ModelType == typeof(OrderParam[]))
             {

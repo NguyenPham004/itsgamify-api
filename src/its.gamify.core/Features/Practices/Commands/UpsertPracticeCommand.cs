@@ -9,39 +9,30 @@ namespace its.gamify.api.Features.Practices.Commands
     {
         public Guid LessonId { get; set; }
         public List<PracticeUpsertModel> PracticeTags { get; set; } = [];
-        class CommandHandler : IRequestHandler<UpsertPracticeCommand, List<PracticeTag>>
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpsertPracticeCommand, List<PracticeTag>>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<List<PracticeTag>> Handle(UpsertPracticeCommand request, CancellationToken cancellationToken)
             {
-                var res = new List<PracticeTag>();
-                foreach (var practiceTag in request.PracticeTags)
-                {
-                    var isUpdate = practiceTag.CreateId is not null && practiceTag.CreateId != Guid.Empty;
-                    if (isUpdate)
-                    {
-                        var current = await unitOfWork.PracticeTagRepository.FirstOrDefaultAsync(x => x.Id == practiceTag.CreateId)
-                            ?? throw new InvalidOperationException($"Không tìm thấy practice_tag với Id: {practiceTag.CreateId}");
-                        unitOfWork.Mapper.Map(practiceTag, current);
-                        current.LessonId = request.LessonId;
-                        unitOfWork.PracticeTagRepository.Update(current);
-                        res.Add(current);
-                    }
-                    else
-                    {
-                        var createItem = unitOfWork.Mapper.Map<PracticeTag>(practiceTag);
-                        createItem.LessonId = request.LessonId;
-                        await unitOfWork.PracticeTagRepository.AddAsync(createItem);
-                        res.Add(createItem);
-                    }
-                    await unitOfWork.SaveChangesAsync();
+                var existing = await unitOfWork.PracticeTagRepository.WhereAsync(x => x.LessonId == request.LessonId);
 
+                if (existing.Count > 0)
+                {
+                    unitOfWork.PracticeTagRepository.SoftRemoveRange(existing);
+                    await unitOfWork.SaveChangesAsync();
                 }
-                return res;
+
+
+                var pratices = unitOfWork.Mapper.Map<List<PracticeTag>>(request.PracticeTags);
+                foreach (var practice in pratices)
+                {
+                    practice.LessonId = request.LessonId;
+                }
+
+                await unitOfWork.PracticeTagRepository.AddRangeAsync(pratices, cancellationToken);
+                await unitOfWork.SaveChangesAsync();
+
+                return pratices;
             }
         }
     }

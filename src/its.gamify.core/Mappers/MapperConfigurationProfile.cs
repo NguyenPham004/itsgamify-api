@@ -57,8 +57,8 @@ public class MapperConfigurationProfile : Profile
         CreateMap<CourseSection, CourseSectionCreateModel>().ReverseMap();
         CreateMap<CourseSection, CourseSectionUpdateModel>()
             .ForMember(x => x.Lessons, op => op.Ignore())
-            .ReverseMap();
-
+            .ReverseMap()
+            .ForMember(x => x.Lessons, op => op.Ignore());
         #endregion
 
 
@@ -66,7 +66,9 @@ public class MapperConfigurationProfile : Profile
         CreateMap<Lesson, LessonCreateModel>().ReverseMap();
         CreateMap<Lesson, LessonUpdateModel>()
             .ForMember(x => x.QuestionModels, op => op.Ignore())
-            .ReverseMap();
+            .ForMember(x => x.Practices, op => op.Ignore())
+            .ReverseMap()
+            .ForMember(x => x.Practices, op => op.Ignore());
 
         #endregion
 

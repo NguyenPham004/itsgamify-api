@@ -11,16 +11,12 @@ namespace its.gamify.api.Features.Lessons.Commands
     public class UpsertLessonsCommand : IRequest<List<Lesson>>
     {
         public List<LessonUpdateModel> Models { get; set; } = [];
-        class CommandHandler : IRequestHandler<UpsertLessonsCommand, List<Lesson>>
+        class CommandHandler(
+            IUnitOfWork unitOfWork,
+            IMediator mediator
+        ) : IRequestHandler<UpsertLessonsCommand, List<Lesson>>
         {
-            private readonly IMediator mediator;
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IMediator mediator)
-            {
-                this.mediator = mediator;
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<List<Lesson>> Handle(UpsertLessonsCommand request, CancellationToken cancellationToken)
             {
 
@@ -42,12 +38,19 @@ namespace its.gamify.api.Features.Lessons.Commands
 
                         }, cancellationToken);
                     }
-
                     unitOfWork.LessonRepository.Update(lesson);
                     await unitOfWork.SaveChangesAsync();
+
+                    if (lesson.Type == LESSON_TYPES.PRACTICE)
+                    {
+                        lesson.Practices = await mediator.Send(new UpsertPracticeCommand()
+                        {
+                            LessonId = lesson.Id,
+                            PracticeTags = model.Practices!
+                        }, cancellationToken);
+                    }
+
                     res.Add(lesson);
-
-
                 }
                 return res;
 
