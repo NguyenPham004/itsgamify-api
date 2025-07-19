@@ -1,4 +1,6 @@
-using System.Linq.Expressions;
+﻿using Amazon.S3.Model;
+using Azure.Core;
+using Firebase.Auth;
 using its.gamify.core;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
@@ -9,6 +11,7 @@ using its.gamify.domains.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Linq.Expressions;
 
 
 
@@ -75,18 +78,9 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             }
             if (!string.IsNullOrEmpty(request.CourseQuery?.Classify) && (_claimSerivce.CurrentRole == ROLE.EMPLOYEE || _claimSerivce.CurrentRole == ROLE.LEADER))
             {
-                Expression<Func<Course, bool>> filter_classify = null;
-                if (request.CourseQuery?.Classify == COURSE_CLASSIFY.ENROLLED.ToString())
-                {
-                    filter_classify = x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
-                    filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
-                }
-                else if (request.CourseQuery?.Classify == COURSE_CLASSIFY.SAVED.ToString())
-                {
-                    List<Guid> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == user.Id).Select(x => x.UserId).ToList();
-                    filter_classify = x => collections != null && collections.Count != 0 && collections.Contains(user.Id);
-                    filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
-                }
+                Expression<Func<Course, bool>> filter_classify = await ClassifyFunc(request.CourseQuery?.Classify, user.Id);
+                filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
+                
             }
 
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
@@ -100,9 +94,32 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             return new BasePagingResponseModel<Course>(datas: res.Value.Entities, pagination: res.Value.Pagination);
         }
+        private async Task<Expression<Func<Course, bool>>> ClassifyFunc(string? value, Guid UserId)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return x => true;
+            }
+
+            if (value == COURSE_CLASSIFY.ENROLLED.ToString())
+            {
+                return  x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
+            }
+            else if (value == COURSE_CLASSIFY.SAVED.ToString())
+            {
+                if(UserId == Guid.Empty) return x => true; 
+                List<Guid> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == UserId).Select(x => x.UserId).ToList();
+                return x => collections != null && collections.Count != 0 && collections.Contains(UserId);
+            }
+            else if(value == COURSE_CLASSIFY.COMPLETED.ToString())
+            {
+                return x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.COMPLETED.ToString());
+            }
+            return x => true;
+        }
 
     }
-
+    
 }
 
 
