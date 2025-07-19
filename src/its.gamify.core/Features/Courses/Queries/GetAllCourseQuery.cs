@@ -52,7 +52,12 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
                    x.IsDraft == false &&
-                   (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId)) ;
+                   (x.CourseType == COURSE_TYPE.ALL || (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.DepartmentId == user.DepartmentId));
+
+                includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                       .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
+                       .Include(x => x.Deparment!)
+                       .Include(x => x.Category);
 
             }
 
