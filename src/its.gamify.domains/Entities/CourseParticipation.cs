@@ -15,6 +15,7 @@ public class CourseParticipation : BaseEntity
     [JsonPropertyName("course_id")]
     public Guid CourseId { get; set; }
     public virtual Course Course { get; set; } = null!;
+    public DateTime Deadline { get; set; }
     public virtual CourseResult? CourseResult { get; set; }
     public ICollection<LearningProgress> LearningProgresses { get; set; } = [];
     public virtual CourseReview? CourseReview { get; set; }

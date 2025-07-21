@@ -33,6 +33,7 @@ public class Course : BaseEntity
     [JsonPropertyName("drafted")]
     public bool IsDraft { get; set; } = false;
     public string Status { get; set; } = CourseStatusEnum.INITIAL.ToString();
+    public bool IsOptional { get; set; } = false;
 
     public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
     public virtual ICollection<CourseParticipation> CourseParticipations { get; set; } = [];

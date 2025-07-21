@@ -29,7 +29,7 @@ public class User : BaseEntity
     #region  Relationship Configuration 
     public Guid RoleId { get; set; }
     public virtual Role? Role { get; set; }
-    public virtual EmployeeMetric? EmployeeMetric { get; set; }
+    public ICollection<EmployeeMetric>? EmployeeMetrics { get; set; }
     public virtual ICollection<CourseParticipation>? CourseParticipations { get; set; }
     public virtual ICollection<Badge>? Badges { get; set; }
     public virtual ICollection<CourseResult> CourseResults { get; set; } = new List<CourseResult>();
