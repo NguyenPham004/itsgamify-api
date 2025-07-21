@@ -1,8 +1,7 @@
 namespace its.gamify.domains.Entities;
 
-public class EmployeeMetric : BaseEntity
+public class UserMetric : BaseEntity
 {
-    public string Description { get; set; } = string.Empty;
     public int CourseParticipatedNum { get; set; } = 0;
     public int CourseCompletedNum { get; set; } = 0;
     public int ChallengeParticipateNum { get; set; } = 0;

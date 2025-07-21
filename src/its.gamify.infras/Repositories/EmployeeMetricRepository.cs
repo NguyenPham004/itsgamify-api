@@ -5,7 +5,7 @@ using its.gamify.infras.Datas;
 
 namespace its.gamify.infras.Repositories
 {
-    public class EmployeeMetricRepository : GenericRepository<EmployeeMetric>, IEmployeeMetricRepository
+    public class EmployeeMetricRepository : GenericRepository<UserMetric>, IEmployeeMetricRepository
     {
         public EmployeeMetricRepository(AppDbContext context, ICurrentTime currentTime, IClaimsService claimsService)
             : base(context, currentTime, claimsService)

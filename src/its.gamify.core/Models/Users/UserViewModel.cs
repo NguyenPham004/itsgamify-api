@@ -16,8 +16,6 @@ namespace its.gamify.core.Models.Users
         public string Status { get; set; } = string.Empty;
         [JsonPropertyName("phone_number")]
         public string? PhoneNumber { get; set; } = string.Empty;
-        [JsonPropertyName("metric_description")]
-        public string MetricDescription { get; set; } = string.Empty;
         [JsonPropertyName("department_id")]
         public Guid DepartmentId { get; set; }
         [JsonPropertyName("role")]

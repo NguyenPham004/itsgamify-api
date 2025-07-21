@@ -7,5 +7,5 @@ public class Quarter : BaseEntity
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public virtual ICollection<Course>? Courses { get; set; }
-    public ICollection<EmployeeMetric>? EmployeeMetrics { get; set; }
+    public ICollection<UserMetric>? UserMetrics { get; set; }
 }
