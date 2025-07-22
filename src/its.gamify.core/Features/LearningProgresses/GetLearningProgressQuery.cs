@@ -1,13 +1,16 @@
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace its.gamify.core.Features.LearningProgresses.Queries
 {
     public class GetLearningProgressQuery : IRequest<BasePagingResponseModel<LearningProgress>>
     {
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
+        public FilterQuery? Filter { get; set; }
         public class QueryHandler : IRequestHandler<GetLearningProgressQuery, BasePagingResponseModel<LearningProgress>>
         {
             private readonly IUnitOfWork unitOfWork;
@@ -17,12 +20,25 @@ namespace its.gamify.core.Features.LearningProgresses.Queries
             }
             public async Task<BasePagingResponseModel<LearningProgress>> Handle(GetLearningProgressQuery request, CancellationToken cancellationToken)
             {
-                var items = await unitOfWork.LearningProgressRepository.ToPagination(
-                    pageIndex: request.PageIndex,
-                    pageSize: request.PageSize,
-                    includes: [x => x.CourseParticipation, x => x.QuizResult],
-                    cancellationToken: cancellationToken);
-                return new BasePagingResponseModel<LearningProgress>(items.Entities, items.Pagination);
+                (Pagination Pagination, List<LearningProgress> Entities)? res = null;
+                Expression<Func<LearningProgress, bool>>? filter = null;
+                Dictionary<string, bool>? sortOrders = request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
+
+                Func<IQueryable<LearningProgress>, IIncludableQueryable<LearningProgress, object>>? includeFunc =
+                    x =>
+                        x
+                        .Include(x => x.Lesson!)
+                        .Include(x => x.QuizResult!)
+                        .Include(x => x.CourseParticipation);
+                res = await unitOfWork.LearningProgressRepository.ToDynamicPagination(
+                              request.Filter?.Page ?? 0,
+                              request.Filter?.Limit ?? 10,
+                              filter: filter,
+                              searchTerm: request.Filter?.Q, searchFields: ["Status", "LastAccessed"],
+                              sortOrders: sortOrders,
+                              includeFunc: includeFunc
+                        );
+                return new BasePagingResponseModel<LearningProgress>(datas: res.Value.Entities, pagination: res.Value.Pagination);
             }
         }
     }
