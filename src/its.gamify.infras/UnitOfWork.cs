@@ -19,7 +19,7 @@ namespace its.gamify.infras
         private readonly IBadgeRepository _badgeRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IDifficultyRepository _difficultyRepository;
-        private readonly IEmployeeMetricRepository _employeeMetricRepository;
+        private readonly IUserMetricRepository _userMetricRepository;
         private readonly ILeaderBoardRepository _leaderBoardRepository;
         private readonly ILessonRepository _lessonRepository;
         private readonly ICourseSectionRepository _courseSectionRepository;
@@ -57,7 +57,7 @@ namespace its.gamify.infras
             _badgeRepository = serviceProvider.GetRequiredService<IBadgeRepository>();
             _categoryRepository = serviceProvider.GetRequiredService<ICategoryRepository>();
             _difficultyRepository = serviceProvider.GetRequiredService<IDifficultyRepository>();
-            _employeeMetricRepository = serviceProvider.GetRequiredService<IEmployeeMetricRepository>();
+            _userMetricRepository = serviceProvider.GetRequiredService<IUserMetricRepository>();
             _leaderBoardRepository = serviceProvider.GetRequiredService<ILeaderBoardRepository>();
             _lessonRepository = serviceProvider.GetRequiredService<ILessonRepository>();
             _courseSectionRepository = serviceProvider.GetRequiredService<ICourseSectionRepository>();
@@ -86,7 +86,7 @@ namespace its.gamify.infras
         public IBadgeRepository BadgeRepository => _badgeRepository;
         public ICategoryRepository CategoryRepository => _categoryRepository;
         public IDifficultyRepository DifficultyRepository => _difficultyRepository;
-        public IEmployeeMetricRepository EmployeeMetricRepository => _employeeMetricRepository;
+        public IUserMetricRepository UserMetricRepository => _userMetricRepository;
         public ILeaderBoardRepository LeaderBoardRepository => _leaderBoardRepository;
         public ILessonRepository LessonRepository => _lessonRepository;
         public ICourseSectionRepository CourseSectionRepository => _courseSectionRepository;

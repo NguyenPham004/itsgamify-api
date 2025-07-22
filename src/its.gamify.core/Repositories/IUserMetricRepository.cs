@@ -2,7 +2,7 @@ using its.gamify.domains.Entities;
 
 namespace its.gamify.core.Repositories
 {
-    public interface IEmployeeMetricRepository : IGenericRepository<UserMetric>
+    public interface IUserMetricRepository : IGenericRepository<UserMetric>
     {
     }
 }

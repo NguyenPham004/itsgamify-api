@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace its.gamify.core.Features.EmployeeMetrics;
+namespace its.gamify.core.Features.UserMetrics;
 
-public class EmployeeMetricQuery : IRequest<BasePagingResponseModel<UserMetric>>
+public class UserMetricQuery : IRequest<BasePagingResponseModel<UserMetric>>
 {
     public FilterQuery? Filter { get; set; }
-    class QueryHandler (IUnitOfWork unitOfWork, IClaimsService _claimSerivce) : IRequestHandler<EmployeeMetricQuery, BasePagingResponseModel<UserMetric>>
+    class QueryHandler (IUnitOfWork unitOfWork, IClaimsService _claimSerivce) : IRequestHandler<UserMetricQuery, BasePagingResponseModel<UserMetric>>
     {
-        public async Task<BasePagingResponseModel<UserMetric>> Handle(EmployeeMetricQuery request, CancellationToken cancellationToken)
+        public async Task<BasePagingResponseModel<UserMetric>> Handle(UserMetricQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<UserMetric, bool>>? filter = null;
             var user = await unitOfWork.UserRepository.GetByIdAsync(_claimSerivce.CurrentUser) ?? throw new BadRequestException("Không tìm thấy người dùng!");
@@ -34,7 +34,7 @@ public class EmployeeMetricQuery : IRequest<BasePagingResponseModel<UserMetric>>
                     .Include(x => x.User!)
                     .Include(x => x.Quarter);
             (Pagination Pagination, List<UserMetric> Entities)? res = null;
-            res = await unitOfWork.EmployeeMetricRepository.ToDynamicPagination(
+            res = await unitOfWork.UserMetricRepository.ToDynamicPagination(
                               request.Filter?.Page ?? 0,
                               request.Filter?.Limit ?? 10,
                               filter: filter,

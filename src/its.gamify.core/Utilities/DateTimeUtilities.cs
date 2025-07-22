@@ -28,5 +28,15 @@
             return (startDate, endDate);
         }
 
+        public static async Task<Guid> GetQuarterIdCurrent(IUnitOfWork unitOfWork)
+        {
+            var targetDate = DateTime.Today;
+            var quarterId = (await unitOfWork.QuarterRepository
+                .WhereAsync(q => q.StartDate <= targetDate && q.EndDate >= targetDate))
+                .Select(q => q.Id)
+                .FirstOrDefault();
+            return (quarterId);
+        }
+
     }
 }

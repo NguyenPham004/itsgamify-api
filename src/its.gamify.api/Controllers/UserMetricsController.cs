@@ -1,6 +1,7 @@
-﻿using its.gamify.core.Features.EmployeeMetrics;
+﻿using its.gamify.core.Features.UserMetrics;
 using its.gamify.core.Models.ShareModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -18,9 +19,10 @@ namespace its.gamify.api.Controllers
         /// Get all user metrics
         /// </summary>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter)
         {
-            var res = await mediator.Send(new EmployeeMetricQuery()
+            var res = await mediator.Send(new UserMetricQuery()
             {
                 Filter = Filter
             });
