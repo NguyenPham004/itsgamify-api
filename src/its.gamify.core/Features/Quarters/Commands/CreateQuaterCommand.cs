@@ -12,8 +12,8 @@ namespace its.gamify.api.Features.Quarters.Commands
         {
             public CommandValidation()
             {
-                RuleFor(x => x.EndDate).NotNull().NotEmpty().GreaterThan(x => x.StartDate);
-                RuleFor(x => x.EndDate).NotNull().NotEmpty().GreaterThanOrEqualTo(DateTime.Now);
+                RuleFor(x => x.EndDate).NotNull().NotEmpty().GreaterThan(x => x.StartDate).WithMessage("End date must be before start date.");
+                RuleFor(x => x.EndDate).NotNull().NotEmpty().GreaterThanOrEqualTo(DateTime.Now).WithMessage("End date must be before today.");
                 RuleFor(x => x.Name).NotNull().NotEmpty();
             }
         }

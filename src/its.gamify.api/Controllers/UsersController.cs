@@ -1,9 +1,11 @@
 ﻿using its.gamify.api.Features.Users.Commands;
 using its.gamify.api.Features.Users.Queries;
 using its.gamify.core.Features.CourseResults;
+using its.gamify.core.Features.UserMetrics;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Models.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -77,6 +79,17 @@ namespace its.gamify.api.Controllers
                 UserId = id,
                 FilterQuery = query
             }));
+        }
+        [HttpGet("{id}/user-metrics")]
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter)
+        {
+            var res = await mediator.Send(new UserMetricQuery()
+            {
+                Filter = Filter
+            });
+            return Ok(res);
+
         }
 
     }
