@@ -11,6 +11,7 @@ using its.gamify.domains.Enums;
 using its.gamify.domains.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 
@@ -39,7 +40,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             Dictionary<string, bool>? sortOrders = request.CourseQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
-            Func<IQueryable<Course>, Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<Course, object>>? includeFunc =
+            Func<IQueryable<Course>, IIncludableQueryable<Course, object>>? includeFunc =
                 x =>
                     x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                     .Include(x => x.Deparment!)

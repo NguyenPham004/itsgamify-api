@@ -2,6 +2,7 @@
 using its.gamify.core;
 using its.gamify.core.Models.Users;
 using its.gamify.core.Services.Interfaces;
+using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -40,6 +41,13 @@ namespace its.gamify.api.Features.Users.Commands
                     await authService.SignUpAsync(user.Email, request.Model.HashedPassword);
                 if (await unitOfWork.SaveChangesAsync())
                 {
+                    var userMetric = new UserMetric()
+                    {
+                        UserId = user.Id,
+                        QuarterId = await DateTimeUtilities.GetQuarterIdCurrent(unitOfWork)
+                    };
+                    await unitOfWork.UserMetricRepository.AddAsync(userMetric);
+                    await unitOfWork.SaveChangesAsync();
                     return unitOfWork.Mapper.Map<UserViewModel>(user);
                 }
                 else return null;
