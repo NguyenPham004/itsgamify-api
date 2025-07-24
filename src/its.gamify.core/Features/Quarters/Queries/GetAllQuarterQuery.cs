@@ -9,11 +9,12 @@ namespace its.gamify.api.Features.Quarters.Queries
 {
     public class GetAllQuarterQuery : IRequest<BasePagingResponseModel<Quarter>>
     {
-        public int PageSize { get; set; }
-        public int PageIndex { get; set; }
+        public FilterQuery? Filter { get; set; }
+        /*public int PageSize { get; set; }
+        public int PageIndex { get; set; }*/
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
-        public string SearchTerm { get; set; } = string.Empty;
+        /*public string SearchTerm { get; set; } = string.Empty;*/
         class QueuryHandler : IRequestHandler<GetAllQuarterQuery, BasePagingResponseModel<Quarter>>
         {
             private readonly IUnitOfWork unitOfWork;
@@ -41,13 +42,13 @@ namespace its.gamify.api.Features.Quarters.Queries
                 {
                     filter = x => x.EndDate <= request.DateTo;
                 }
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (!string.IsNullOrEmpty(request.Filter?.Q))
                 {
-                    filter = filter?.AndAlso(x => x.Name == request.SearchTerm);
+                    filter = filter?.AndAlso(x => x.Name == request.Filter.Q);
                 }
 
 
-                var result = await unitOfWork.QuarterRepository.ToPagination(request.PageIndex, request.PageSize, false, filter);
+                var result = await unitOfWork.QuarterRepository.ToPagination(request.Filter?.Page ?? 0, request.Filter?.Limit ?? 10, false, filter);
                 return new BasePagingResponseModel<Quarter>(result.Entities, result.Pagination);
             }
         }
