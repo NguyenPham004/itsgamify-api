@@ -11,20 +11,15 @@ namespace its.gamify.core.Features.CourseParticipations.Queries
     public class GetCourseParticipationQuery : IRequest<BasePagingResponseModel<CourseParticipation>>
     {
 
-        public class QueryHandler : IRequestHandler<GetCourseParticipationQuery, BasePagingResponseModel<CourseParticipation>>
+        public class QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<GetCourseParticipationQuery, BasePagingResponseModel<CourseParticipation>>
         {
-            private readonly IUnitOfWork unitOfWork;
-            private readonly IClaimsService claimsService;
-            public QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService)
-            {
-                this.unitOfWork = unitOfWork;
-                this.claimsService = claimsService;
-            }
+            private readonly IUnitOfWork unitOfWork = unitOfWork;
+            private readonly IClaimsService claimsService = claimsService;
+
             public async Task<BasePagingResponseModel<CourseParticipation>> Handle(GetCourseParticipationQuery request, CancellationToken cancellationToken)
             {
                 var user = await unitOfWork.UserRepository.GetByIdAsync(claimsService.CurrentUser) ?? throw new BadRequestException("Không tìm thấy người dùng!");
-                Expression<Func<CourseParticipation, bool>>? filter = null;
-                var items = await unitOfWork.CourseParticipationRepository.ToDynamicPagination(
+                var (Pagination, Entities) = await unitOfWork.CourseParticipationRepository.ToDynamicPagination(
                     pageIndex: 0,
                     pageSize: 3,
                     filter: x => x.UserId == claimsService.CurrentUser,
@@ -35,7 +30,7 @@ namespace its.gamify.core.Features.CourseParticipations.Queries
                         .Include(x => x.CourseResult!),
                     cancellationToken: cancellationToken);
 
-                return new BasePagingResponseModel<CourseParticipation>(items.Entities, items.Pagination);
+                return new BasePagingResponseModel<CourseParticipation>(Entities, Pagination);
             }
         }
     }
