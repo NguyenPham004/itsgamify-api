@@ -36,7 +36,7 @@ namespace its.gamify.api.Features.Users.Commands
                 CancellationToken cancellationToken)
             {
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
-                await unitOfWork.UserRepository.AddAsync(user);
+                await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
                 if (!string.IsNullOrEmpty(request.Model.HashedPassword))
                     await authService.SignUpAsync(user.Email, request.Model.HashedPassword);
                 if (await unitOfWork.SaveChangesAsync())
@@ -46,7 +46,7 @@ namespace its.gamify.api.Features.Users.Commands
                         UserId = user.Id,
                         QuarterId = await DateTimeUtilities.GetQuarterIdCurrent(unitOfWork)
                     };
-                    await unitOfWork.UserMetricRepository.AddAsync(userMetric);
+                    await unitOfWork.UserMetricRepository.AddAsync(userMetric, cancellationToken);
                     await unitOfWork.SaveChangesAsync();
                     return unitOfWork.Mapper.Map<UserViewModel>(user);
                 }
