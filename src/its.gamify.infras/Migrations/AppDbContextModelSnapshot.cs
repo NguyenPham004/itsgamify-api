@@ -1085,6 +1085,9 @@ namespace its.gamify.infras.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "correct_answer");
 
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid")
                         .HasAnnotation("Relational:JsonPropertyName", "created_by");
@@ -1135,6 +1138,8 @@ namespace its.gamify.infras.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "updated_date");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("QuizId");
 
@@ -1326,56 +1331,56 @@ namespace its.gamify.infras.Migrations
                         {
                             Id = new Guid("71874fd3-1892-4d92-a77f-c85c0d16b8db"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(787),
+                            CreatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(241),
                             Description = "",
                             IsDeleted = false,
                             Name = "EMPLOYEE",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(789)
+                            UpdatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(245)
                         },
                         new
                         {
                             Id = new Guid("620d170e-c32e-4443-b450-32848c1eb5e9"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1691),
+                            CreatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1162),
                             Description = "",
                             IsDeleted = false,
                             Name = "LEADER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1692)
+                            UpdatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1163)
                         },
                         new
                         {
                             Id = new Guid("3b72db68-b2c6-40d8-859e-b4996f8535a1"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1706),
+                            CreatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1199),
                             Description = "",
                             IsDeleted = false,
                             Name = "TRAININGSTAFF",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1706)
+                            UpdatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1200)
                         },
                         new
                         {
                             Id = new Guid("f7fa7c6b-f76a-4b95-8711-517eb8205a1a"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1709),
+                            CreatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1204),
                             Description = "",
                             IsDeleted = false,
                             Name = "MANAGER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1709)
+                            UpdatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1204)
                         },
                         new
                         {
                             Id = new Guid("b002d347-66b9-4722-9547-5b2165abaa9f"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1712),
+                            CreatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1208),
                             Description = "",
                             IsDeleted = false,
                             Name = "ADMIN",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 25, 11, 38, 24, 963, DateTimeKind.Utc).AddTicks(1712)
+                            UpdatedDate = new DateTime(2025, 7, 25, 17, 13, 26, 827, DateTimeKind.Utc).AddTicks(1209)
                         });
                 });
 
@@ -1407,14 +1412,7 @@ namespace its.gamify.infras.Migrations
                     b.Property<Guid?>("DepartmentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("DepartmentId1")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("EmpployeeCode")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -1456,16 +1454,9 @@ namespace its.gamify.infras.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "updated_date");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "username");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("DepartmentId1");
 
                     b.HasIndex("LeadearBoardId");
 
@@ -1764,11 +1755,19 @@ namespace its.gamify.infras.Migrations
 
             modelBuilder.Entity("its.gamify.domains.Entities.Question", b =>
                 {
+                    b.HasOne("its.gamify.domains.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("its.gamify.domains.Entities.Quiz", "Quiz")
                         .WithMany("Questions")
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("Quiz");
                 });
@@ -1811,13 +1810,9 @@ namespace its.gamify.infras.Migrations
             modelBuilder.Entity("its.gamify.domains.Entities.User", b =>
                 {
                     b.HasOne("its.gamify.domains.Entities.Department", "Department")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("its.gamify.domains.Entities.Department", null)
-                        .WithMany("Users")
-                        .HasForeignKey("DepartmentId1");
 
                     b.HasOne("its.gamify.domains.Entities.LeadearBoard", null)
                         .WithMany("Users")

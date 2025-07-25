@@ -8,12 +8,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.Property(x => x.DepartmentId).IsRequired(false);
+        builder.Property(x => x.DepartmentId).IsRequired(false).HasDefaultValue(null);
 
         builder.HasOne(x => x.Department)
-            .WithMany()
+            .WithMany(d => d.Users) 
             .HasForeignKey(x => x.DepartmentId)
-            .IsRequired(false) 
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasOne(x => x.Role)

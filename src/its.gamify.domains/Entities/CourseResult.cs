@@ -4,7 +4,7 @@ public class CourseResult : BaseEntity
 {
     public double Scrore { get; set; } = 0.0;
     public bool IsPassed { get; set; } = false;
-    public DateTime CompletedDate { get; set; } = DateTime.Now;
+    public DateTime CompletedDate { get; set; } = DateTime.UtcNow;
 
     #region Relationship Configuration 
     public Guid UserId { get; set; }

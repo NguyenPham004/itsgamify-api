@@ -4,7 +4,6 @@ namespace its.gamify.core.Models.Users
 {
     public class UserCreateModel
     {
-        public string EmployeeCode { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         [JsonPropertyName("password")]
         public string? HashedPassword { get; set; } = string.Empty;

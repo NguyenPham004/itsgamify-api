@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Users;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
@@ -17,7 +18,6 @@ namespace its.gamify.api.Features.Users.Commands
             {
                 RuleFor(x => x.Model.Email).EmailAddress();
                 RuleFor(x => x.Model.HashedPassword).NotNull().NotEmpty();
-                RuleFor(x => x.Model.EmployeeCode).NotNull().NotEmpty();
                 RuleFor(x => x.Model.DepartmentId).NotNull().NotEmpty();
             }
         }
@@ -38,19 +38,22 @@ namespace its.gamify.api.Features.Users.Commands
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
                 await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
                 if (!string.IsNullOrEmpty(request.Model.HashedPassword))
+
                     await authService.SignUpAsync(user.Email, request.Model.HashedPassword);
-                if (await unitOfWork.SaveChangesAsync())
+
+                var quarter = (await unitOfWork.QuarterRepository
+                    .FirstOrDefaultAsync(q => q.StartDate <= DateTime.UtcNow && q.EndDate >= DateTime.UtcNow))
+                    ?? throw new BadRequestException("No current quarter found");
+                var userMetric = new UserMetric()
                 {
-                    var userMetric = new UserMetric()
-                    {
-                        UserId = user.Id,
-                        QuarterId = await DateTimeUtilities.GetQuarterIdCurrent(unitOfWork)
-                    };
-                    await unitOfWork.UserMetricRepository.AddAsync(userMetric, cancellationToken);
-                    await unitOfWork.SaveChangesAsync();
-                    return unitOfWork.Mapper.Map<UserViewModel>(user);
-                }
-                else return null;
+                    UserId = user.Id,
+                    QuarterId = quarter?.Id ?? Guid.Empty,
+                };
+
+                await unitOfWork.UserMetricRepository.AddAsync(userMetric, cancellationToken);
+                await unitOfWork.SaveChangesAsync();
+                return unitOfWork.Mapper.Map<UserViewModel>(user);
+
             }
         }
     }
