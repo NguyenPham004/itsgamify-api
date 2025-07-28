@@ -37,13 +37,13 @@ namespace its.gamify.api.Features.Questions.Commands
                     quiz.Duration = request.Duration;
                     _unitOfWork.QuizRepository.Update(quiz);
 
-                    var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
-                    if (tmp.Count > 0)
-                    {
-                        _unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
-                        await _unitOfWork.SaveChangesAsync();
+                    // var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
+                    // if (tmp.Count > 0)
+                    // {
+                    //     _unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
+                    //     await _unitOfWork.SaveChangesAsync();
 
-                    }
+                    // }
                 }
 
                 quiz ??= await GetQuiz(10, request.QuestionUpsertModels.Count, request.Duration);

@@ -35,7 +35,6 @@ namespace its.gamify.infras
         private readonly IQuizAnswerRepository _quizAnswerRepository;
         private readonly IQuizResultRepository _quizResultRepository;
         private readonly IChallengeRepository _challengeRepository;
-        private readonly IChallengeParticipationRepository _challengeParticipationRepository;
         private readonly ILearningMaterialRepository learningMaterialRepository;
         private readonly IFileRepository _fileRepository;
         private readonly ICourseMetricRepository _courseMetricRepository;
@@ -73,7 +72,6 @@ namespace its.gamify.infras
             _quizAnswerRepository = serviceProvider.GetRequiredService<IQuizAnswerRepository>();
             _quizResultRepository = serviceProvider.GetRequiredService<IQuizResultRepository>();
             _challengeRepository = serviceProvider.GetRequiredService<IChallengeRepository>();
-            _challengeParticipationRepository = serviceProvider.GetRequiredService<IChallengeParticipationRepository>();
             _courseMetricRepository = serviceProvider.GetRequiredService<ICourseMetricRepository>();
         }
         public ICourseRepository CourseRepository => _courseRepository;
@@ -104,7 +102,6 @@ namespace its.gamify.infras
         public IQuizResultRepository QuizResultRepository => _quizResultRepository;
         public IChallengeRepository ChallengeRepository => _challengeRepository;
         public ILearningMaterialRepository LearningMaterialRepository => learningMaterialRepository;
-        public IChallengeParticipationRepository ChallengeParticipationRepository => _challengeParticipationRepository;
         public ICourseMetricRepository CourseMetricRepository => _courseMetricRepository;
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;

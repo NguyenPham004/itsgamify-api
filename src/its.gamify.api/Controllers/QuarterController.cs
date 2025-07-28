@@ -37,7 +37,7 @@ namespace its.gamify.api.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
         {
-           return NoContent();
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

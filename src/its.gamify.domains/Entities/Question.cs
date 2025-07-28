@@ -20,7 +20,9 @@ public class Question : BaseEntity
     [JsonPropertyName("quiz_id")]
     public Guid QuizId { get; set; }
     public virtual Quiz Quiz { get; set; } = null!;
-    public ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();
+    public Guid CourseId { get; set; }
+    public virtual Course Course { get; set; } = null!;
+    public ICollection<QuizAnswer> QuizAnswers { get; set; } = [];
 
 
 }

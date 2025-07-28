@@ -37,7 +37,6 @@ public class AppDbContext : DbContext
     public DbSet<CourseResult> CourseResult { get; set; }
     public DbSet<CourseParticipation> CourseParticipation { get; set; }
     public DbSet<Course> Course { get; set; }
-    public DbSet<ChallengeParticipation> ChallengeParticipation { get; set; }
     public DbSet<Challenge> Challenge { get; set; }
     public DbSet<Category> Category { get; set; }
     public DbSet<Badge> Badge { get; set; }

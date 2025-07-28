@@ -8,7 +8,7 @@ namespace its.gamify.api.Features.Users.Queries
     public class GetAllUserQuery : IRequest<BasePagingResponseModel<UserViewModel>>
     {
 
-        public FilterQuery FilterQuery { get; set; }
+        public required FilterQuery FilterQuery { get; set; }
 
         class QueryHandler : IRequestHandler<GetAllUserQuery, BasePagingResponseModel<UserViewModel>>
         {
@@ -22,7 +22,7 @@ namespace its.gamify.api.Features.Users.Queries
                 var res = await unitOfWork.UserRepository.ToDynamicPagination(
                     pageIndex: request.FilterQuery.Page ?? 0,
                     pageSize: request.FilterQuery.Limit ?? 0,
-                    searchFields: ["FirstName", "LastName", "EmpployeeCode", "Email", "Username"],
+                    searchFields: ["FullName", "Email"],
                     searchTerm: request.FilterQuery.Q,
                     sortOrders: request.FilterQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
                     includes: [x => x.Role!, x => x.Department!]);

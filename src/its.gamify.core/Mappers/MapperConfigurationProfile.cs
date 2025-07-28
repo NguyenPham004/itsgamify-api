@@ -1,5 +1,6 @@
 using AutoMapper;
 using its.gamify.core.Models.Categories;
+using its.gamify.core.Models.Challenges;
 using its.gamify.core.Models.CourseCollections;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
@@ -108,5 +109,9 @@ public class MapperConfigurationProfile : Profile
         CreateMap<CourseCollection, CourseCollectionViewModel>().ReverseMap();
 
         CreateMap<PracticeTag, PracticeUpsertModel>().ReverseMap();
+
+        CreateMap<Challenge, ChallengeViewModel>().ReverseMap();
+        CreateMap<Challenge, ChallengeUpdateModel>().ReverseMap();
+        CreateMap<Challenge, ChallengeCreateModel>().ReverseMap();
     }
 }
