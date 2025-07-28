@@ -82,12 +82,9 @@ namespace its.gamify.api.Controllers
         }
         [HttpGet("{id}/user-metrics")]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter)
+        public async Task<IActionResult> GetAll()
         {
-            var res = await mediator.Send(new UserMetricQuery()
-            {
-                Filter = Filter
-            });
+            var res = await mediator.Send(new UserMetricQuery());
             return Ok(res);
 
         }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]s")]
     [ApiController]
     public class QuarterController : ControllerBase
     {

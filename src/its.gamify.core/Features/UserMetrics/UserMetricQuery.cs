@@ -14,7 +14,7 @@ namespace its.gamify.core.Features.UserMetrics;
 
 public class UserMetricQuery : IRequest<BasePagingResponseModel<UserMetric>>
 {
-    public FilterQuery? Filter { get; set; }
+    //public FilterQuery? Filter { get; set; }
     class QueryHandler (IUnitOfWork unitOfWork, IClaimsService _claimSerivce) : IRequestHandler<UserMetricQuery, BasePagingResponseModel<UserMetric>>
     {
         public async Task<BasePagingResponseModel<UserMetric>> Handle(UserMetricQuery request, CancellationToken cancellationToken)
@@ -35,8 +35,8 @@ public class UserMetricQuery : IRequest<BasePagingResponseModel<UserMetric>>
                     .Include(x => x.Quarter);
             (Pagination Pagination, List<UserMetric> Entities)? res = null;
             res = await unitOfWork.UserMetricRepository.ToDynamicPagination(
-                              request.Filter?.Page ?? 0,
-                              request.Filter?.Limit ?? 10,
+                                0,
+                                10,
                               filter: filter,
                               includeFunc: includeFunc
                         );
