@@ -12,11 +12,9 @@ namespace its.gamify.api.Features.LearningProgresses.Commands
     {
         public required LearningProgessUpsertModel Model { get; set; }
 
-
-
         class CommandHandler(
             IUnitOfWork _unitOfWork,
-             IBackgroundJobClient _backgroundJobClient
+            IBackgroundJobClient _backgroundJobClient
         ) : IRequestHandler<UpsertProgressCommand, LearningProgress>
         {
 
@@ -35,8 +33,22 @@ namespace its.gamify.api.Features.LearningProgresses.Commands
                 int completedLesson = participation.LearningProgresses.Where(x => x.Status == PROGRESS_STATUS.COMPLETED).Count();
                 if (totalLessons == completedLesson)
                 {
+
+                    var quarter = await _unitOfWork.QuarterRepository
+                        .FirstOrDefaultAsync(q => q.StartDate <= DateTime.UtcNow && q.EndDate >= DateTime.UtcNow)
+                        ?? throw new BadRequestException("No current quarter found");
+
+                    var metric = await _unitOfWork
+                        .UserMetricRepository
+                        .FirstOrDefaultAsync(x => x.UserId == participation.UserId && x.QuarterId == quarter.Id) ?? throw new BadRequestException("No user metric found");
+
+                    metric.CourseCompletedNum += 1;
+                    metric.PointInQuarter += 1000;
+
                     participation.Status = COURSE_PARTICIPATION_STATUS.COMPLETED;
                     _unitOfWork.CourseParticipationRepository.Update(participation);
+
+
                     var course_result = new CourseResult
                     {
                         Scrore = 10,
@@ -47,6 +59,7 @@ namespace its.gamify.api.Features.LearningProgresses.Commands
                         CourseParticipationId = participation.Id
                     };
 
+                    _unitOfWork.UserMetricRepository.Update(metric);
                     await _unitOfWork.CourseResultRepository.AddAsync(course_result);
                     await _unitOfWork.SaveChangesAsync();
                 }
