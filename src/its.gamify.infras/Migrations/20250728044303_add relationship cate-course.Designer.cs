@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using its.gamify.infras.Datas;
@@ -12,9 +13,11 @@ using its.gamify.infras.Datas;
 namespace its.gamify.infras.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728044303_add relationship cate-course")]
+    partial class addrelationshipcatecourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,10 +139,6 @@ namespace its.gamify.infras.Migrations
 
                     b.Property<int>("NumOfRoom")
                         .HasColumnType("integer");
-
-                    b.Property<string>("ThumbnailImage")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1298,56 +1297,56 @@ namespace its.gamify.infras.Migrations
                         {
                             Id = new Guid("71874fd3-1892-4d92-a77f-c85c0d16b8db"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(5131),
+                            CreatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(3147),
                             Description = "",
                             IsDeleted = false,
                             Name = "EMPLOYEE",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(5134)
+                            UpdatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(3150)
                         },
                         new
                         {
                             Id = new Guid("620d170e-c32e-4443-b450-32848c1eb5e9"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6086),
+                            CreatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4296),
                             Description = "",
                             IsDeleted = false,
                             Name = "LEADER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6087)
+                            UpdatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4297)
                         },
                         new
                         {
                             Id = new Guid("3b72db68-b2c6-40d8-859e-b4996f8535a1"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6101),
+                            CreatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4312),
                             Description = "",
                             IsDeleted = false,
                             Name = "TRAININGSTAFF",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6101)
+                            UpdatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4312)
                         },
                         new
                         {
                             Id = new Guid("f7fa7c6b-f76a-4b95-8711-517eb8205a1a"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6105),
+                            CreatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4315),
                             Description = "",
                             IsDeleted = false,
                             Name = "MANAGER",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6105)
+                            UpdatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4315)
                         },
                         new
                         {
                             Id = new Guid("b002d347-66b9-4722-9547-5b2165abaa9f"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6151),
+                            CreatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4453),
                             Description = "",
                             IsDeleted = false,
                             Name = "ADMIN",
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            UpdatedDate = new DateTime(2025, 7, 29, 10, 38, 22, 961, DateTimeKind.Utc).AddTicks(6152)
+                            UpdatedDate = new DateTime(2025, 7, 28, 4, 43, 2, 765, DateTimeKind.Utc).AddTicks(4454)
                         });
                 });
 
@@ -1430,59 +1429,6 @@ namespace its.gamify.infras.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("User");
-                });
-
-            modelBuilder.Entity("its.gamify.domains.Entities.UserChallengeHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChallengeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid")
-                        .HasAnnotation("Relational:JsonPropertyName", "created_by");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "created_date");
-
-                    b.Property<string>("Duration")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasAnnotation("Relational:JsonPropertyName", "is_deleted");
-
-                    b.Property<string>("OpponentScore")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Score")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UpdatedBy")
-                        .HasColumnType("uuid")
-                        .HasAnnotation("Relational:JsonPropertyName", "updated_by");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "updated_date");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChallengeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserChallengeHistory");
                 });
 
             modelBuilder.Entity("its.gamify.domains.Entities.UserMetric", b =>
@@ -1787,7 +1733,7 @@ namespace its.gamify.infras.Migrations
             modelBuilder.Entity("its.gamify.domains.Entities.Quiz", b =>
                 {
                     b.HasOne("its.gamify.domains.Entities.Challenge", "Challenge")
-                        .WithMany()
+                        .WithMany("Quizzes")
                         .HasForeignKey("ChallengeId");
 
                     b.Navigation("Challenge");
@@ -1841,23 +1787,6 @@ namespace its.gamify.infras.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("its.gamify.domains.Entities.UserChallengeHistory", b =>
-                {
-                    b.HasOne("its.gamify.domains.Entities.Challenge", "Challenge")
-                        .WithMany("UserChallengeHistories")
-                        .HasForeignKey("ChallengeId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("its.gamify.domains.Entities.User", "User")
-                        .WithMany("UserChallengeHistories")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Challenge");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("its.gamify.domains.Entities.UserMetric", b =>
                 {
                     b.HasOne("its.gamify.domains.Entities.Quarter", "Quarter")
@@ -1884,7 +1813,7 @@ namespace its.gamify.infras.Migrations
 
             modelBuilder.Entity("its.gamify.domains.Entities.Challenge", b =>
                 {
-                    b.Navigation("UserChallengeHistories");
+                    b.Navigation("Quizzes");
                 });
 
             modelBuilder.Entity("its.gamify.domains.Entities.Course", b =>
@@ -1971,8 +1900,6 @@ namespace its.gamify.infras.Migrations
                     b.Navigation("CourseResults");
 
                     b.Navigation("Notifications");
-
-                    b.Navigation("UserChallengeHistories");
 
                     b.Navigation("UserMetrics");
                 });

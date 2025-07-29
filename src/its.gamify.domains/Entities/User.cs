@@ -1,4 +1,5 @@
 using its.gamify.domains.Enums;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
@@ -31,6 +32,7 @@ public class User : BaseEntity
     public virtual ICollection<Badge>? Badges { get; set; }
     public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
     public virtual ICollection<Notification> Notifications { get; set; } = [];
+    public virtual ICollection<UserChallengeHistory>? UserChallengeHistories { get; set; } = [];
     
     public Guid? DepartmentId { get; set; }
     public virtual Department? Department { get; set; }

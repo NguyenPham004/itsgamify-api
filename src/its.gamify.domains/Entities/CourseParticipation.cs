@@ -8,7 +8,7 @@ public class CourseParticipation : BaseEntity
     [JsonPropertyName("enrolled_Date")]
     public DateTime EnrolledDate { get; set; }
     [JsonPropertyName("status")]
-    public string Status { get; set; } = CourseParticipationStatusEnum.INPROGRESS.ToString();
+    public string Status { get; set; } = CourseParticipationStatusEnum.ENROLLED.ToString();
     [JsonPropertyName("user_id")]
     public Guid UserId { get; set; }
     public virtual User User { get; set; } = null!;

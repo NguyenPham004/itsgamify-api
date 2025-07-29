@@ -32,9 +32,9 @@ namespace its.gamify.core
         public IQuizAnswerRepository QuizAnswerRepository { get; }
         public IQuizResultRepository QuizResultRepository { get; }
         public IChallengeRepository ChallengeRepository { get; }
-        public IChallengeParticipationRepository ChallengeParticipationRepository { get; }
         public ILearningMaterialRepository LearningMaterialRepository { get; }
         public ICourseMetricRepository CourseMetricRepository { get; }
+        public IUserChallengeHistoryRepository UserChallengeHistoryRepository { get; }
         Task<bool> SaveChangesAsync();
     }
 }

@@ -89,7 +89,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             {
                 Expression<Func<Course, bool>> filter_classify = await ClassifyFunc(request.CourseQuery?.Classify, user.Id);
                 filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
-                
+
             }
 
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
@@ -112,15 +112,15 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             if (value == COURSE_CLASSIFY.ENROLLED.ToString())
             {
-                return  x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
+                return x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
             }
             else if (value == COURSE_CLASSIFY.SAVED.ToString())
             {
-                if(UserId == Guid.Empty) return x => true; 
+                if (UserId == Guid.Empty) return x => true;
                 List<Guid> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == UserId).Select(x => x.UserId).ToList();
                 return x => collections != null && collections.Count != 0 && collections.Contains(UserId);
             }
-            else if(value == COURSE_CLASSIFY.COMPLETED.ToString())
+            else if (value == COURSE_CLASSIFY.COMPLETED.ToString())
             {
                 return x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.COMPLETED.ToString());
             }
@@ -128,7 +128,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
         }
 
     }
-    
+
 }
 
 

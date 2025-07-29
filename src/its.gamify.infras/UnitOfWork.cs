@@ -35,10 +35,10 @@ namespace its.gamify.infras
         private readonly IQuizAnswerRepository _quizAnswerRepository;
         private readonly IQuizResultRepository _quizResultRepository;
         private readonly IChallengeRepository _challengeRepository;
-        private readonly IChallengeParticipationRepository _challengeParticipationRepository;
         private readonly ILearningMaterialRepository learningMaterialRepository;
         private readonly IFileRepository _fileRepository;
         private readonly ICourseMetricRepository _courseMetricRepository;
+        private readonly IUserChallengeHistoryRepository _userChallengeHistoryRepository;
 
         private readonly IMapper mapper;
         public UnitOfWork(AppDbContext dbContext, ICourseRepository courseRepository, IDepartmentRepository departmentRepository,
@@ -73,8 +73,8 @@ namespace its.gamify.infras
             _quizAnswerRepository = serviceProvider.GetRequiredService<IQuizAnswerRepository>();
             _quizResultRepository = serviceProvider.GetRequiredService<IQuizResultRepository>();
             _challengeRepository = serviceProvider.GetRequiredService<IChallengeRepository>();
-            _challengeParticipationRepository = serviceProvider.GetRequiredService<IChallengeParticipationRepository>();
             _courseMetricRepository = serviceProvider.GetRequiredService<ICourseMetricRepository>();
+            _userChallengeHistoryRepository = serviceProvider.GetRequiredService<IUserChallengeHistoryRepository>();
         }
         public ICourseRepository CourseRepository => _courseRepository;
         public IMapper Mapper => mapper;
@@ -104,8 +104,8 @@ namespace its.gamify.infras
         public IQuizResultRepository QuizResultRepository => _quizResultRepository;
         public IChallengeRepository ChallengeRepository => _challengeRepository;
         public ILearningMaterialRepository LearningMaterialRepository => learningMaterialRepository;
-        public IChallengeParticipationRepository ChallengeParticipationRepository => _challengeParticipationRepository;
         public ICourseMetricRepository CourseMetricRepository => _courseMetricRepository;
+        public IUserChallengeHistoryRepository UserChallengeHistoryRepository => _userChallengeHistoryRepository;
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;
 

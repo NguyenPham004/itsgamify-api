@@ -49,5 +49,6 @@ public class Course : BaseEntity
     public virtual Category Category { get; set; } = null!;
     public Guid? DepartmentId { get; set; }
     public Department? Deparment { get; set; } = null;
+    public virtual ICollection<Challenge> Challenges { get; set; } = [];
 
 }
