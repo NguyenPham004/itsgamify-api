@@ -294,7 +294,7 @@ public class GenericRepository<TEntity>(
 
     public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        entity.CreatedDate = _timeService.GetCurrentTime();
+        entity.CreatedDate = _timeService.GetCurrentTime;
         entity.CreatedBy = _claimsService.CurrentUser;
         var result = await _dbSet.AddAsync(entity, cancellationToken);
         return result.Entity;
@@ -302,7 +302,7 @@ public class GenericRepository<TEntity>(
 
     public async Task AddRangeAsync(List<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        var currentTime = _timeService.GetCurrentTime();
+        var currentTime = _timeService.GetCurrentTime;
         var currentUser = _claimsService.CurrentUser;
 
         foreach (var entity in entities)
@@ -316,14 +316,14 @@ public class GenericRepository<TEntity>(
 
     public void Update(TEntity entity)
     {
-        entity.UpdatedDate = _timeService.GetCurrentTime();
+        entity.UpdatedDate = _timeService.GetCurrentTime;
         entity.UpdatedBy = _claimsService.CurrentUser;
         _dbSet.Update(entity);
     }
 
     public void UpdateRange(List<TEntity> entities)
     {
-        var currentTime = _timeService.GetCurrentTime();
+        var currentTime = _timeService.GetCurrentTime;
         var currentUser = _claimsService.CurrentUser;
 
         foreach (var entity in entities)
@@ -338,14 +338,14 @@ public class GenericRepository<TEntity>(
     public void SoftRemove(TEntity entity)
     {
         entity.IsDeleted = true;
-        entity.UpdatedDate = _timeService.GetCurrentTime();
+        entity.UpdatedDate = _timeService.GetCurrentTime;
         entity.UpdatedBy = _claimsService.CurrentUser;
         _dbSet.Update(entity);
     }
 
     public void SoftRemoveRange(List<TEntity> entities)
     {
-        var currentTime = _timeService.GetCurrentTime();
+        var currentTime = _timeService.GetCurrentTime;
         var currentUser = _claimsService.CurrentUser;
 
         foreach (var entity in entities)

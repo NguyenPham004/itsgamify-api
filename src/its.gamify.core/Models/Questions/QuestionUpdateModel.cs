@@ -23,6 +23,7 @@ namespace its.gamify.core.Models.Questions
         [JsonPropertyName("description")]
         public string Explanation { get; set; } = string.Empty;
         public int Index { get; set; }
+        public Guid CourseId { get; set; }
     }
 
 }

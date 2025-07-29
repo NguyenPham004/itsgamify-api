@@ -20,7 +20,6 @@ namespace its.gamify.api.Features.Users.Queries
                 UserViewModel user = new UserViewModel();
                 user = unitOfWork.Mapper.Map<UserViewModel>(await unitOfWork.UserRepository.GetByIdAsync(request.Id, includes: [x => x.Department!, x => x.Role!]));
                 user.Department = unitOfWork.Mapper.Map<DepartmentViewModel>(await unitOfWork.DepartmentRepository.GetByIdAsync(user.DepartmentId));
-                user.MetricDescription = (await unitOfWork.EmployeeMetricRepository.FirstOrDefaultAsync(x => x.UserId == request.Id))?.Description!;
                 return user;
             }
         }

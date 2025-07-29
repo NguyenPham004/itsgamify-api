@@ -2,6 +2,7 @@ using Hangfire;
 using its.gamify.api;
 using its.gamify.api.Middlewares;
 using its.gamify.core.GlobalExceptionHandling;
+using its.gamify.core.Services;
 using its.gamify.domains.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,5 +33,11 @@ app.MapOpenApi();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var s3Service = scope.ServiceProvider.GetRequiredService<IS3Service>();
+    await s3Service.SetCorsConfigurationAsync();
+}
 
 app.Run();

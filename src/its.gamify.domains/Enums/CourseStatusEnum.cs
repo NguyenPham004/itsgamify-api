@@ -3,10 +3,8 @@ namespace its.gamify.domains.Enums;
 public enum CourseParticipationStatusEnum
 {
     ENROLLED = 1,
-    INPROGRESS = 2,
+    IN_PROGRESS = 2,
     COMPLETED = 3,
-    FAILED = 4,
-    WITHDRAWN = 5
 }
 public enum CourseStatusEnum
 {
@@ -42,5 +40,15 @@ public static class COURSE_TYPE
 public static class COURSE_PARTICIPATION_STATUS
 {
     public const string COMPLETED = "COMPLETED";
-    public const string IN_PROGRESS = "IN_PROGRESS";
+    public const string ENROLLED = "ENROLLED";
+    public const string INPROGRESS = "IN_PROGRESS";
+}
+
+public static class COURSE_CLASSIFY
+{
+    public const string ALL = "ALL";
+    public const string ENROLLED = "ENROLLED";
+    public const string SAVED = "SAVED";
+    public const string COMPLETED = "COMPLETED";
+
 }

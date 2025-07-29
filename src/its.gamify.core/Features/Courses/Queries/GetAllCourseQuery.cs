@@ -1,5 +1,8 @@
-using System.Linq.Expressions;
+﻿using Amazon.S3.Model;
+using Azure.Core;
+using Firebase.Auth;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
@@ -8,7 +11,9 @@ using its.gamify.domains.Enums;
 using its.gamify.domains.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
+using System.Linq.Expressions;
 
 
 
@@ -16,6 +21,7 @@ namespace its.gamify.core.Features.Courses.Queries;
 
 public class CourseQuery : FilterQuery
 {
+    public string? Classify { get; set; } = string.Empty;
     public string? Categories { get; set; } = string.Empty;
 }
 public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
@@ -30,20 +36,19 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
         public async Task<BasePagingResponseModel<Course>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
         {
-
-
             Expression<Func<Course, bool>>? filter = null;
 
             Dictionary<string, bool>? sortOrders = request.CourseQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
-            Func<IQueryable<Course>, Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<Course, object>>? includeFunc =
+            Func<IQueryable<Course>, IIncludableQueryable<Course, object>>? includeFunc =
                 x =>
                     x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                     .Include(x => x.Deparment!)
                     .Include(x => x.Category);
 
             (Pagination Pagination, List<Course> Entities)? res = null;
-            var user = await unitOfWork.UserRepository.GetByIdAsync(_claimSerivce.CurrentUser) ?? throw new Exception("Can not find user");
+
+            var user = await unitOfWork.UserRepository.GetByIdAsync(_claimSerivce.CurrentUser) ?? throw new BadRequestException("Không tìm thấy người dùng!");
 
 
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
@@ -80,6 +85,13 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                 }
             }
 
+            if (!string.IsNullOrEmpty(request.CourseQuery?.Classify) && (_claimSerivce.CurrentRole == ROLE.EMPLOYEE || _claimSerivce.CurrentRole == ROLE.LEADER))
+            {
+                Expression<Func<Course, bool>> filter_classify = await ClassifyFunc(request.CourseQuery?.Classify, user.Id);
+                filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
+
+            }
+
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
                               request.CourseQuery?.Page ?? 0,
                               request.CourseQuery?.Limit ?? 10,
@@ -90,6 +102,29 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                         );
 
             return new BasePagingResponseModel<Course>(datas: res.Value.Entities, pagination: res.Value.Pagination);
+        }
+        private async Task<Expression<Func<Course, bool>>> ClassifyFunc(string? value, Guid UserId)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return x => true;
+            }
+
+            if (value == COURSE_CLASSIFY.ENROLLED.ToString())
+            {
+                return x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.ENROLLED.ToString());
+            }
+            else if (value == COURSE_CLASSIFY.SAVED.ToString())
+            {
+                if (UserId == Guid.Empty) return x => true;
+                List<Guid> collections = (await unitOfWork.CourseCollectionRepository.GetAllAsync()).Where(x => x.UserId == UserId).Select(x => x.UserId).ToList();
+                return x => collections != null && collections.Count != 0 && collections.Contains(UserId);
+            }
+            else if (value == COURSE_CLASSIFY.COMPLETED.ToString())
+            {
+                return x => x.CourseParticipations.Any(u => u.Status == CourseParticipationStatusEnum.COMPLETED.ToString());
+            }
+            return x => true;
         }
 
     }

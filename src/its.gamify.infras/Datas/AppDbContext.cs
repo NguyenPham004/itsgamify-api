@@ -4,44 +4,44 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace its.gamify.infras.Datas;
 
-public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
+public class AppDbContext : DbContext
 {
     private DbSet<User> user;
     private DbSet<Role> role;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    public AppDbContext(Microsoft.EntityFrameworkCore.DbContextOptions<AppDbContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     {
     }
     public DbSet<FileEntity> File { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<User> User { get => user; set => user = value; }
-    public Microsoft.EntityFrameworkCore.DbSet<Role> Role { get => role; set => role = value; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseCollection> CourseCollection { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<QuizResult> QuizResult { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<QuizAnswer> QuizAnswer { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Quiz> Quiz { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Question> Question { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Quarter> Quarter { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<PracticeTag> PracticeTag { get; set; }
+    public DbSet<User> User { get => user; set => user = value; }
+    public DbSet<Role> Role { get => role; set => role = value; }
+    public DbSet<CourseCollection> CourseCollection { get; set; }
+    public DbSet<QuizResult> QuizResult { get; set; }
+    public DbSet<QuizAnswer> QuizAnswer { get; set; }
+    public DbSet<Quiz> Quiz { get; set; }
+    public DbSet<Question> Question { get; set; }
+    public DbSet<Quarter> Quarter { get; set; }
+    public DbSet<PracticeTag> PracticeTag { get; set; }
 
-    public Microsoft.EntityFrameworkCore.DbSet<Notification> Notification { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Lesson> Lesson { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<LearningProgress> LearningProgress { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<LearningMaterial> LearningMaterial { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<LeadearBoard> LeadearBoard { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<EmployeeMetric> EmployeeMetric { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Department> Department { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseSection> CourseSection { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseReview> CourseReview { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseResult> CourseResult { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseParticipation> CourseParticipation { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Course> Course { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<ChallengeParticipation> ChallengeParticipation { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Challenge> Challenge { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Category> Category { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<Badge> Badge { get; set; }
-    public Microsoft.EntityFrameworkCore.DbSet<CourseMetric> CourseMetric { get; set; }
+    public DbSet<Notification> Notification { get; set; }
+    public DbSet<Lesson> Lesson { get; set; }
+    public DbSet<LearningProgress> LearningProgress { get; set; }
+    public DbSet<LearningMaterial> LearningMaterial { get; set; }
+    public DbSet<LeadearBoard> LeadearBoard { get; set; }
+    public DbSet<UserMetric> UserMetrics { get; set; }
+    public DbSet<Department> Department { get; set; }
+    public DbSet<CourseSection> CourseSection { get; set; }
+    public DbSet<CourseReview> CourseReview { get; set; }
+    public DbSet<CourseResult> CourseResult { get; set; }
+    public DbSet<CourseParticipation> CourseParticipation { get; set; }
+    public DbSet<Course> Course { get; set; }
+    public DbSet<Challenge> Challenge { get; set; }
+    public DbSet<Category> Category { get; set; }
+    public DbSet<Badge> Badge { get; set; }
+    public DbSet<CourseMetric> CourseMetric { get; set; }
+    public DbSet<UserChallengeHistory>UserChallengeHistory { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -50,7 +50,7 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
 
 
     }
-    protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<PracticeTag>().HasOne(x => x.Lesson)

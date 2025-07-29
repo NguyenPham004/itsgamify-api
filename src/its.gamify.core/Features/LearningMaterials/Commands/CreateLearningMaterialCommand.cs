@@ -1,4 +1,4 @@
-﻿using its.gamify.api.Features.Files.Commands;
+﻿using its.gamify.core.Features.Files.Commands;
 using its.gamify.core;
 using its.gamify.core.Models.LearningMaterials;
 using its.gamify.domains.Entities;

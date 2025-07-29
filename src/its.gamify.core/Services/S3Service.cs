@@ -8,12 +8,47 @@ using Microsoft.AspNetCore.Http;
 
 namespace its.gamify.core.Services;
 
+public class PartETagModel
+{
+    public int PartNumber { get; set; }
+    public string ETag { get; set; } = string.Empty;
+}
+
+
+public class InitiateMultipartUploadModel
+{
+    public string FileName { get; set; } = string.Empty;
+}
+public class GeneratePresignedUrlModel : InitiateMultipartUploadModel
+{
+    public string UploadId { get; set; } = string.Empty;
+    public int PartNumber { get; set; }
+}
+
+public class CompleteMultipartUploadModel
+{
+    public string FileName { get; set; } = string.Empty;
+    public string UploadId { get; set; } = string.Empty;
+    public List<PartETagModel> PartETags { get; set; } = [];
+}
+
+
+
+
 public interface IS3Service
 {
     Task<(string fileName, string url)> UploadFileAsync(IFormFile file);
     Task<Stream> GetFileAsync(string fileName);
     Task<string> GetPresignedUrlAsync(string fileName, TimeSpan expiry);
     Task<bool> FileExistsAsync(string fileName);
+
+    //Upload multipart
+    Task<string> InitiateMultipartUploadAsync(InitiateMultipartUploadModel model);
+
+    Task<string> GeneratePresignedUrlForPartAsync(GeneratePresignedUrlModel model);
+
+    Task<string> CompleteMultipartUploadAsync(CompleteMultipartUploadModel model);
+    Task SetCorsConfigurationAsync();
 }
 
 public class S3Service(AppSetting _appSetting) : IS3Service
@@ -32,6 +67,36 @@ public class S3Service(AppSetting _appSetting) : IS3Service
 
         return new AmazonS3Client(credentials, config);
     }
+
+
+    public async Task SetCorsConfigurationAsync()
+    {
+        using var client = CreateS3Client();
+
+        var corsConfiguration = new CORSConfiguration
+        {
+            Rules =
+                [
+                    new CORSRule
+                    {
+                        AllowedHeaders = ["*"],
+                        AllowedMethods = ["PUT", "POST", "GET"],
+                        AllowedOrigins = ["*"],  // Thay bằng domains cụ thể
+                        ExposeHeaders = ["ETag"],
+                        MaxAgeSeconds = 3000
+                    }
+                ]
+        };
+
+        var putRequest = new PutCORSConfigurationRequest
+        {
+            BucketName = _appSetting.AWSConfig.S3BucketName,
+            Configuration = corsConfiguration
+        };
+
+        await client.PutCORSConfigurationAsync(putRequest);
+    }
+
 
     public async Task<(string fileName, string url)> UploadFileAsync(IFormFile file)
     {
@@ -125,5 +190,60 @@ public class S3Service(AppSetting _appSetting) : IS3Service
         {
             return false;
         }
+    }
+
+    public async Task<string> InitiateMultipartUploadAsync(InitiateMultipartUploadModel model)
+    {
+        using var client = CreateS3Client();
+
+        var initiateRequest = new InitiateMultipartUploadRequest
+        {
+            BucketName = _appSetting.AWSConfig.S3BucketName,
+            Key = model.FileName
+        };
+
+        var initiateResponse = await client.InitiateMultipartUploadAsync(initiateRequest);
+        return initiateResponse.UploadId;
+    }
+
+    public async Task<string> GeneratePresignedUrlForPartAsync(GeneratePresignedUrlModel model)
+    {
+        using var client = CreateS3Client();
+
+        var presignRequest = new GetPreSignedUrlRequest
+        {
+            BucketName = _appSetting.AWSConfig.S3BucketName,
+            Key = model.FileName,
+            UploadId = model.UploadId,
+            PartNumber = model.PartNumber,
+            Verb = HttpVerb.PUT,
+            Expires = DateTime.UtcNow.Add(TimeSpan.FromMinutes(15))
+        };
+
+        return await client.GetPreSignedURLAsync(presignRequest);
+    }
+
+    public async Task<string> CompleteMultipartUploadAsync(CompleteMultipartUploadModel model)
+    {
+        using var client = CreateS3Client();
+
+        var partETags = model.PartETags.Select(dto => new PartETag
+        {
+            PartNumber = dto.PartNumber,
+            ETag = dto.ETag
+        }).ToList();
+
+
+        var completeRequest = new CompleteMultipartUploadRequest
+        {
+            BucketName = _appSetting.AWSConfig.S3BucketName,
+            Key = model.FileName,
+            UploadId = model.UploadId,
+            PartETags = partETags
+        };
+
+        await client.CompleteMultipartUploadAsync(completeRequest);
+
+        return $"{_appSetting.AWSConfig.S3BaseObjectUrl}?fileName={model.FileName}&expiryMinutes=60";
     }
 }

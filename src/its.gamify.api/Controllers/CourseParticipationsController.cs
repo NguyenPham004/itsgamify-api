@@ -17,15 +17,15 @@ namespace its.gamify.api.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ParticipationQuery participationQuery)
         {
-            var result = await _mediator.Send(new GetCourseParticipationQuery());
-            if (result == null || result.Datas == null || result.Datas.Count == 0)
-                return Ok();
-            // throw new InvalidOperationException("Danh sách CourseParticipation trống");
+            var result = await _mediator.Send(new GetCourseParticipationQuery()
+            {
+                ParticipationQuery = participationQuery
+            });
+
             return Ok(result);
         }
-
 
     }
 }

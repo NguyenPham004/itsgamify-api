@@ -17,11 +17,12 @@ public class Question : BaseEntity
     public string CorrectAnswer { get; set; } = string.Empty;
     [JsonPropertyName("description")]
     public string Explanation { get; set; } = string.Empty;
-    public Guid QuestionBankId { get; set; }
     [JsonPropertyName("quiz_id")]
     public Guid QuizId { get; set; }
     public virtual Quiz Quiz { get; set; } = null!;
-    public ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();
+    public Guid CourseId { get; set; }
+    public virtual Course Course { get; set; } = null!;
+    public ICollection<QuizAnswer> QuizAnswers { get; set; } = [];
 
 
 }

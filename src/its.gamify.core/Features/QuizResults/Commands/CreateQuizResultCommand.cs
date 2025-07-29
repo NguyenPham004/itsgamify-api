@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using Hangfire;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.QuizResults;
 using its.gamify.domains.Entities;
@@ -29,7 +31,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 RuleFor(x => x.Answer).Null();
             }
         }
-        class CommandHandler(IUnitOfWork _unitOfWork) : IRequestHandler<CreateQuizResultCommand, QuizResult>
+        class CommandHandler(IUnitOfWork _unitOfWork, IBackgroundJobClient _backgroundJobClient) : IRequestHandler<CreateQuizResultCommand, QuizResult>
         {
             public async Task<QuizResult> Handle(CreateQuizResultCommand request, CancellationToken cancellationToken)
             {
@@ -52,20 +54,57 @@ namespace its.gamify.api.Features.QuizResults.Commands
 
                     if (progress == null)
                     {
+
                         await _unitOfWork.LearningProgressRepository.AddAsync(new LearningProgress
                         {
-                            Status = PROGRESS_STATUS.COMPLETED,
+                            Status = quizResult.IsPassed ? PROGRESS_STATUS.COMPLETED : PROGRESS_STATUS.IN_PROGRESS,
                             CourseParticipationId = request.Model.ParticipationId,
                             LessonId = request.Model.TypeId,
                             QuizResultId = quizResult.Id
                         }, cancellationToken);
                     }
+                    else
+                    {
+                        progress.Status = quizResult.IsPassed ? PROGRESS_STATUS.COMPLETED : PROGRESS_STATUS.IN_PROGRESS;
+                        _unitOfWork.LearningProgressRepository.Update(progress);
+                    }
                 }
 
                 await _unitOfWork.SaveChangesAsync();
+                _backgroundJobClient.Enqueue(() => CompletedCourse(request.Model.ParticipationId!));
                 return quizResult;
             }
+            public async Task CompletedCourse(Guid participationId)
+            {
+                var participation = await _unitOfWork
+                    .CourseParticipationRepository
+                    .GetByIdAsync(participationId, includes: x => x.LearningProgresses.Where(x => !x.IsDeleted))
+                ?? throw new BadRequestException("Chưa tham gia khóa học");
 
+                var modules = await _unitOfWork
+                    .CourseSectionRepository
+                    .WhereAsync(x => x.CourseId == participation.CourseId, includes: x => x.Lessons.Where(x => !x.IsDeleted));
+
+                int totalLessons = modules.Sum(module => module.Lessons.Count);
+                int completedLesson = participation.LearningProgresses.Where(x => x.Status == PROGRESS_STATUS.COMPLETED).Count();
+                if (totalLessons == completedLesson)
+                {
+                    participation.Status = COURSE_PARTICIPATION_STATUS.COMPLETED;
+                    _unitOfWork.CourseParticipationRepository.Update(participation);
+                    var course_result = new CourseResult
+                    {
+                        Scrore = 10,
+                        IsPassed = true,
+                        CompletedDate = DateTime.UtcNow,
+                        CourseId = participation.CourseId,
+                        UserId = participation.UserId,
+                        CourseParticipationId = participation.Id
+                    };
+
+                    await _unitOfWork.CourseResultRepository.AddAsync(course_result);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
             private static QuizResult TrackQuizResult(Quiz quiz, IEnumerable<QuizAnswerCreateModel> userAnswers)
             {
                 // Tạo đối tượng QuizResult mới

@@ -27,11 +27,8 @@ public class CourseCreateModels
     public Guid? DepartmentId { get; set; }
     [JsonPropertyName("category_id")]
     public Guid CategoryId { get; set; }
-    // [JsonPropertyName("modules")]
-    // public List<CourseSectionCreateModel>? CourseSectionCreate { get; set; }
-
-    // [JsonPropertyName("file_ids")]
-    // public List<Guid> LearningMaterialIds { get; set; } = [];
+    public Guid QuarterId { get; set; }
+    public bool IsOptional { get; set; } = false;
 }
 
 

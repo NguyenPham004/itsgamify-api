@@ -157,6 +157,7 @@ public static class ServiceCollectionExtensions
         });
         return services;
     }
+    
     private static Assembly[] getAssemblies()
         => [AssemblyReference.Assembly, infras.AssemblyReference.Assembly, core.AssemblyReference.Assembly];
 

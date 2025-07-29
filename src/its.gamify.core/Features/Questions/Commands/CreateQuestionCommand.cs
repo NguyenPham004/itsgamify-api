@@ -23,19 +23,14 @@ namespace its.gamify.api.Features.Questions.Commands
                 RuleFor(x => x.QuizId).NotNull().WithMessage("Input Quiz belong to");
             }
         }
-        class CommandHandler : IRequestHandler<CreateQuestionCommand, Question>
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateQuestionCommand, Question>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
 
-            }
             public async Task<Question> Handle(CreateQuestionCommand request, CancellationToken cancellationToken)
             {
                 var question = unitOfWork.Mapper.Map<Question>(request);
                 await unitOfWork.QuizRepository.EnsureExistsIfIdNotEmpty(request.Model.QuizId);
-                await unitOfWork.QuestionRepository.AddAsync(question);
+                await unitOfWork.QuestionRepository.AddAsync(question, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
                 return question;
             }

@@ -1,15 +1,13 @@
 using its.gamify.domains.Enums;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
 namespace its.gamify.domains.Entities;
 
 public class User : BaseEntity
 {
-    [JsonProperty("employee_code")]
-    public string EmpployeeCode { get; set; } = string.Empty;
-    [JsonPropertyName("username")]
-    public string Username { get; set; } = string.Empty;
     [JsonPropertyName("password")]
     public string? HashedPassword { get; set; } = string.Empty;
     [JsonPropertyName("salt")]
@@ -29,11 +27,13 @@ public class User : BaseEntity
     #region  Relationship Configuration 
     public Guid RoleId { get; set; }
     public virtual Role? Role { get; set; }
-    public virtual EmployeeMetric? EmployeeMetric { get; set; }
+    public ICollection<UserMetric>? UserMetrics { get; set; }
     public virtual ICollection<CourseParticipation>? CourseParticipations { get; set; }
     public virtual ICollection<Badge>? Badges { get; set; }
-    public virtual ICollection<CourseResult> CourseResults { get; set; } = new List<CourseResult>();
-    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
+    public virtual ICollection<Notification> Notifications { get; set; } = [];
+    public virtual ICollection<UserChallengeHistory>? UserChallengeHistories { get; set; } = [];
+    
     public Guid? DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
 

@@ -6,7 +6,6 @@ using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
-using its.gamify.core.Models.ShareModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +16,6 @@ namespace its.gamify.api.Controllers
     [ApiController]
     public class CourseController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator mediator = mediator;
-
         /// <summary>
         /// Delete course
         /// </summary>
@@ -119,7 +116,6 @@ namespace its.gamify.api.Controllers
             return Ok(courseParticipation);
         }
 
-
         [HttpGet("{id}/course-participations")]
         [Authorize]
         public async Task<IActionResult> GetCourseParticipation([FromRoute] Guid id)
@@ -132,7 +128,5 @@ namespace its.gamify.api.Controllers
             });
             return Ok(result);
         }
-
-
     }
 }
