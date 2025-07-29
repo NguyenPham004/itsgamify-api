@@ -1879,10 +1879,24 @@ namespace its.gamify.infras.Migrations
 
             modelBuilder.Entity("its.gamify.domains.Entities.Category", b =>
                 {
-                    b.Navigation("Courses");
+                    b.HasOne("its.gamify.domains.Entities.Quarter", "Quarter")
+                        .WithMany("UserMetrics")
+                        .HasForeignKey("QuarterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("its.gamify.domains.Entities.User", "User")
+                        .WithMany("UserMetrics")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quarter");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("its.gamify.domains.Entities.Challenge", b =>
+            modelBuilder.Entity("its.gamify.domains.Entities.Category", b =>
                 {
                     b.Navigation("UserChallengeHistories");
                 });
