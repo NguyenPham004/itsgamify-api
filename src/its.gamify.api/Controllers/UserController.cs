@@ -1,6 +1,7 @@
 ﻿using its.gamify.api.Features.Users.Commands;
 using its.gamify.api.Features.Users.Queries;
 using its.gamify.core.Features.CourseResults;
+using its.gamify.core.Features.UserChallengeHistories.Queries;
 using its.gamify.core.Features.UserMetrics;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Models.Users;
@@ -10,11 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
-
-    public class UsersController : BaseController
+    [Route("api/[controller]s")]
+    [ApiController]
+    public class UserController : BaseController
     {
         private readonly IMediator mediator;
-        public UsersController(IMediator mediator)
+        public UserController(IMediator mediator)
         {
             this.mediator = mediator;
         }
@@ -88,6 +90,13 @@ namespace its.gamify.api.Controllers
             return Ok(res);
 
         }
+        [HttpGet("{id}/challenge-history")]
+        [Authorize]
+        public async Task<IActionResult> GetAllChallengeHistory([FromQuery] FilterQuery Filter, Guid id)
+        {
+            var res = await mediator.Send(new GetAllUserChallengeHistoryQuery());
+            return Ok(res);
 
+        }
     }
 }
