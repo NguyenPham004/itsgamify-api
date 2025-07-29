@@ -1,5 +1,7 @@
 using its.gamify.core.Features.Challenges.Commands;
 using its.gamify.core.Features.Challenges.Queries;
+using its.gamify.core.Models.Challenges;
+using its.gamify.core.Models.ShareModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +18,12 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] GetChallengeQuery query)
+        public async Task<IActionResult> GetAll([FromQuery] FilterQuery query)
         {
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(new GetChallengeQuery
+            {
+                Filter = query
+            });
             return Ok(result);
         }
 
@@ -30,16 +35,20 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateChallengeCommand command)
+        public async Task<IActionResult> Create([FromBody] ChallengeCreateModel command)
         {
             var res = await _mediator.Send(command);
             return Ok(res);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateChallengeCommand updatedItem)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] ChallengeUpdateModel model)
         {
-            var result = await _mediator.Send(updatedItem);
+            await _mediator.Send(new UpdateChallengeCommand
+            {
+                Id = id,
+                Model = model
+            });
             return NoContent();
         }
 

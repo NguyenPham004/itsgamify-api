@@ -1,4 +1,3 @@
-using Amazon.S3.Model;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -26,8 +25,8 @@ namespace its.gamify.core.Features.Challenges.Queries
                 x =>
                     x.Include(x => x.Course);
                 var items = await unitOfWork.ChallengeRepository.ToDynamicPagination(request.Filter?.Page ?? 0,
-                                                                                    request.Filter?.Limit ?? 10, 
-                                                                                    filter:filter,
+                                                                                    request.Filter?.Limit ?? 10,
+                                                                                    filter: filter,
                                                                                     searchTerm: request.Filter?.Q,
                                                                                     searchFields: ["Title", "Description"],
                                                                                     sortOrders: sortOrders,
