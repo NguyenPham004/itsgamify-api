@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace its.gamify.core.Models.Challenges
+﻿namespace its.gamify.core.Models.Challenges
 {
     public class ChallengeCreateModel
     {
@@ -13,5 +7,7 @@ namespace its.gamify.core.Models.Challenges
         public int NumOfRoom { get; set; }
         public string ThumbnailImage { get; set; } = string.Empty;
         public Guid CourseId { get; set; }
+        public Guid ThumbnailImageId { get; set; }
+        public Guid CategoryId { get; set; }
     }
 }
