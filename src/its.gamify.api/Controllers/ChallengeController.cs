@@ -35,7 +35,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ChallengeCreateModel command)
+        public async Task<IActionResult> Create([FromBody] CreateChallengeCommand command)
         {
             var res = await _mediator.Send(command);
             return Ok(res);
