@@ -14,6 +14,7 @@ using its.gamify.core.Models.Questions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.Quizes;
 using its.gamify.core.Models.QuizResults;
+using its.gamify.core.Models.Rooms;
 using its.gamify.core.Models.UserChallengeHistories;
 using its.gamify.core.Models.Users;
 using its.gamify.domains.Entities;
@@ -117,5 +118,9 @@ public class MapperConfigurationProfile : Profile
 
         CreateMap<UserChallengeHistory, UserChallengeHistoryCreateModel>().ReverseMap();
         CreateMap<UserChallengeHistory, UserChallengeHistoryViewModel>().ReverseMap();
+
+        CreateMap<Room, RoomCreateModel>().ReverseMap();
+        CreateMap<Room, RoomUpdateModel>().ReverseMap();
+        CreateMap<Room, RoomViewModel>().ReverseMap();
     }
 }

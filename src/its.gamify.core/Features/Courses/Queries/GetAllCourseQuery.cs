@@ -1,8 +1,4 @@
-﻿using Amazon.S3.Model;
-using Azure.Core;
-using Firebase.Auth;
-using its.gamify.core;
-using its.gamify.core.GlobalExceptionHandling.Exceptions;
+﻿using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
