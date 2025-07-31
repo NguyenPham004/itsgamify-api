@@ -1,4 +1,5 @@
 ﻿using its.gamify.core.Features.Challenges.Commands;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,23 +12,16 @@ namespace its.gamify.core.Features.Rooms.Commands
     public class DeleteRoomCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        class CommandHandler : IRequestHandler<DeleteRoomCommand, bool>
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteRoomCommand, bool>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
 
             public async Task<bool> Handle(DeleteRoomCommand request, CancellationToken cancellationToken)
             {
-                var room = await unitOfWork.RoomRepository.GetByIdAsync(request.Id);
-                if (room is not null)
-                {
-                    unitOfWork.RoomRepository.SoftRemove(room);
-                    return await unitOfWork.SaveChangesAsync();
-                }
-                else throw new InvalidOperationException("Room not found");
+                var room = await unitOfWork.RoomRepository.GetByIdAsync(request.Id) ?? throw new BadRequestException("Phòng không tồn tại!");
+
+                unitOfWork.RoomRepository.SoftRemove(room);
+                return await unitOfWork.SaveChangesAsync();
+
             }
         }
 

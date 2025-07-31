@@ -1,4 +1,6 @@
 ﻿using its.gamify.core.Features.Rooms.Commands;
+using its.gamify.core.Features.Rooms.Queries;
+using its.gamify.core.Models.Rooms;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +10,17 @@ namespace its.gamify.api.Controllers
     [Route("api/[controller]s")]
     [ApiController]
     [Authorize]
-    public class RoomController : ControllerBase
+    public class RoomController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator mediator;
-        public RoomController(IMediator mediator)
+        private readonly IMediator mediator = mediator;
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            this.mediator = mediator;
+            var result = await mediator.Send(new GetRoomByIdQuery { Id = id });
+            return Ok(result);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRoomCommand command)
         {
@@ -23,23 +28,27 @@ namespace its.gamify.api.Controllers
             return Ok(res);
         }
 
-        
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateRoomCommand updatedItem)
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] RoomUpdateModel model)
         {
-            var result = await mediator.Send(updatedItem);
-            if (result) return NoContent();
-            else return BadRequest();
+            await mediator.Send(new UpdateRoomCommand
+            {
+                Id = id,
+                Model = model
+            });
+            return NoContent();
+
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var res = await mediator.Send(new DeleteRoomCommand()
+            await mediator.Send(new DeleteRoomCommand()
             {
                 Id = id
             });
-            return res ? NoContent() : StatusCode(500);
+            return NoContent();
         }
     }
 }

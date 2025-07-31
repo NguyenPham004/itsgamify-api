@@ -66,20 +66,15 @@ namespace its.gamify.api.Controllers
             return res ? NoContent() : StatusCode(500);
         }
         [HttpGet("{id}/rooms")]
-        public async Task<IActionResult> GetAllRoom([FromQuery] FilterQuery query)
+        public async Task<IActionResult> GetAllRoom([FromRoute] Guid id, [FromQuery] FilterQuery query)
         {
             var result = await _mediator.Send(new GetAllRoomQuery
             {
+                ChallengeId = id,
                 Filter = query
             });
             return Ok(result);
         }
 
-        [HttpGet("{id}/rooms/{roomId}")]
-        public async Task<IActionResult> GetById(Guid id, Guid roomId)
-        {
-            var result = await _mediator.Send(new GetRoomByIdQuery { Id = roomId });
-            return Ok(result);
-        }
     }
 }
