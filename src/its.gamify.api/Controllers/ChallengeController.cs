@@ -1,14 +1,18 @@
 using its.gamify.core.Features.Challenges.Commands;
 using its.gamify.core.Features.Challenges.Queries;
+using its.gamify.core.Features.Roles;
+using its.gamify.core.Features.Rooms.Queries;
 using its.gamify.core.Models.Challenges;
 using its.gamify.core.Models.ShareModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
 {
     [ApiController]
     [Route("api/[controller]s")]
+    [Authorize]
     public class ChallengeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -60,6 +64,22 @@ namespace its.gamify.api.Controllers
                 Id = id
             });
             return res ? NoContent() : StatusCode(500);
+        }
+        [HttpGet("{id}/rooms")]
+        public async Task<IActionResult> GetAllRoom([FromQuery] FilterQuery query)
+        {
+            var result = await _mediator.Send(new GetAllRoomQuery
+            {
+                Filter = query
+            });
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/rooms/{roomId}")]
+        public async Task<IActionResult> GetById(Guid id, Guid roomId)
+        {
+            var result = await _mediator.Send(new GetRoomByIdQuery { Id = roomId });
+            return Ok(result);
         }
     }
 }
