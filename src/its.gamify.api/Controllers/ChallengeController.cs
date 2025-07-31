@@ -1,7 +1,6 @@
 using its.gamify.core.Features.Challenges.Commands;
-using its.gamify.core.Features.Challenges.Queries;
+using its.gamify.core.Features.Challenges;
 using its.gamify.core.Models.Challenges;
-using its.gamify.core.Models.ShareModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +17,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] FilterQuery query)
+        public async Task<IActionResult> GetAll([FromQuery] ChallengeQuery query)
         {
             var result = await _mediator.Send(new GetChallengeQuery
             {
