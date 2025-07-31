@@ -42,6 +42,7 @@ public class AppDbContext : DbContext
     public DbSet<Badge> Badge { get; set; }
     public DbSet<CourseMetric> CourseMetric { get; set; }
     public DbSet<UserChallengeHistory>UserChallengeHistory { get; set; }
+    public DbSet<Room> Room { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
