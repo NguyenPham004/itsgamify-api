@@ -1,11 +1,5 @@
-﻿using its.gamify.core.Features.Challenges.Queries;
-using its.gamify.domains.Entities;
+﻿using its.gamify.domains.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace its.gamify.core.Features.Rooms.Queries
 {
