@@ -2,7 +2,6 @@
 using its.gamify.domains.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace its.gamify.core.Features.Rooms.Queries
 {
@@ -15,17 +14,19 @@ namespace its.gamify.core.Features.Rooms.Queries
 
             public async Task<BasePagingResponseModel<Room>> Handle(GetAllRoomQuery request, CancellationToken cancellationToken)
             {
-                Func<IQueryable<Room>, IIncludableQueryable<Room, object>>? includeFunc =
-                x =>
-                    x.Include(x => x.Challenge);
+
                 var (Pagination, Entities) = await unitOfWork.RoomRepository.ToDynamicPagination(
                     pageIndex: request.Filter?.Page ?? 0,
                     pageSize: request.Filter?.Limit ?? 10,
                     sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
                     filter: x => x.ChallengeId == request.ChallengeId,
-                    includeFunc: includeFunc);
-                return BasePagingResponseModel<Room>.CreateInstance(Entities, Pagination);
+                    includeFunc: x => x
+                        .Include(x => x.Challenge)
+                        .Include(x => x.HostUser!)
+                        .Include(x => x.OpponentUser!)
+                    );
 
+                return BasePagingResponseModel<Room>.CreateInstance(Entities, Pagination);
 
             }
         }

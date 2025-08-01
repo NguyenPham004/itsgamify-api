@@ -3,6 +3,7 @@ using its.gamify.api;
 using its.gamify.api.Middlewares;
 using its.gamify.core.GlobalExceptionHandling;
 using its.gamify.core.Services;
+using its.gamify.core.SingalR;
 using its.gamify.domains.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,9 @@ app.UseHangfireDashboard("/hangfire");
 app.MapOpenApi();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<GameHub>("/gameHub");
+
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())

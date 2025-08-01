@@ -155,9 +155,12 @@ public static class ServiceCollectionExtensions
         {
             options.MaxRequestBodySize = int.MaxValue;
         });
+
+        services.AddSignalR();
+
         return services;
     }
-    
+
     private static Assembly[] getAssemblies()
         => [AssemblyReference.Assembly, infras.AssemblyReference.Assembly, core.AssemblyReference.Assembly];
 
