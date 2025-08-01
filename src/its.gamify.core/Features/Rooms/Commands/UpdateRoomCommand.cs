@@ -16,8 +16,8 @@ namespace its.gamify.core.Features.Rooms.Commands
             public CommandValidate()
             {
                 RuleFor(x => x.Model.ChallengeId).NotEmpty().NotNull().WithMessage("Vui lòng nhập thử thách");
-                RuleFor(x => x.Model.AmountQuestion).GreaterThan(0).WithMessage("Số câu hỏi phải lớn hơn 0.");
-                RuleFor(x => x.Model.TimeQuestion).GreaterThan(0).WithMessage("Thời gian cho câu hỏi không hợp lệ.");
+                RuleFor(x => x.Model.QuestionCount).GreaterThan(0).WithMessage("Số câu hỏi phải lớn hơn 0.");
+                RuleFor(x => x.Model.TimePerQuestion).GreaterThan(0).WithMessage("Thời gian cho câu hỏi không hợp lệ.");
             }
         }
         class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateRoomCommand, bool>
