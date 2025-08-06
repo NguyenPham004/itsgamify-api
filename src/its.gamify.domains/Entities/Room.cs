@@ -14,8 +14,12 @@ namespace its.gamify.domains.Entities
         public User? HostUser { get; set; }
         public Guid? OpponentUserId { get; set; }
         public User? OpponentUser { get; set; }
+        public int HostScore { get; set; } = 0;
+        public int OpponentScore { get; set; } = 0;
         public bool IsHostReady { get; set; } = false;
         public bool IsOpponentReady { get; set; } = false;
-        public bool IsAbandoned { get; set; } = false;
+        public bool IsHostAnswer { get; set; } = false;
+        public bool IsOpponentAnswer { get; set; } = false;
+        public int CurrentQuestion { get; set; } = 0;
     }
 }

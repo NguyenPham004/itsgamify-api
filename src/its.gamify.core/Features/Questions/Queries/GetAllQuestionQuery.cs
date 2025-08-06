@@ -4,34 +4,37 @@ using its.gamify.domains.Entities;
 using MediatR;
 using System.Linq.Expressions;
 
-namespace its.gamify.api.Features.Questions.Queries
+namespace its.gamify.core.Features.Questions.Queries;
+
+public class QuestionFilterQuery : FilterQuery
 {
-    public class GetAllQuestionQuery : IRequest<BasePagingResponseModel<Question>>
-    {
-        public int PageSize { get; set; }
-        public int PageIndex { get; set; }
-        public string Search { get; set; } = string.Empty;
-        class QueryHandler : IRequestHandler<GetAllQuestionQuery, BasePagingResponseModel<Question>>
-        {
-            private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
-            public async Task<BasePagingResponseModel<Question>> Handle(GetAllQuestionQuery request, CancellationToken cancellationToken)
-            {
-
-                Expression<Func<Question, bool>>? filter = null;
-                if (!string.IsNullOrEmpty(request.Search))
-                {
-                    filter = x => x.Content.Contains(request.Search);
-                }
-                var res = await unitOfWork.QuestionRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.Quiz]);
-
-                return new BasePagingResponseModel<Question>(datas: res.Entities, pagination: res.Pagination);
-            }
-
-        }
-
-    }
+    public Guid CourseId { get; set; }
 }
+
+public class GetAllQuestionQuery : IRequest<List<Question>>
+{
+
+    public required QuestionFilterQuery FilterQuery { get; set; }
+
+    class QueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetAllQuestionQuery, List<Question>>
+    {
+
+        public async Task<List<Question>> Handle(GetAllQuestionQuery request, CancellationToken cancellationToken)
+        {
+
+            Expression<Func<Question, bool>>? filter = x => x.CourseId == request.FilterQuery.CourseId;
+
+            var allQuestions = await unitOfWork.QuestionRepository.WhereAsync(filter: filter);
+            var limit = request.FilterQuery.Limit ?? 10;
+
+            var randomQuestions = allQuestions
+                .OrderBy(_ => Guid.NewGuid())
+                .Take(Math.Min(limit, allQuestions.Count))
+                .ToList();
+
+            return randomQuestions;
+        }
+    }
+
+}
+

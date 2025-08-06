@@ -90,11 +90,16 @@ namespace its.gamify.api.Controllers
             return Ok(res);
 
         }
-        [HttpGet("{id}/challenge-history")]
+        [HttpGet("{id}/challenge-histories")]
         [Authorize]
-        public async Task<IActionResult> GetAllChallengeHistory([FromQuery] FilterQuery Filter, Guid id)
+        public async Task<IActionResult> GetAllChallengeHistory([FromQuery] FilterQuery filter, Guid id)
         {
-            var res = await mediator.Send(new GetAllUserChallengeHistoryQuery());
+            var res = await mediator.Send(new GetAllUserChallengeHistoryQuery
+            {
+                Filter = filter,
+                UserId = id
+            });
+
             return Ok(res);
 
         }
