@@ -1,32 +1,28 @@
-﻿using its.gamify.api.Features.Categories.Queries;
-using its.gamify.core.Models.ShareModels;
+﻿using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace its.gamify.core.Features.UserChallengeHistories.Queries
 {
     public class GetAllUserChallengeHistoryQuery : IRequest<BasePagingResponseModel<UserChallengeHistory>>
     {
+        public required Guid UserId { get; set; }
         public FilterQuery? Filter { get; set; }
-        class QueryHandler : IRequestHandler<GetAllUserChallengeHistoryQuery, BasePagingResponseModel<UserChallengeHistory>>
+        class QueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetAllUserChallengeHistoryQuery, BasePagingResponseModel<UserChallengeHistory>>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<BasePagingResponseModel<UserChallengeHistory>> Handle(GetAllUserChallengeHistoryQuery request, CancellationToken cancellationToken)
             {
-                var res = await unitOfWork.UserChallengeHistoryRepository.ToDynamicPagination(pageIndex: request.Filter?.Page ?? 0,
+                var (Pagination, Entities) = await unitOfWork.UserChallengeHistoryRepository
+                .ToDynamicPagination(pageIndex: request.Filter?.Page ?? 0,
                     pageSize: request.Filter?.Limit ?? 10,
-                    searchFields: ["ChallengeId","UserId","CreateBy"], searchTerm: request.Filter?.Q ?? string.Empty,
-                    sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"));
-                return BasePagingResponseModel<UserChallengeHistory>.CreateInstance(res.Entities, res.Pagination);
+                    filter: x => x.UserId == request.UserId,
+                    searchFields: ["ChallengeId", "UserId", "CreateBy"], searchTerm: request.Filter?.Q ?? string.Empty,
+                    sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
+                    includeFunc: x => x.Include(x => x.Challenge).Include(x => x.User).Include(x => x.Opponent));
+                return BasePagingResponseModel<UserChallengeHistory>.CreateInstance(Entities, Pagination);
 
 
             }
