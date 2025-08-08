@@ -257,10 +257,16 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
             await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
             return;
         }
+        room.Status = ROOM_STATUS.WAITING;
 
         if (room.OpponentUserId == null)
         {
             _unitOfWork.RoomRepository.SoftRemove(room);
+        }
+        else if (room.OpponentUserId == userId)
+        {
+            room.OpponentUserId = null;
+            _unitOfWork.RoomRepository.Update(room);
         }
         else
         {
@@ -268,8 +274,9 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
             {
                 room.HostUserId = room.OpponentUserId;
             }
-            room.OpponentUser = null;
+            room.OpponentUserId = null;
             _unitOfWork.RoomRepository.Update(room);
+
         }
 
         await _unitOfWork.SaveChangesAsync();
