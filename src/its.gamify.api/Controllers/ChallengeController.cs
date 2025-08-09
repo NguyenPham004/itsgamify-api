@@ -17,6 +17,7 @@ namespace its.gamify.api.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] ChallengeQuery query)
         {
             var result = await _mediator.Send(new GetChallengeQuery
@@ -27,6 +28,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _mediator.Send(new GetChallengeByIdQuery { Id = id });

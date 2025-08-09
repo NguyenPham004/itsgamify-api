@@ -1,4 +1,5 @@
 using its.gamify.core.Models.ShareModels;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -19,7 +20,7 @@ namespace its.gamify.core.Features.Challenges
     {
         public ChallengeQuery? Filter { get; set; }
 
-        public class QueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetChallengeQuery, BasePagingResponseModel<Challenge>>
+        public class QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<GetChallengeQuery, BasePagingResponseModel<Challenge>>
         {
 
             public async Task<BasePagingResponseModel<Challenge>> Handle(GetChallengeQuery request, CancellationToken cancellationToken)
@@ -51,7 +52,9 @@ namespace its.gamify.core.Features.Challenges
                                     searchFields: ["Title", "Description"],
                                     sortOrders: sortOrders,
                                     includeFunc: x =>
-                                        x.Include(x => x.Course).Include(x => x.Category!)
+                                        x.Include(x => x.Course)
+                                        .ThenInclude(x => x.CourseResults.Where(x => x.UserId == claimsService.CurrentUser))
+                                        .Include(x => x.Category!)
                                 );
                 return new BasePagingResponseModel<Challenge>(Entities, Pagination);
             }

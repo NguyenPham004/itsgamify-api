@@ -157,7 +157,7 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
-    public async Task EndMatch(Guid roomId)
+    public async Task EndMatch(Guid roomId, Guid userId)
     {
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
         if (room == null)
@@ -166,25 +166,33 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
             return;
         }
 
-        await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
-        {
-            YourScore = room.HostScore,
-            OppScore = room.OpponentScore,
-            UserId = room.HostUserId!.Value,
-            OpponentId = room.OpponentUserId!.Value,
-            ChallengeId = room.ChallengeId,
-            Status = room.HostScore > room.OpponentScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
-        });
+        var isHost = room.HostUserId == userId;
 
-        await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
+        if (isHost)
         {
-            YourScore = room.OpponentScore,
-            OppScore = room.HostScore,
-            UserId = room.OpponentUserId!.Value,
-            OpponentId = room.HostUserId!.Value,
-            ChallengeId = room.ChallengeId,
-            Status = room.OpponentScore > room.HostScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
-        });
+            await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
+            {
+                YourScore = room.HostScore,
+                OppScore = room.OpponentScore,
+                UserId = room.HostUserId!.Value,
+                OpponentId = room.OpponentUserId!.Value,
+                ChallengeId = room.ChallengeId,
+                Status = room.HostScore > room.OpponentScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+            });
+
+        }
+        else
+        {
+            await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
+            {
+                YourScore = room.OpponentScore,
+                OppScore = room.HostScore,
+                UserId = room.OpponentUserId!.Value,
+                OpponentId = room.HostUserId!.Value,
+                ChallengeId = room.ChallengeId,
+                Status = room.OpponentScore > room.HostScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+            });
+        }
 
         room.CurrentQuestion = 0;
         room.IsHostAnswer = false;
