@@ -64,7 +64,8 @@ jobs:
           server: site33412.siteasp.net
           username: site33412
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
+          protocol: ftps # Hoặc sftp nếu máy chủ hỗ trợ
+          port: 21 # Hoặc 22 cho SFTP
           local-dir: ./publish/
           server-dir: /wwwroot/
           dangerous-clean-slate: false
