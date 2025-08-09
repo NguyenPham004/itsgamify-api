@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - its-gamify
 on:
   push:
     branches:
-      - develop
+      - main
   workflow_dispatch:
 
 jobs:
@@ -66,4 +66,5 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6E2FB20ED9044D0B9CC878127088B9DC }}
+
 
