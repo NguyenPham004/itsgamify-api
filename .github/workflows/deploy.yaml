@@ -61,8 +61,8 @@ jobs:
       - name: Deploy to FTP Server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: site33412.siteasp.net
-          username: site33412
+          server: site32340.siteasp.net
+          username: site32340
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           port: 21
