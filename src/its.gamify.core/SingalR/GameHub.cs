@@ -266,6 +266,8 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
             return;
         }
         room.Status = ROOM_STATUS.WAITING;
+        room.IsHostReady = false;
+        room.IsOpponentReady = false;
 
         if (room.OpponentUserId == null)
         {
