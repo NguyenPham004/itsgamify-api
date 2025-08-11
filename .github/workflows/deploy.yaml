@@ -69,3 +69,4 @@ jobs:
           local-dir: ./publish/
           server-dir: /wwwroot/
           dangerous-clean-slate: false
+          timeout: 120000
