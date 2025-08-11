@@ -62,7 +62,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'its-gamify'
+          app-name: 'its-gamification'
           slot-name: 'Production'
           package: .
           publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE}}
