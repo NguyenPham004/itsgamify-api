@@ -1,0 +1,68 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - its-gamify
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update appsettings.json with CON_STRING
+        run: |
+          $appsettings = "src/its.gamify.api/appsettings.json"
+          (Get-Content $appsettings) -replace '"DefaultConnection":\s*""', '"DefaultConnection": "${{ secrets.CON_STRING }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"S3AccessKey":\s*""', '"S3AccessKey": "${{ secrets.S3_ACCESS_KEY }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"S3SecretKey":\s*""', '"S3SecretKey": "${{ secrets.S3_SECRET_KEY }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"S3BucketName":\s*""', '"S3BucketName": "${{ secrets.S3_BUCKET_NAME }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"S3BaseObjectUrl":\s*""', '"S3BaseObjectUrl": "${{ secrets.S3_BASE_OBJECT_URL }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ServiceAccountAdmin":\s*""', '"ServiceAccountAdmin": "${{ secrets.FIREBASE_SERVICE_ACCOUNT_ADMIN }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ServiceAccountPass":\s*""', '"ServiceAccountPass": "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PASS }}"' | Set-Content $appsettings
+          (Get-Content $appsettings) -replace '"ApiKey":\s*""', '"ApiKey": "${{ secrets.FIREBASE_API_KEY }}"' | Set-Content $appsettings
+        shell: pwsh
+        
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 'v9.0'
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'its-gamify'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
