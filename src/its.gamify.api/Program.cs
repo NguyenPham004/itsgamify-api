@@ -38,10 +38,10 @@ app.MapHub<GameHub>("/gameHub");
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var s3Service = scope.ServiceProvider.GetRequiredService<IS3Service>();
-    await s3Service.SetCorsConfigurationAsync();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var s3Service = scope.ServiceProvider.GetRequiredService<IS3Service>();
+//     await s3Service.SetCorsConfigurationAsync();
+// }
 
 app.Run();
