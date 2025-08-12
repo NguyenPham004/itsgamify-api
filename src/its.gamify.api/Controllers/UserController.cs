@@ -13,13 +13,10 @@ namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]s")]
     [ApiController]
-    public class UserController : BaseController
+    public class UserController(IMediator mediator) : BaseController
     {
-        private readonly IMediator mediator;
-        public UserController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
+        private readonly IMediator mediator = mediator;
+
         [HttpGet]
         public async Task<IActionResult> GetAllUser([FromQuery] FilterQuery filter)
         {

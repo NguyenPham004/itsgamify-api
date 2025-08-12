@@ -22,6 +22,8 @@ namespace its.gamify.core.Models.Users
         public string RoleName { get; set; } = string.Empty;
         public Guid RoleId { get; set; }
         public string AvatarUrl { get; set; } = string.Empty;
+        [JsonPropertyName("password")]
+        public string? HashedPassword { get; set; } = string.Empty;
         public DepartmentViewModel Department { get; set; } = new();
     }
 
