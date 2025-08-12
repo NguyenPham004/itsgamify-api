@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.SignalR;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using Newtonsoft.Json;
+using its.gamify.core.Services.Interfaces;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 
 
 namespace its.gamify.core.SingalR;
 
-public class GameHub(IUnitOfWork unitOfWork) : Hub
+public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
 {
     private static readonly Dictionary<string, HashSet<string>> _roomConnections = [];  // roomId -> set of connectionIds
     private static readonly Dictionary<string, string> _connectionToUser = [];  // connectionId -> userId (để biết user nào disconnect)
@@ -157,7 +159,7 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
-    public async Task EndMatch(Guid roomId, Guid userId)
+    public async Task EndMatch(Guid roomId, Guid userId, int numOfCorrect)
     {
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
         if (room == null)
@@ -170,6 +172,7 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
 
         if (isHost)
         {
+            var isWinner = room.HostScore > room.OpponentScore;
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.HostScore,
@@ -177,12 +180,14 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
                 UserId = room.HostUserId!.Value,
                 OpponentId = room.OpponentUserId!.Value,
                 ChallengeId = room.ChallengeId,
+                AverageCorrect = numOfCorrect / room.QuestionCount,
                 Status = room.HostScore > room.OpponentScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
-
+            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
         }
         else
         {
+            var isWinner = room.OpponentScore > room.HostScore;
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.OpponentScore,
@@ -190,8 +195,10 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
                 UserId = room.OpponentUserId!.Value,
                 OpponentId = room.HostUserId!.Value,
                 ChallengeId = room.ChallengeId,
+                AverageCorrect = numOfCorrect / room.QuestionCount,
                 Status = room.OpponentScore > room.HostScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
+            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
         }
 
         room.CurrentQuestion = 0;
@@ -232,6 +239,30 @@ public class GameHub(IUnitOfWork unitOfWork) : Hub
         string jsonRoom = await GetRoomJsonAsync(roomId);
 
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
+    }
+
+    private async Task UpdateUserMetric(Guid userId, bool isWinner, int points)
+    {
+        var quarter = await _unitOfWork.QuarterRepository
+               .FirstOrDefaultAsync(q =>
+                    q.StartDate <= currentTime.GetCurrentTime &&
+                    q.EndDate >= currentTime.GetCurrentTime
+                ) ?? throw new BadRequestException("Không tìm thấy quý!");
+
+        var metric = await _unitOfWork.UserMetricRepository.FirstOrDefaultAsync(x => x.UserId == userId && x.QuarterId == quarter.Id)
+            ?? throw new NotFoundException("Không tìm thấy chỉ số người dùng!");
+
+        metric.PointInQuarter += isWinner ? points : -points;
+        metric.WinNum += isWinner ? 1 : 0;
+        metric.LoseNum += isWinner ? 1 : 0;
+        if (!isWinner)
+        {
+            metric.HighestWinStreak = metric.WinStreak;
+        }
+        metric.WinStreak = isWinner ? (metric.WinStreak + 1) : 0;
+
+        _unitOfWork.UserMetricRepository.Update(metric);
+
     }
 
     public override Task OnConnectedAsync()

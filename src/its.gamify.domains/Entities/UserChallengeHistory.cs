@@ -7,6 +7,7 @@ namespace its.gamify.domains.Entities
         public int YourScore { get; set; } = 0;
         public int OppScore { get; set; } = 0;
         public string Status { get; set; } = UserChallengeHistoryEnum.WIN;
+        public double AverageCorrect { get; set; }
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
         public Guid OpponentId { get; set; }
