@@ -7,7 +7,7 @@ namespace its.gamify.core.Features.UserMetrics;
 
 public class UserMetricFilterQuery : FilterQuery
 {
-    public Guid DepartmentId { get; set; }
+    public Guid? DepartmentId { get; set; }
     public Guid QuarterId { get; set; }
 }
 

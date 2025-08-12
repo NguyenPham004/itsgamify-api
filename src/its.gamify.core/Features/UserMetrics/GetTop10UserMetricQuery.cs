@@ -17,7 +17,9 @@ public class GetTop10UserMetricQuery : IRequest<BasePagingResponseModel<UserMetr
                 pageIndex: request.Filter.Page ?? 0,
                 pageSize: request.Filter.Limit ?? 10,
                 filter: x => x.QuarterId == request.Filter.QuarterId &&
-                             x.User.DepartmentId == request.Filter.DepartmentId &&
+                             x.User.Role!.Name != "ADMIN" &&
+                             x.User.Role!.Name != "MANAGER" &&
+                             x.User.Role!.Name != "TRAININGSTAFF" &&
                              (string.IsNullOrEmpty(request.Filter.Q) || x.User.FullName.Contains(request.Filter.Q, StringComparison.OrdinalIgnoreCase)),
                 cancellationToken: cancellationToken,
                 orderByList: [(x => x.PointInQuarter, true)],
