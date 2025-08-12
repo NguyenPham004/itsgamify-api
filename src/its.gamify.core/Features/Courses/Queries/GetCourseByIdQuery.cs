@@ -21,6 +21,7 @@ namespace its.gamify.api.Features.Courses.Queries
                     includeFunc: x => x.Include(course => course.LearningMaterials.Where(x => !x.IsDeleted))
                         .Include(x => x.Deparment)
                         .Include(x => x.Category)
+                        .Include(x => x.Quarter)
                         .Include(course => course.CourseSections.Where(x => !x.IsDeleted))
                             .ThenInclude(cs => cs.Lessons.Where(x => !x.IsDeleted))
                                 .ThenInclude(x => x.Quiz)
@@ -28,6 +29,7 @@ namespace its.gamify.api.Features.Courses.Queries
                                 .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                                 .ThenInclude(x => x.Lessons.Where(x => !x.IsDeleted))
                                     .ThenInclude(x => x.Practices)))
+
                      ?? throw new InvalidOperationException("Không tìm thấy Course với id " + request.Id);
             }
         }

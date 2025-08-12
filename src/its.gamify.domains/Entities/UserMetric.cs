@@ -7,6 +7,10 @@ public class UserMetric : BaseEntity
     public int ChallengeParticipateNum { get; set; } = 0;
     public int ChallengeAwardNum { get; set; } = 0;
     public int PointInQuarter { get; set; } = 0;
+    public int WinNum { get; set; } = 0;
+    public int LoseNum { get; set; } = 0;
+    public int WinStreak { get; set; } = 0;
+    public int HighestWinStreak { get; set; } = 0;
     public Guid UserId { get; set; }
     public virtual User User { get; set; } = null!;
     public Guid QuarterId { get; set; }
