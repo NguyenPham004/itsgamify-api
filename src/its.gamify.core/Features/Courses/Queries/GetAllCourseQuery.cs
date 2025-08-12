@@ -63,8 +63,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             else if (_claimSerivce.CurrentRole == ROLE.LEADER)
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                            x.IsDraft == false &&
-                            x.DepartmentId == user.DepartmentId;
+                            x.IsDraft == false 
+                            || (x.DepartmentId == user.DepartmentId && x.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString());
 
                 includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.Deparment!)
