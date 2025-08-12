@@ -97,7 +97,6 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
 
 
         string jsonRoom = await GetRoomJsonAsync(roomGuid);
-        Console.WriteLine("jsonRoom");
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
@@ -170,9 +169,9 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
 
         var isHost = room.HostUserId == userId;
 
-        if (isHost)
+
+        if (room.Status == ROOM_STATUS.PLAYING)
         {
-            var isWinner = room.HostScore > room.OpponentScore;
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.HostScore,
@@ -183,11 +182,9 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
                 AverageCorrect = numOfCorrect / room.QuestionCount,
                 Status = room.HostScore > room.OpponentScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
-            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
-        }
-        else
-        {
-            var isWinner = room.OpponentScore > room.HostScore;
+            await UpdateUserMetric(room.HostUserId.Value, room.HostScore > room.OpponentScore, room.BetPoints!);
+
+
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.OpponentScore,
@@ -198,7 +195,7 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
                 AverageCorrect = numOfCorrect / room.QuestionCount,
                 Status = room.OpponentScore > room.HostScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
-            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
+            await UpdateUserMetric(room.OpponentUserId.Value, room.OpponentScore > room.HostScore, room.BetPoints!);
         }
 
         room.CurrentQuestion = 0;
