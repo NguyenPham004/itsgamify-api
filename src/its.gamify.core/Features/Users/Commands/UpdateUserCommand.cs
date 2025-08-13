@@ -26,7 +26,7 @@ namespace its.gamify.api.Features.Users.Commands
                 var leader = dept?.Users?.FirstOrDefault(x => x.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id);
                 if (leader is not null)
                 {
-                    throw new Exception("Phòng ban đã có leader");
+                    throw new BadRequestException("Phòng ban đã có leader");
                 }
                 else
                 {

@@ -23,9 +23,9 @@ namespace its.gamify.api.Controllers
                 var loginRes = await authService.LoginAsync(model.Email, model.Password);
                 return loginRes is not null ? Ok(loginRes) : StatusCode(500);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
 
         }
