@@ -70,7 +70,7 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 if (metric.CourseParticipatedNum >= 5)
                     throw new BadRequestException("Đã đạt mức giới hạn cho phép trong 1 quý!");
 
-                if (quarter.Id != course.QuarterId && course.IsOptional == false)
+                if (quarter.Id != course.QuarterId)
                     throw new BadRequestException("Bạn không thể tham gia khoá học!");
 
                 var isDup = await unitOfWork.CourseParticipationRepository.FirstOrDefaultAsync(x => x.UserId == currentUser.Id && x.CourseId == course.Id);
