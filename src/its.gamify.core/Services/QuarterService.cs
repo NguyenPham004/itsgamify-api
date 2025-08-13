@@ -8,6 +8,7 @@ namespace its.gamify.core.Services;
 public interface IQuarterService
 {
     Task AutoGenerateQuarter();
+    Task CreateCurrentQuarter();
 }
 
 
@@ -24,7 +25,7 @@ public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime) 
         // Nếu không tìm thấy quarter hiện tại, tạo quarter cho quý hiện tại
         if (currentQuarter == null)
         {
-            await CreateCurrentQuarter(currentTime);
+            await CreateCurrentQuarter();
             return;
         }
 
@@ -60,8 +61,9 @@ public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime) 
         await _unitOfWork.SaveChangesAsync();
     }
 
-    private async Task CreateCurrentQuarter(DateTime currentTime)
+    public async Task CreateCurrentQuarter()
     {
+        var currentTime = _currentTime.GetCurrentTime;
         var currentYear = currentTime.Year;
         var currentMonth = currentTime.Month;
         var quarterNumber = DateTimeUtilities.GetQuarterNumber(currentMonth);

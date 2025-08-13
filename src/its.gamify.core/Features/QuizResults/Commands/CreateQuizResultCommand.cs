@@ -54,7 +54,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                         .LearningProgressRepository
                         .FirstOrDefaultAsync(x => x.CourseParticipationId == request.Model.ParticipationId && x.LessonId == request.Model.TypeId);
 
-                    if (progress == null && progress!.QuizResultId == null)
+                    if (progress == null)
                     {
 
                         await _unitOfWork.LearningProgressRepository.AddAsync(new LearningProgress
@@ -65,7 +65,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                             QuizResultId = quizResult.Id
                         }, cancellationToken);
                     }
-                    else
+                    else if (progress!.QuizResultId == null || progress.Status == PROGRESS_STATUS.IN_PROGRESS)
                     {
                         progress.Status = quizResult.IsPassed ? PROGRESS_STATUS.COMPLETED : PROGRESS_STATUS.IN_PROGRESS;
                         _unitOfWork.LearningProgressRepository.Update(progress);

@@ -44,6 +44,8 @@ using (var scope = app.Services.CreateScope())
     await s3Service.SetCorsConfigurationAsync();
 }
 
+BackgroundJob.Enqueue<IQuarterService>(service => service.CreateCurrentQuarter());
+
 RecurringJob.AddOrUpdate<IQuarterService>("auto-generate-quarter", service => service.AutoGenerateQuarter(), "0 2 21 * *", new RecurringJobOptions
 {
     TimeZone = TimeZoneInfo.Utc,
