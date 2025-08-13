@@ -1,6 +1,7 @@
 ﻿using its.gamify.api.Extensions;
 using its.gamify.api.Features.Departments.Commands;
 using its.gamify.api.Features.Departments.Queries;
+using its.gamify.core.Features.Departments.Queries;
 using its.gamify.core.Models.Departments;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
@@ -34,6 +35,16 @@ namespace its.gamify.api.Controllers
         public async Task<IActionResult> GetAll([FromQuery] FilterQuery filter)
         {
             return Ok(await mediator.Send(new GetAllDepartmentQuery()
+            {
+                Filter = filter
+            }));
+        }
+
+        [HttpGet("statistics")]
+        [ProcessOrderBy]
+        public async Task<IActionResult> GetStatistics([FromQuery] StatisticFilter filter)
+        {
+            return Ok(await mediator.Send(new GetStatisticsQuery()
             {
                 Filter = filter
             }));
