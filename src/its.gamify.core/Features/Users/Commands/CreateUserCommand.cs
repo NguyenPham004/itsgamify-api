@@ -5,6 +5,7 @@ using its.gamify.core.Models.Users;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 
 namespace its.gamify.api.Features.Users.Commands
@@ -36,6 +37,15 @@ namespace its.gamify.api.Features.Users.Commands
                 CancellationToken cancellationToken)
             {
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
+                var roles = await unitOfWork.RoleRepository.GetAllAsync();
+                var dept = await unitOfWork.DepartmentRepository.FirstOrDefaultAsync(x => x.Id == user.DepartmentId,
+                    false, cancellationToken, [x => x.Users!]);
+
+                var leader = dept?.Users?.FirstOrDefault(x => x.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id);
+                if (leader is not null)
+                {
+                    throw new BadRequestException("Phòng ban đã có leader");
+                }
                 await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
                 if (!string.IsNullOrEmpty(request.Model.HashedPassword))
 
