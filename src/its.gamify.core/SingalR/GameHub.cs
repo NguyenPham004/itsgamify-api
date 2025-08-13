@@ -358,7 +358,7 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
         metric.ChallengeParticipateNum += 1;
         metric.PointInQuarter += isWinner ? points : -points;
         metric.WinNum += isWinner ? 1 : 0;
-        metric.LoseNum += isWinner ? 1 : 0;
+        metric.LoseNum += !isWinner ? 1 : 0;
         if (!isWinner)
         {
             metric.HighestWinStreak = metric.WinStreak;
