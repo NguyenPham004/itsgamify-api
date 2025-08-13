@@ -18,8 +18,16 @@ namespace its.gamify.api.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] AuthRequestModel model)
         {
-            var loginRes = await authService.LoginAsync(model.Email, model.Password);
-            return Ok(loginRes);
+            try
+            {
+                var loginRes = await authService.LoginAsync(model.Email, model.Password);
+                return Ok(loginRes);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Tài khoản không hợp lệ!");
+            }
+
         }
     }
 }
