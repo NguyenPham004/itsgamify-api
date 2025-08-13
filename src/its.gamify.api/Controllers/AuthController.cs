@@ -25,7 +25,7 @@ namespace its.gamify.api.Controllers
             }
             catch (Exception)
             {
-                throw new Exception("Login thất bại");
+                return BadRequest();
             }
 
         }

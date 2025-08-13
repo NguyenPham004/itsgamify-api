@@ -4,9 +4,11 @@ using its.gamify.core;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.QuizResults;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
+using System.Threading.Tasks;
 
 namespace its.gamify.api.Features.QuizResults.Commands
 {
@@ -51,8 +53,9 @@ namespace its.gamify.api.Features.QuizResults.Commands
                     var progress = await _unitOfWork
                         .LearningProgressRepository
                         .FirstOrDefaultAsync(x => x.CourseParticipationId == request.Model.ParticipationId && x.LessonId == request.Model.TypeId);
-
-                    if (progress == null)
+                    // Kiểm tra user đã làm bài quiz chưa
+                    bool IsQuizDone = await IsUserDoneQuiz(request.Model.ParticipationId);
+                    if (progress == null && IsQuizDone)
                     {
 
                         await _unitOfWork.LearningProgressRepository.AddAsync(new LearningProgress
@@ -157,6 +160,12 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 quizResult.IsPassed = totalScore >= quiz.PassedMark;
 
                 return quizResult;
+            }
+            private async Task<bool> IsUserDoneQuiz(Guid CourseParticipationId)
+            {
+                var learningProgress = await _unitOfWork.LearningProgressRepository.FirstOrDefaultAsync(x => x.CourseParticipationId == CourseParticipationId);
+                if(learningProgress?.QuizResultId == null) return true;
+                return false;
             }
         }
     }
