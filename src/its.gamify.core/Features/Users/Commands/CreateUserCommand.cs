@@ -42,10 +42,14 @@ namespace its.gamify.api.Features.Users.Commands
                     false, cancellationToken, [x => x.Users!]);
 
                 var leader = dept?.Users?.FirstOrDefault(x => x.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id);
-                if (leader is not null)
+                if (request.Model.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id)
                 {
-                    throw new BadRequestException("Phòng ban đã có leader");
+                    if (leader is not null)
+                    {
+                        throw new BadRequestException("Phòng ban đã có leader");
+                    }
                 }
+                   
                 await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
                 if (!string.IsNullOrEmpty(request.Model.HashedPassword))
 

@@ -26,14 +26,15 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
     class QueryHandler(
         IUnitOfWork unitOfWork,
-        IClaimsService _claimSerivce
+        IClaimsService _claimSerivce,
+        ICurrentTime currentTime
     ) : IRequestHandler<GetAllCourseQuery, BasePagingResponseModel<Course>>
     {
 
         public async Task<BasePagingResponseModel<Course>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<Course, bool>>? filter = null;
-
+            var quarter = await unitOfWork.QuarterRepository.FirstOrDefaultAsync(x=>x.StartDate<= currentTime.GetCurrentTime && x.EndDate>= currentTime.GetCurrentTime);
             Dictionary<string, bool>? sortOrders = request.CourseQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
             Func<IQueryable<Course>, IIncludableQueryable<Course, object>>? includeFunc =
@@ -50,13 +51,12 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                    x.IsDraft == false &&
+                    x.IsDraft == false && x.QuarterId == quarter.Id &&
                     (x.CourseType == COURSE_TYPE.ALL || 
                         (x.CourseType == COURSE_TYPE.DEPARTMENTONLY 
                          && x.DepartmentId == user.DepartmentId 
                          && x.Status == COURSE_STATUS.PUBLISHED 
                          &&x.IsDraft == false));
-
                 includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                         .Include(x => x.Deparment!)
@@ -67,7 +67,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             else if (_claimSerivce.CurrentRole == ROLE.LEADER)
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                            x.IsDraft == false 
+                            x.IsDraft == false && x.QuarterId == quarter.Id
                             || (x.DepartmentId == user.DepartmentId 
                                 && x.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString() 
                                 && x.Status == COURSE_STATUS.PUBLISHED &&
