@@ -7,13 +7,9 @@ namespace its.gamify.api.Controllers
 {
     [ApiController]
     [Route("api/course-participations")]
-    public class CourseParticipationsController : ControllerBase
+    public class CourseParticipationsController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-        public CourseParticipationsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         [HttpGet]
         [Authorize]
