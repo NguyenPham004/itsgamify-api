@@ -4,9 +4,11 @@ using its.gamify.core;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.QuizResults;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
+using System.Threading.Tasks;
 
 namespace its.gamify.api.Features.QuizResults.Commands
 {
@@ -52,7 +54,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                         .LearningProgressRepository
                         .FirstOrDefaultAsync(x => x.CourseParticipationId == request.Model.ParticipationId && x.LessonId == request.Model.TypeId);
 
-                    if (progress == null)
+                    if (progress == null && progress!.QuizResultId == null)
                     {
 
                         await _unitOfWork.LearningProgressRepository.AddAsync(new LearningProgress
