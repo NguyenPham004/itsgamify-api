@@ -38,6 +38,7 @@ namespace its.gamify.api.Features.Users.Commands
             {
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
                 var roles = await unitOfWork.RoleRepository.GetAllAsync();
+                var leaderRole = roles.FirstOrDefault(x => x.Name == RoleEnum.LEADER.ToString());
                 var dept = await unitOfWork.DepartmentRepository.FirstOrDefaultAsync(x => x.Id == user.DepartmentId,
                     false, cancellationToken, [x => x.Users!]);
 
