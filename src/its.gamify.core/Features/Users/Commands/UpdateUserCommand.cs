@@ -24,16 +24,24 @@ namespace its.gamify.api.Features.Users.Commands
                     false, cancellationToken, [x => x.Users!]);
 
                 var leader = dept?.Users?.FirstOrDefault(x => x.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id);
-                if (leader is not null)
+                if(request.Model.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id)
                 {
-                    throw new BadRequestException("Phòng ban đã có leader");
-                }
-                else
+                    if (leader is not null)
+                    {
+                        throw new BadRequestException("Phòng ban đã có leader");
+                    }
+                    else
+                    {
+                        user.RoleId = roles.FirstOrDefault(x => x.Name == RoleEnum.EMPLOYEE.ToString())!.Id;
+                        unitOfWork.UserRepository.Update(user);
+                    }
+                }else if(request.Model.RoleId == roles.First(x => x.Name == RoleEnum.EMPLOYEE.ToString()).Id)
                 {
                     user.RoleId = roles.FirstOrDefault(x => x.Name == RoleEnum.EMPLOYEE.ToString())!.Id;
                     unitOfWork.UserRepository.Update(user);
                 }
-                user.Role = null;
+
+                    user.Role = null;
                 unitOfWork.UserRepository.Update(user);
                 return await unitOfWork.SaveChangesAsync();
 
