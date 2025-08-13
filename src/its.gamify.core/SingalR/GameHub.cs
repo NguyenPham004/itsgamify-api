@@ -169,13 +169,15 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
             await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
             return;
         }
+        if (room.IsHostAnswer && room.IsOpponentAnswer)
+        {
+            room.CurrentQuestion += 1;
+            room.IsHostAnswer = false;
+            room.IsOpponentAnswer = false;
 
-        room.CurrentQuestion += 1;
-        room.IsHostAnswer = false;
-        room.IsOpponentAnswer = false;
-
-        _unitOfWork.RoomRepository.Update(room);
-        await _unitOfWork.SaveChangesAsync();
+            _unitOfWork.RoomRepository.Update(room);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
         string jsonRoom = await GetRoomJsonAsync(roomId);
 
