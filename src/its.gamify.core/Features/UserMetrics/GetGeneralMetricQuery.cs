@@ -25,7 +25,7 @@ public class GetGeneralMetricQuery : IRequest<GeneralMetricInfor>
             var quarter = await unitOfWork.QuarterRepository
                 .FirstOrDefaultAsync(q => q.StartDate <= currentTime.GetCurrentTime && q.EndDate >= currentTime.GetCurrentTime) ?? throw new BadRequestException("Không tìm thấy quý!");
 
-            var metricInQuater = await unitOfWork.UserMetricRepository.WhereAsync(x => x.QuarterId == quarter.Id, includes: x => x.User);
+            var metricInQuater = await unitOfWork.UserMetricRepository.WhereAsync(x => x.QuarterId == quarter.Id && !x.User.IsDeleted, includes: x => x.User);
 
             var topMetric = metricInQuater
                 .OrderByDescending(m => m.PointInQuarter)

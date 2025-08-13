@@ -69,6 +69,18 @@ namespace its.gamify.api.Controllers
             return res ? NoContent() : StatusCode(500);
 
         }
+
+        [HttpGet("{id}/statistic")]
+        public async Task<IActionResult> GêtStatistic([FromRoute] Guid id, [FromQuery] Guid Quaterid)
+        {
+            var res = await mediator.Send(new GetUserStatistic()
+            {
+                UserId = id,
+                QuarterId = Quaterid
+            });
+            return Ok(res);
+
+        }
         [HttpGet("{id}/course-results")]
         public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] FilterQuery query)
         {
