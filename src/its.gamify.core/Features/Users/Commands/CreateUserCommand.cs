@@ -38,11 +38,12 @@ namespace its.gamify.api.Features.Users.Commands
             {
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
                 var roles = await unitOfWork.RoleRepository.GetAllAsync();
+                var employeeRole = roles.FirstOrDefault(x => x.Name == RoleEnum.EMPLOYEE.ToString());
                 var dept = await unitOfWork.DepartmentRepository.FirstOrDefaultAsync(x => x.Id == user.DepartmentId,
                     false, cancellationToken, [x => x.Users!]);
 
                 var leader = dept?.Users?.FirstOrDefault(x => x.RoleId == roles.First(x => x.Name == RoleEnum.LEADER.ToString()).Id);
-                if (leader is not null)
+                if (leader is not null && user.RoleId == employeeRole!.Id)
                 {
                     throw new BadRequestException("Phòng ban đã có leader");
                 }
