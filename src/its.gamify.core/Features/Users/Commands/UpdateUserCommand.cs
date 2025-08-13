@@ -37,12 +37,10 @@ namespace its.gamify.api.Features.Users.Commands
                     }
                 }else if(request.Model.RoleId == roles.First(x => x.Name == RoleEnum.EMPLOYEE.ToString()).Id)
                 {
-                    user.RoleId = roles.FirstOrDefault(x => x.Name == RoleEnum.EMPLOYEE.ToString())!.Id;
+                    Guid guid = roles.FirstOrDefault(x => x.Name == RoleEnum.EMPLOYEE.ToString())!.Id;
+                    user.RoleId = guid;
                     unitOfWork.UserRepository.Update(user);
                 }
-
-                    user.Role = null;
-                unitOfWork.UserRepository.Update(user);
                 return await unitOfWork.SaveChangesAsync();
 
             }
