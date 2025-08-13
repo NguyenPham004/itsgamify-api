@@ -8,12 +8,12 @@ namespace its.gamify.api.Controllers
     {
         private readonly IAuthService authService = authService;
 
-        [HttpPost("google/{token}")]
-        public async Task<IActionResult> LoginGoogleAsync([FromRoute] string token)
-        {
-            var loginRes = await authService.LoginGoogleAsync(token, default);
-            return loginRes is not null ? Ok(loginRes) : StatusCode(500);
-        }
+        // [HttpPost("google/{token}")]
+        // public async Task<IActionResult> LoginGoogleAsync([FromRoute] string token)
+        // {
+        //     var loginRes = await authService.LoginGoogleAsync(token, default);
+        //     return loginRes is not null ? Ok(loginRes) : StatusCode(500);
+        // }
 
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] AuthRequestModel model)
@@ -21,11 +21,11 @@ namespace its.gamify.api.Controllers
             try
             {
                 var loginRes = await authService.LoginAsync(model.Email, model.Password);
-                return loginRes is not null ? Ok(loginRes) : StatusCode(500);
+                return Ok(loginRes);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest("Tài khoản không hợp lệ!");
             }
 
         }

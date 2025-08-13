@@ -53,9 +53,8 @@ namespace its.gamify.api.Features.QuizResults.Commands
                     var progress = await _unitOfWork
                         .LearningProgressRepository
                         .FirstOrDefaultAsync(x => x.CourseParticipationId == request.Model.ParticipationId && x.LessonId == request.Model.TypeId);
-                    // Kiểm tra user đã làm bài quiz chưa
-                    bool IsQuizDone = await IsUserDoneQuiz(request.Model.ParticipationId);
-                    if (progress == null && IsQuizDone)
+
+                    if (progress == null && progress!.QuizResultId == null)
                     {
 
                         await _unitOfWork.LearningProgressRepository.AddAsync(new LearningProgress
@@ -160,12 +159,6 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 quizResult.IsPassed = totalScore >= quiz.PassedMark;
 
                 return quizResult;
-            }
-            private async Task<bool> IsUserDoneQuiz(Guid CourseParticipationId)
-            {
-                var learningProgress = await _unitOfWork.LearningProgressRepository.FirstOrDefaultAsync(x => x.CourseParticipationId == CourseParticipationId);
-                if(learningProgress?.QuizResultId == null) return true;
-                return false;
             }
         }
     }

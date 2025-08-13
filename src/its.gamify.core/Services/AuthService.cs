@@ -1,4 +1,5 @@
 ﻿using Firebase.Auth;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Auth;
 using its.gamify.core.Models.Users;
 using its.gamify.core.Services.Interfaces;
@@ -44,7 +45,7 @@ namespace its.gamify.core.Services
                     User = unitOfWork.Mapper.Map<UserViewModel>(userInDb)
                 };
             }
-            throw new InvalidOperationException("Invalid");
+            throw new BadRequestException("Tài khoản không hợp lệ!");
         }
 
         public async Task<AuthResponseModel> LoginGoogleAsync(string token, CancellationToken cancellationToken)
