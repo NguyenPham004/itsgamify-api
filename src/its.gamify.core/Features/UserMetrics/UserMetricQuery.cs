@@ -9,8 +9,9 @@ namespace its.gamify.core.Features.UserMetrics;
 
 public class UserMetricQuery : IRequest<UserMetric>
 {
+    public Guid Id { get; set; }
     public FilterQuery? Filter { get; set; }
-    class QueryHandler(IUnitOfWork unitOfWork, IClaimsService _claimSerivce, ICurrentTime currentTime) : IRequestHandler<UserMetricQuery, UserMetric>
+    class QueryHandler(IUnitOfWork unitOfWork, ICurrentTime currentTime) : IRequestHandler<UserMetricQuery, UserMetric>
     {
         public async Task<UserMetric> Handle(UserMetricQuery request, CancellationToken cancellationToken)
         {
@@ -18,7 +19,7 @@ public class UserMetricQuery : IRequest<UserMetric>
             var quarter = await unitOfWork.QuarterRepository
                 .FirstOrDefaultAsync(q => q.StartDate <= currentTime.GetCurrentTime && q.EndDate >= currentTime.GetCurrentTime) ?? throw new BadRequestException("Không tìm thấy quý!");
 
-            return await unitOfWork.UserMetricRepository.FirstOrDefaultAsync(x => x.UserId == _claimSerivce.CurrentUser && x.QuarterId == quarter.Id, cancellationToken: cancellationToken)
+            return await unitOfWork.UserMetricRepository.FirstOrDefaultAsync(x => x.UserId == request.Id && x.QuarterId == quarter.Id, cancellationToken: cancellationToken)
                 ?? throw new NotFoundException("Không tìm thấy chỉ số người dùng!");
         }
     }

@@ -10,5 +10,6 @@ namespace its.gamify.domains.Enums
     {
         public const string WIN = "WIN";
         public const string LOSE = "LOSE";
+        public const string TIE = "TIE";
     }
 }
