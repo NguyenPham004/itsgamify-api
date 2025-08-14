@@ -25,6 +25,8 @@ namespace its.gamify.core.Models.Users
         public string AvatarUrl { get; set; } = string.Empty;
         [JsonPropertyName("password")]
         public string? HashedPassword { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; } = false;
+
         public List<UserMetric> Metrics { get; set; } = [];
         public DepartmentViewModel Department { get; set; } = new();
     }

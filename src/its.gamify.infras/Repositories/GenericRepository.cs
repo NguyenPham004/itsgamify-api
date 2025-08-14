@@ -386,12 +386,7 @@ public class GenericRepository<TEntity>(
         // Apply soft delete filter
         if (!withDeleted)
         {
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var deletedProperty = Expression.Property(parameter, "IsDeleted");
-            var notDeleted = Expression.Equal(deletedProperty, Expression.Constant(false));
-            var lambda = Expression.Lambda<Func<TEntity, bool>>(notDeleted, parameter);
-            query = query.Where(lambda);
-
+            query = query.Where(x => !x.IsDeleted);
         }
 
         if (filter != null)
@@ -502,6 +497,7 @@ public class GenericRepository<TEntity>(
         return string.Concat(pascalCase.Select((x, i) =>
             i > 0 && char.IsUpper(x) ? "_" + char.ToLower(x) : char.ToLower(x).ToString()));
     }
+
     #region Pagination Methods
     public async Task<(Pagination Pagination, List<TEntity> Entities)> ToDynamicPagination(
     int pageIndex = 0,
@@ -530,12 +526,7 @@ public class GenericRepository<TEntity>(
         // Apply soft delete filter
         if (!withDeleted)
         {
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var deletedProperty = Expression.Property(parameter, "IsDeleted");
-            var notDeleted = Expression.Equal(deletedProperty, Expression.Constant(false));
-            var lambda = Expression.Lambda<Func<TEntity, bool>>(notDeleted, parameter);
-
-            query = query.Where(lambda);
+            query = query.Where(x => !x.IsDeleted);
         }
 
 
