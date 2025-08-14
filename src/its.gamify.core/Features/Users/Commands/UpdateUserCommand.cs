@@ -10,7 +10,7 @@ namespace its.gamify.api.Features.Users.Commands
     public class UpdateUserCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        public UserCreateModel Model { get; set; } = new();
+        public UserUpdateModel Model { get; set; } = new();
 
         class CommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateUserCommand, bool>
         {

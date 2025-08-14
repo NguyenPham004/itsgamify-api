@@ -49,7 +49,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserCreateModel model)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateModel model)
         {
             var res = await mediator.Send(new UpdateUserCommand()
             {

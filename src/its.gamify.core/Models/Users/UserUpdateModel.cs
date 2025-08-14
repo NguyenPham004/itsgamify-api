@@ -2,14 +2,8 @@
 
 namespace its.gamify.core.Models.Users
 {
-    public class UserUpdateModel
+    public class UserUpdateModel:UserCreateModel
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public Guid RoleId { get; set; }
-        [JsonPropertyName("password")]
-        public string? HashedPassword { get; set; } = string.Empty;
 
     }
 }
