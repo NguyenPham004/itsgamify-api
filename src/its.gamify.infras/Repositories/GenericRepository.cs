@@ -529,7 +529,6 @@ public class GenericRepository<TEntity>(
             query = query.Where(x => !x.IsDeleted);
         }
 
-
         if (!string.IsNullOrWhiteSpace(searchTerm) && searchFields != null)
         {
             var parameter = Expression.Parameter(typeof(TEntity), "x");
@@ -546,10 +545,10 @@ public class GenericRepository<TEntity>(
                 // Use Contains with StringComparison.OrdinalIgnoreCase
                 var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) })!;
                 var containsCall = Expression.Call(
-                       Expression.Constant(searchTerm),
-                       typeof(string).GetMethod("Contains", new[] { typeof(string) })!,
-                       property
-                   );
+                   property,
+                   typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!,
+                   Expression.Constant(searchTerm)
+                );
 
                 var safeContains = Expression.AndAlso(notNullCheck, containsCall);
                 combined = combined == null ? safeContains : Expression.OrElse(combined, safeContains);
