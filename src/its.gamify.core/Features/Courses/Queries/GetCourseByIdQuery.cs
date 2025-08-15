@@ -1,5 +1,7 @@
 ﻿using its.gamify.core;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +13,17 @@ namespace its.gamify.api.Features.Courses.Queries
         class QueryHandler : IRequestHandler<GetCourseByIdQuery, Course>
         {
             private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
+            private readonly IClaimsService claimsService;
+            public QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService)
             {
                 this.unitOfWork = unitOfWork;
+                this.claimsService = claimsService;
             }
             public async Task<Course> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
             {
-                return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
+                bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
+                                claimsService.CurrentRole == ROLE.MANAGER;
+                return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, checkRole, cancellationToken,
                     includeFunc: x => x.Include(course => course.LearningMaterials.Where(x => !x.IsDeleted))
                         .Include(x => x.Deparment)
                         .Include(x => x.Category)
