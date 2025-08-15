@@ -1,28 +1,13 @@
-﻿using FluentValidation;
-using its.gamify.core.Features.Courses.Commands;
-using its.gamify.core.GlobalExceptionHandling.Exceptions;
+﻿using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Challenges;
-using its.gamify.core.Models.Courses;
 using its.gamify.domains.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace its.gamify.core.Features.Challenges.Commands
 {
     public class ReActiveChallengeCommand : ChallengeReActiveModel, IRequest<Challenge>
     {
-        class CommandValidation : AbstractValidator<ReActiveChallengeCommand>
-        {
-            public CommandValidation()
-            {
-                RuleFor(x => x.Id).NotNull().NotEmpty().WithMessage("Vui lòng nhập challenge id");
-            }
-        }
+        public Guid Id { get; set; }
         class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<ReActiveChallengeCommand, Challenge>
         {
             public async Task<Challenge> Handle(ReActiveChallengeCommand request, CancellationToken cancellationToken)

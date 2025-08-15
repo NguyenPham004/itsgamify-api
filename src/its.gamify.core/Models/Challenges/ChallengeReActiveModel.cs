@@ -8,7 +8,6 @@ namespace its.gamify.core.Models.Challenges
 {
     public class ChallengeReActiveModel
     {
-        public Guid Id { get; set; }
         public bool IsActive { get; set; }
     }
 }

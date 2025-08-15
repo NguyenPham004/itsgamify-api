@@ -7,6 +7,7 @@ using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
 using its.gamify.core.Models.Courses;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -134,7 +135,7 @@ namespace its.gamify.api.Controllers
         /// </summary>
 
         [HttpPut("{id}/re-active")]
-        [Authorize(Roles = "TRAININGSTAFF")]
+        [Authorize(Roles = ROLE.TRAININGSTAFF)]
         public async Task<IActionResult> ReActiveCourse([FromRoute] Guid id, [FromBody] CourseReActiveModel model)
         {
             return Ok(await mediator.Send(new ReActiveCourseCommand()

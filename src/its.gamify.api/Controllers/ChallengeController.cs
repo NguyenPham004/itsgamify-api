@@ -5,6 +5,7 @@ using its.gamify.core.Features.Rooms.Queries;
 using its.gamify.core.Models.Challenges;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +77,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPut("{id}/re-active")]
-        [Authorize(Roles= "TRAININGSTAFF")]
+        [Authorize(Roles = ROLE.TRAININGSTAFF)]
         public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] ChallengeReActiveModel model)
         {
             return Ok(await mediator.Send(new ReActiveChallengeCommand()
