@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace its.gamify.core.Models.Courses
+namespace its.gamify.core.Models
 {
-    public class CourseReActiveModel
+    public class BaseReActiveModel
     {
         public bool IsActive { get; set; }
     }

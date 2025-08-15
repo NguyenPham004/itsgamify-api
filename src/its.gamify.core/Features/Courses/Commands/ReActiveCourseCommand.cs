@@ -1,11 +1,12 @@
 ﻿using its.gamify.core.GlobalExceptionHandling.Exceptions;
+using its.gamify.core.Models;
 using its.gamify.core.Models.Courses;
 using its.gamify.domains.Entities;
 using MediatR;
 
 namespace its.gamify.core.Features.Courses.Commands
 {
-    public class ReActiveCourseCommand : CourseReActiveModel, IRequest<Course>
+    public class ReActiveCourseCommand : BaseReActiveModel, IRequest<Course>
     {
         public Guid Id { get; set; }
         class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<ReActiveCourseCommand, Course>

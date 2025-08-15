@@ -1,11 +1,12 @@
 ﻿using its.gamify.core.GlobalExceptionHandling.Exceptions;
+using its.gamify.core.Models;
 using its.gamify.core.Models.Challenges;
 using its.gamify.domains.Entities;
 using MediatR;
 
 namespace its.gamify.core.Features.Challenges.Commands
 {
-    public class ReActiveChallengeCommand : ChallengeReActiveModel, IRequest<Challenge>
+    public class ReActiveChallengeCommand : BaseReActiveModel, IRequest<Challenge>
     {
         public Guid Id { get; set; }
         class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<ReActiveChallengeCommand, Challenge>
