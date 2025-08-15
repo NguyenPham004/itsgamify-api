@@ -94,14 +94,16 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                 filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
 
             }
-
+            bool checkRole = _claimSerivce.CurrentRole == ROLE.ADMIN || _claimSerivce.CurrentRole == ROLE.TRAININGSTAFF ||
+                                _claimSerivce.CurrentRole == ROLE.MANAGER;
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
                               request.CourseQuery?.Page ?? 0,
                               request.CourseQuery?.Limit ?? 10,
                               filter: filter,
                               searchTerm: request.CourseQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
                               sortOrders: sortOrders,
-                              includeFunc: includeFunc
+                              includeFunc: includeFunc,
+                              withDeleted: checkRole
                         );
 
             return new BasePagingResponseModel<Course>(datas: res.Value.Entities, pagination: res.Value.Pagination);

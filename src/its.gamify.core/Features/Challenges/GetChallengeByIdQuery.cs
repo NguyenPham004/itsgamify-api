@@ -1,5 +1,6 @@
 ﻿using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 
 namespace its.gamify.core.Features.Challenges
@@ -12,10 +13,13 @@ namespace its.gamify.core.Features.Challenges
 
             public async Task<Challenge> Handle(GetChallengeByIdQuery request, CancellationToken cancellationToken)
             {
+                bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
+                claimsService.CurrentRole == ROLE.MANAGER;
                 return (await unitOfWork
                     .ChallengeRepository
                     .GetByIdAsync(
                         request.Id,
+                        checkRole,
                         cancellationToken: cancellationToken,
                         includes: [x => x.Course, x => x.Category!, x => x.Course.CourseResults.Where(x => x.UserId == claimsService.CurrentUser)]
                     )) ?? throw new InvalidOperationException("Thử thách không tồn tại");
