@@ -2,6 +2,7 @@ using its.gamify.core.Features.Challenges;
 using its.gamify.core.Features.Challenges.Commands;
 using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Rooms.Queries;
+using its.gamify.core.Models;
 using its.gamify.core.Models.Challenges;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
@@ -78,7 +79,7 @@ namespace its.gamify.api.Controllers
 
         [HttpPut("{id}/re-active")]
         [Authorize(Roles = ROLE.TRAININGSTAFF)]
-        public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] ChallengeReActiveModel model)
+        public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] BaseReActiveModel model)
         {
             return Ok(await mediator.Send(new ReActiveChallengeCommand()
             {
