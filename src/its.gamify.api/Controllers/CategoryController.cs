@@ -1,7 +1,13 @@
 ﻿using its.gamify.api.Features.Categories.Commands;
 using its.gamify.api.Features.Categories.Queries;
+using its.gamify.api.Features.Departments.Commands;
+using its.gamify.core.Features.Categories.Commands;
+using its.gamify.core.Features.Challenges.Commands;
+using its.gamify.core.Models;
 using its.gamify.core.Models.ShareModels;
+using its.gamify.domains.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -57,6 +63,30 @@ namespace its.gamify.api.Controllers
                 Id = id
             });
             return res ? NoContent() : StatusCode(500);
+        }
+        /// <summary>
+        /// Delete list Category
+        /// </summary>
+        [HttpDelete("delete-range")]
+        public async Task<IActionResult> DeleteRange(List<Guid> ids)
+        {
+            var res = await mediator.Send(new DeleteRangeCategoryCommand()
+            {
+                Ids = ids
+            });
+            return res ? NoContent() : StatusCode(500);
+        }
+
+        [HttpPut("{id}/re-active")]
+        [Authorize(Roles = ROLE.TRAININGSTAFF)]
+        public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] BaseReActiveModel model)
+        {
+            return Ok(await mediator.Send(new ReActiveCategoryCommand()
+            {
+                Id = id,
+                IsActive = model.IsActive
+            }));
+
         }
     }
 }
