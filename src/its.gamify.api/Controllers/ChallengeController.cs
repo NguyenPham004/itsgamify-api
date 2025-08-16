@@ -2,6 +2,7 @@ using its.gamify.core.Features.Challenges;
 using its.gamify.core.Features.Challenges.Commands;
 using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Rooms.Queries;
+using its.gamify.core.Models;
 using its.gamify.core.Models.Challenges;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
@@ -15,9 +16,8 @@ namespace its.gamify.api.Controllers
     [ApiController]
     [Route("api/[controller]s")]
     [Authorize]
-    public class ChallengeController(IMediator mediator) : ControllerBase
+    public class ChallengeController(IMediator _mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
 
         [HttpGet]
         [Authorize]
@@ -78,9 +78,9 @@ namespace its.gamify.api.Controllers
 
         [HttpPut("{id}/re-active")]
         [Authorize(Roles = ROLE.TRAININGSTAFF)]
-        public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] ChallengeReActiveModel model)
+        public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] BaseReActiveModel model)
         {
-            return Ok(await mediator.Send(new ReActiveChallengeCommand()
+            return Ok(await _mediator.Send(new ReActiveChallengeCommand()
             {
                 Id = id,
                 IsActive = model.IsActive

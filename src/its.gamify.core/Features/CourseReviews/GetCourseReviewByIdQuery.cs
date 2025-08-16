@@ -1,3 +1,4 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 using System;
@@ -18,7 +19,7 @@ namespace its.gamify.core.Features.CourseReviews.Queries
             }
             public async Task<CourseReview> Handle(GetCourseReviewByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.CourseReviewRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.CourseReviewRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken) ?? throw new BadRequestException("Không tìm thấy review!");
             }
         }
     }

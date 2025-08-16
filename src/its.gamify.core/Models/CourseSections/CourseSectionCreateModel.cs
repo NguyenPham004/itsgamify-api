@@ -37,7 +37,7 @@ namespace its.gamify.core.Models.CourseSections
             try
             {
                 var value = valueProviderResult.FirstValue;
-                var result = JsonSerializer.Deserialize(value, bindingContext.ModelType,
+                var result = JsonSerializer.Deserialize(value!, bindingContext.ModelType,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 bindingContext.Result = ModelBindingResult.Success(result);

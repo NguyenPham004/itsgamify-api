@@ -29,7 +29,7 @@ namespace its.gamify.core.Utilities
 
             try
             {
-                var ret = FindMimeFromData(IntPtr.Zero, null, dataBytes, dataBytes.Length, null, 0, out var outPtr, 0);
+                var ret = FindMimeFromData(IntPtr.Zero, null!, dataBytes, dataBytes.Length, null!, 0, out var outPtr, 0);
                 if (ret == 0 && outPtr != IntPtr.Zero)
                 {
                     mimeType = Marshal.PtrToStringUni(outPtr);
@@ -41,7 +41,7 @@ namespace its.gamify.core.Utilities
                 mimeType = defaultMimeType;
             }
 
-            return mimeType;
+            return mimeType!;
         }
     }
 

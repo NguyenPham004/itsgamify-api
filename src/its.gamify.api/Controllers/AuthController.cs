@@ -23,7 +23,7 @@ namespace its.gamify.api.Controllers
                 var loginRes = await authService.LoginAsync(model.Email, model.Password);
                 return Ok(loginRes);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("Tài khoản không hợp lệ!");
             }

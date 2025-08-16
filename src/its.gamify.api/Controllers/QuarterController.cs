@@ -34,16 +34,16 @@ namespace its.gamify.api.Controllers
             var res = await mediator.Send(command);
             return Ok(res);
         }
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
-        {
-            return NoContent();
-        }
+        // [HttpPut]
+        // public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
+        // {
+        //     return NoContent();
+        // }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            return NoContent();
-        }
+        // [HttpDelete("{id}")]
+        // public async Task<IActionResult> Delete(Guid id)
+        // {
+        //     return NoContent();
+        // }
     }
 }

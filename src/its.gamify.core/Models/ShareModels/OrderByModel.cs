@@ -67,7 +67,7 @@ namespace its.gamify.core.Models.ShareModels
                     return null;
                 })
                 .Where(x => x != null)
-                .GroupBy(x => x.Index)
+                .GroupBy(x => x!.Index)
                 .OrderBy(g => g.Key);
 
             foreach (var group in groupedParams)

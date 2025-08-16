@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Linq.Expressions;
 
 
@@ -19,6 +20,9 @@ public class CourseQuery : FilterQuery
 {
     public string? Classify { get; set; } = string.Empty;
     public string? Categories { get; set; } = string.Empty;
+    public string? Deparments { get; set; }
+    public string? CourseTypes { get; set; }
+    public bool IsActive { get; set; } = true;
 }
 public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 {
@@ -34,7 +38,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
         public async Task<BasePagingResponseModel<Course>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<Course, bool>>? filter = null;
-            var quarter = await unitOfWork.QuarterRepository.FirstOrDefaultAsync(x => x.StartDate <= currentTime.GetCurrentTime && x.EndDate >= currentTime.GetCurrentTime);
+            var quarter = await unitOfWork.QuarterRepository.FirstOrDefaultAsync(x => x.StartDate <= currentTime.GetCurrentTime && x.EndDate >= currentTime.GetCurrentTime)
+                ?? throw new BadRequestException("Quý hiện tại không khả dụng!");
             Dictionary<string, bool>? sortOrders = request.CourseQuery?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
             Func<IQueryable<Course>, IIncludableQueryable<Course, object>>? includeFunc =
@@ -51,7 +56,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
             {
                 filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                    x.IsDraft == false && x.QuarterId == quarter.Id &&
+                    x.IsDraft == false && x.QuarterId == quarter!.Id &&
                     (x.CourseType == COURSE_TYPE.ALL ||
                         (x.CourseType == COURSE_TYPE.DEPARTMENTONLY
                          && x.DepartmentId == user.DepartmentId
@@ -94,8 +99,28 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                 filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
 
             }
-            bool checkRole = _claimSerivce.CurrentRole == ROLE.ADMIN || _claimSerivce.CurrentRole == ROLE.TRAININGSTAFF ||
-                                _claimSerivce.CurrentRole == ROLE.MANAGER;
+            bool isManageRole = _claimSerivce.CurrentRole == ROLE.ADMIN || _claimSerivce.CurrentRole == ROLE.TRAININGSTAFF ||
+                                       _claimSerivce.CurrentRole == ROLE.MANAGER;
+
+            // if (!string.IsNullOrEmpty(request.CourseQuery?.Deparments) && isManageRole)
+            // {
+            //     Expression<Func<Course, bool>> filter_classify = await ClassifyFunc(request.CourseQuery?.Classify, user.Id);
+            //     filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
+
+            // }
+            if (!string.IsNullOrEmpty(request.CourseQuery?.CourseTypes))
+            {
+                List<string> courseTypes = [.. request.CourseQuery.CourseTypes.Split('.')];
+                if (courseTypes != null && courseTypes.Count != 0)
+                {
+                    Expression<Func<Course, bool>> filter_cate = x => courseTypes != null && courseTypes.Count != 0 && courseTypes.Contains(x.CourseType);
+                    filter = filter != null ? FilterCustom.CombineFilters(filter, filter_cate) : filter_cate;
+                }
+            }
+
+            Expression<Func<Course, bool>> filterDeleted = x => x.IsDeleted == !request.CourseQuery!.IsActive;
+            filter = filter != null ? FilterCustom.CombineFilters(filter, filterDeleted) : filterDeleted;
+
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
                               request.CourseQuery?.Page ?? 0,
                               request.CourseQuery?.Limit ?? 10,
@@ -103,7 +128,7 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                               searchTerm: request.CourseQuery?.Q, searchFields: ["Title", "Description", "LongDescription"],
                               sortOrders: sortOrders,
                               includeFunc: includeFunc,
-                              withDeleted: checkRole
+                              withDeleted: isManageRole
                         );
 
             return new BasePagingResponseModel<Course>(datas: res.Value.Entities, pagination: res.Value.Pagination);
@@ -131,6 +156,25 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             }
             return x => true;
         }
+
+        // private async Task<Expression<Func<Course, bool>>> DeparmentFunc(string? value, Guid UserId)
+        // {
+        //     if (string.IsNullOrWhiteSpace(value))
+        //     {
+        //         return x => true;
+        //     }
+
+        //     List<Guid> deparments = [.. value.Split(".", StringSplitOptions.RemoveEmptyEntries)
+        //                                  .Where(s => Guid.TryParse(s, out _))
+        //                                  .Select(s => Guid.Parse(s))];
+
+        //     if (deparments != null && deparments.Count > 0)
+        //     {
+        //         return x => x.CourseType == COURSE_TYPE.DEPARTMENTONLY && deparments.Contains((Guid)x.DepartmentId!);
+        //     }
+
+        //     return x => true;
+        // }
 
     }
 

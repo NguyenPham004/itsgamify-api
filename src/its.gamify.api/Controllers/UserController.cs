@@ -18,7 +18,7 @@ namespace its.gamify.api.Controllers
         private readonly IMediator mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUser([FromQuery] FilterQuery filter)
+        public async Task<IActionResult> GetAllUser([FromQuery] UserFilterQuery filter)
         {
             return Ok(await mediator.Send(new GetAllUserQuery()
             {

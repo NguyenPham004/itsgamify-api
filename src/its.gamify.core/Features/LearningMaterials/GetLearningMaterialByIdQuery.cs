@@ -1,3 +1,4 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -15,7 +16,7 @@ namespace its.gamify.core.Features.LearningMaterials.Queries
             }
             public async Task<LearningMaterial> Handle(GetLearningMaterialByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.LearningMaterialRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.LearningMaterialRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken) ?? throw new BadRequestException("Không tìm thấy tài liệu!");
             }
         }
     }

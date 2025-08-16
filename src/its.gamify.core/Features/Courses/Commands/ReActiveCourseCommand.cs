@@ -13,8 +13,7 @@ namespace its.gamify.core.Features.Courses.Commands
         {
             public async Task<Course> Handle(ReActiveCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id,true);
-                if (course == null) throw new NotFoundException("Không tìm thấy khóa học.");
+                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id, true) ?? throw new NotFoundException("Không tìm thấy khóa học.");
                 course.IsDeleted = request.IsActive;
                 unitOfWork.CourseRepository.Update(course);
                 await unitOfWork.SaveChangesAsync();

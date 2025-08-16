@@ -15,6 +15,7 @@ namespace its.gamify.core.Features.Challenges
     public class ChallengeQuery : FilterQuery
     {
         public string? Categories { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
     }
 
     public class GetChallengeQuery : IRequest<BasePagingResponseModel<Challenge>>
@@ -44,6 +45,9 @@ namespace its.gamify.core.Features.Challenges
                         filter = filter != null ? FilterCustom.CombineFilters(filter, filter_cate) : filter_cate;
                     }
                 }
+
+                Expression<Func<Challenge, bool>> filterDeleted = x => x.IsDeleted == !request.Filter!.IsActive;
+                filter = filter != null ? FilterCustom.CombineFilters(filter, filterDeleted) : filterDeleted;
 
 
                 var (Pagination, Entities) = await unitOfWork
