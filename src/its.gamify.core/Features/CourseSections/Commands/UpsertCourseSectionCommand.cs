@@ -1,6 +1,5 @@
 ﻿using its.gamify.api.Features.Lessons.Commands;
 using its.gamify.core;
-using its.gamify.core.IntegrationServices.Interfaces;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.domains.Entities;
 using MediatR;

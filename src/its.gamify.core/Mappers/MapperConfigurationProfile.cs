@@ -101,6 +101,9 @@ public class MapperConfigurationProfile : Profile
         CreateMap<QuizResult, QuizResultUpdateModel>().ReverseMap();
         CreateMap<QuizResult, QuizResultViewModel>().ReverseMap();
         CreateMap<Question, QuestionUpsertModel>().ReverseMap();
+        CreateMap<QuestionUpdateModel, Question>()
+            .ForMember(x => x.QuizId, opt => opt.UseDestinationValue())
+            .ReverseMap();
 
         CreateMap<QuizAnswer, QuizAnswerCreateModel>().ReverseMap();
         CreateMap<QuizAnswer, QuizAnswerUpdateModel>().ReverseMap();

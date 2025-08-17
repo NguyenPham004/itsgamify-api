@@ -1,4 +1,5 @@
 ﻿using its.gamify.api.Features.Departments.Commands;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace its.gamify.core.Features.Categories.Commands
                     unitOfWork.CategoryRepository.SoftRemoveRange(listCategory);
                     return await unitOfWork.SaveChangesAsync();
                 }
-                else throw new InvalidOperationException("Category not found");
+                else throw new BadRequestException("Danh sách không hợp lệ!");
             }
         }
 

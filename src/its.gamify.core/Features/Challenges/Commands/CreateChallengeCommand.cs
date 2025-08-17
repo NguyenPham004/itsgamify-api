@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using its.gamify.core.Features.Questions.Commands;
 using its.gamify.core.Models.Challenges;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -16,7 +17,7 @@ namespace its.gamify.core.Features.Challenges.Commands
                 RuleFor(x => x.NumOfRoom).GreaterThan(0).WithMessage("Số lượng phòng trong thử thách phải lớn hơn 0");
             }
         }
-        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateChallengeCommand, Challenge>
+        class CommandHandler(IUnitOfWork unitOfWork, IMediator mediator) : IRequestHandler<CreateChallengeCommand, Challenge>
         {
             public async Task<Challenge> Handle(CreateChallengeCommand request, CancellationToken cancellationToken)
             {
@@ -24,6 +25,23 @@ namespace its.gamify.core.Features.Challenges.Commands
                 var challenge = unitOfWork.Mapper.Map<Challenge>(request);
                 await unitOfWork.ChallengeRepository.AddAsync(challenge, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
+
+                if (request.UpdatedQuestions.Count > 0)
+                {
+                    await mediator.Send(new UpdateQuestionCommand()
+                    {
+                        Models = request.UpdatedQuestions
+                    }, cancellationToken);
+                }
+
+                if (request.NewQuestions.Count > 0)
+                {
+                    await mediator.Send(new CreateQuestionCommand()
+                    {
+                        Models = request.NewQuestions
+                    }, cancellationToken);
+                }
+
                 return challenge;
             }
         }

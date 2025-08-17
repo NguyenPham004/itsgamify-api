@@ -1,6 +1,4 @@
-﻿using its.gamify.api.Features.Categories.Commands;
-using its.gamify.api.Features.Categories.Queries;
-using its.gamify.api.Features.Quarters.Commands;
+﻿using its.gamify.api.Features.Quarters.Commands;
 using its.gamify.api.Features.Quarters.Queries;
 using its.gamify.core.Models.ShareModels;
 using MediatR;

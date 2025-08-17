@@ -1,38 +1,41 @@
-﻿using FluentValidation;
-using its.gamify.core;
+﻿using its.gamify.core;
 using its.gamify.core.Models.Questions;
 using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.Questions.Commands
+namespace its.gamify.core.Features.Questions.Commands
 {
-    public class CreateQuestionCommand : QuestionCreateModel, IRequest<Question>
+    public class CreateQuestionCommand : IRequest<List<Question>>
     {
-        public QuestionViewModel Model { get; set; } = new();
-        class CommandValidation : AbstractValidator<QuestionViewModel>
-        {
-            public CommandValidation()
-            {
-                RuleFor(x => x.Content).NotEmpty().NotNull().WithMessage("Content can not null.");
-                RuleFor(x => x.OptionA).NotEmpty().NotNull().WithMessage("Option A can not null.");
-                RuleFor(x => x.OptionB).NotEmpty().NotNull().WithMessage("Option B can not null.");
-                RuleFor(x => x.OptionC).NotEmpty().NotNull().WithMessage("Option C can not null.");
-                RuleFor(x => x.OptionD).NotEmpty().NotNull().WithMessage("Option D can not null.");
-                RuleFor(x => x.CorrectAnswer).NotEmpty().NotNull().WithMessage("Correct answer can not null.");
-                RuleFor(x => x.Explanation).NotEmpty().NotNull().WithMessage("Explanation can not null.");
-                RuleFor(x => x.QuizId).NotNull().WithMessage("Input Quiz belong to");
-            }
-        }
-        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateQuestionCommand, Question>
-        {
+        public List<QuestionUpdateModel> Models { get; set; } = [];
 
-            public async Task<Question> Handle(CreateQuestionCommand request, CancellationToken cancellationToken)
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateQuestionCommand, List<Question>>
+        {
+            private async Task<Quiz> GetQuiz(int totalMark, int totalQuestions, double duration)
             {
-                var question = unitOfWork.Mapper.Map<Question>(request);
-                await unitOfWork.QuizRepository.EnsureExistsIfIdNotEmpty(request.Model.QuizId);
-                await unitOfWork.QuestionRepository.AddAsync(question, cancellationToken);
+                var quiz = new Quiz()
+                {
+                    TotalMark = totalMark,
+                    Duration = duration,
+                    PassedMark = totalMark / 2,
+                    TotalQuestions = totalQuestions
+                };
+                await unitOfWork.QuizRepository.AddAsync(quiz);
                 await unitOfWork.SaveChangesAsync();
-                return question;
+                return quiz;
+            }
+
+            public async Task<List<Question>> Handle(CreateQuestionCommand request, CancellationToken cancellationToken)
+            {
+                var questions = unitOfWork.Mapper.Map<List<Question>>(request.Models);
+                var quiz = await GetQuiz(10, request.Models.Count, 100);
+                foreach (var question in questions)
+                {
+                    question.QuizId = quiz.Id;
+                }
+                await unitOfWork.QuestionRepository.AddRangeAsync(questions, cancellationToken);
+                await unitOfWork.SaveChangesAsync();
+                return questions;
             }
         }
     }

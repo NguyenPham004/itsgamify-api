@@ -2,9 +2,10 @@
 
 namespace its.gamify.core.Models.Questions
 {
-    public class QuestionUpdateModel : QuestionCreateModel
+    public class QuestionUpdateModel : QuestionUpsertModel
     {
         public Guid Id { get; set; }
+        public bool IsHidden { get; set; } = false;
     }
 
     public class QuestionUpsertModel

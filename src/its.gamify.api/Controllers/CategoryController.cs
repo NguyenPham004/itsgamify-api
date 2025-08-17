@@ -1,10 +1,8 @@
 ﻿using its.gamify.api.Features.Categories.Commands;
-using its.gamify.api.Features.Categories.Queries;
-using its.gamify.api.Features.Departments.Commands;
 using its.gamify.core.Features.Categories.Commands;
-using its.gamify.core.Features.Challenges.Commands;
+using its.gamify.core.Features.Categories.Queries;
 using its.gamify.core.Models;
-using its.gamify.core.Models.ShareModels;
+using its.gamify.core.Models.Categories;
 using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,18 +12,14 @@ namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator mediator;
-        public CategoriesController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
+
         /// <summary>
         /// Get all Category
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter)
+        public async Task<IActionResult> GetAll([FromQuery] CategoryQuery Filter)
         {
             var res = await mediator.Send(new GetAllCategoriesQuery()
             {
@@ -44,10 +38,14 @@ namespace its.gamify.api.Controllers
         /// <summary>
         /// Update category
         /// </summary>
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CategoryUpdateModel model)
         {
-            var result = await mediator.Send(updatedItem);
+            var result = await mediator.Send(new UpdateCategoryCommand
+            {
+                Id = id,
+                Model = model
+            });
             if (result) return NoContent();
             else return BadRequest();
         }
@@ -78,7 +76,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPut("{id}/re-active")]
-        [Authorize(Roles = ROLE.TRAININGSTAFF)]
+        [Authorize(Roles = ROLE.ADMIN)]
         public async Task<IActionResult> ReActiveChallenge([FromRoute] Guid id, [FromBody] BaseReActiveModel model)
         {
             return Ok(await mediator.Send(new ReActiveCategoryCommand()

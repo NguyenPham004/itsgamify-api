@@ -17,6 +17,7 @@ public class Question : BaseEntity
     public string CorrectAnswer { get; set; } = string.Empty;
     [JsonPropertyName("description")]
     public string Explanation { get; set; } = string.Empty;
+    public bool IsHidden { get; set; } = false;
     [JsonPropertyName("quiz_id")]
     public Guid QuizId { get; set; }
     public virtual Quiz Quiz { get; set; } = null!;
