@@ -97,7 +97,6 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
 
 
         string jsonRoom = await GetRoomJsonAsync(roomGuid);
-        Console.WriteLine("jsonRoom");
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
@@ -106,6 +105,30 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
         var roomGuid = Guid.Parse(roomId);
 
         string jsonRoom = await GetRoomJsonAsync(roomGuid);
+
+        await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
+    }
+    public async Task PlayAgain(Guid roomId)
+    {
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
+        if (room == null)
+        {
+            await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
+            return;
+        }
+        if (room.HostUserId == null || room.OpponentUserId == null)
+        {
+            room.Status = ROOM_STATUS.WAITING;
+        }
+        else
+        {
+            room.Status = ROOM_STATUS.FULL;
+        }
+
+        _unitOfWork.RoomRepository.Update(room);
+        await _unitOfWork.SaveChangesAsync();
+
+        string jsonRoom = await GetRoomJsonAsync(roomId);
 
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
@@ -146,13 +169,15 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
             await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
             return;
         }
+        if (room.IsHostAnswer && room.IsOpponentAnswer)
+        {
+            room.CurrentQuestion += 1;
+            room.IsHostAnswer = false;
+            room.IsOpponentAnswer = false;
 
-        room.CurrentQuestion += 1;
-        room.IsHostAnswer = false;
-        room.IsOpponentAnswer = false;
-
-        _unitOfWork.RoomRepository.Update(room);
-        await _unitOfWork.SaveChangesAsync();
+            _unitOfWork.RoomRepository.Update(room);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
         string jsonRoom = await GetRoomJsonAsync(roomId);
 
@@ -168,11 +193,9 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
             return;
         }
 
-        var isHost = room.HostUserId == userId;
-
-        if (isHost)
+        if (room.Status == ROOM_STATUS.PLAYING)
         {
-            var isWinner = room.HostScore > room.OpponentScore;
+            var isTie = room.OpponentScore == room.HostScore;
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.HostScore,
@@ -181,13 +204,12 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
                 OpponentId = room.OpponentUserId!.Value,
                 ChallengeId = room.ChallengeId,
                 AverageCorrect = numOfCorrect / room.QuestionCount,
-                Status = room.HostScore > room.OpponentScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+                Status = room.HostScore > room.OpponentScore
+                    ? UserChallengeHistoryEnum.WIN
+                    : (isTie ? UserChallengeHistoryEnum.TIE : UserChallengeHistoryEnum.LOSE)
             });
-            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
-        }
-        else
-        {
-            var isWinner = room.OpponentScore > room.HostScore;
+
+
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 YourScore = room.OpponentScore,
@@ -196,9 +218,16 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
                 OpponentId = room.HostUserId!.Value,
                 ChallengeId = room.ChallengeId,
                 AverageCorrect = numOfCorrect / room.QuestionCount,
-                Status = room.OpponentScore > room.HostScore ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+                Status = room.OpponentScore > room.HostScore
+                    ? UserChallengeHistoryEnum.WIN
+                    : (isTie ? UserChallengeHistoryEnum.TIE : UserChallengeHistoryEnum.LOSE)
             });
-            await UpdateUserMetric(userId, isWinner, room.BetPoints!);
+
+            if (!isTie)
+            {
+                await UpdateUserMetric(room.HostUserId.Value, room.HostScore > room.OpponentScore, room.BetPoints!);
+                await UpdateUserMetric(room.OpponentUserId.Value, room.OpponentScore > room.HostScore, room.BetPoints!);
+            }
         }
 
         room.CurrentQuestion = 0;
@@ -208,6 +237,80 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
         room.IsOpponentReady = false;
         room.Status = ROOM_STATUS.FINISHED;
         _unitOfWork.RoomRepository.Update(room);
+        await _unitOfWork.SaveChangesAsync();
+
+        string jsonRoom = await GetRoomJsonAsync(roomId);
+
+        await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
+    }
+
+    public async Task OutMatch(Guid roomId, Guid userId, int numOfCorrect)
+    {
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
+        if (room == null)
+        {
+            await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
+            return;
+        }
+
+        if (room.Status == ROOM_STATUS.PLAYING)
+        {
+            await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
+            {
+                YourScore = room.HostScore,
+                OppScore = room.OpponentScore,
+                UserId = room.HostUserId!.Value,
+                OpponentId = room.OpponentUserId!.Value,
+                ChallengeId = room.ChallengeId,
+                AverageCorrect = numOfCorrect / room.QuestionCount,
+                Status = room.HostUserId != userId ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+            });
+
+
+            await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
+            {
+                YourScore = room.OpponentScore,
+                OppScore = room.HostScore,
+                UserId = room.OpponentUserId!.Value,
+                OpponentId = room.HostUserId!.Value,
+                ChallengeId = room.ChallengeId,
+                AverageCorrect = numOfCorrect / room.QuestionCount,
+                Status = room.OpponentUserId != userId ? UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
+            });
+
+
+            await UpdateUserMetric(room.HostUserId.Value, room.HostUserId != userId, room.BetPoints!);
+            await UpdateUserMetric(room.OpponentUserId.Value, room.OpponentUserId != userId, room.BetPoints!);
+
+        }
+
+        room.CurrentQuestion = 0;
+        room.IsHostAnswer = false;
+        room.IsOpponentAnswer = false;
+        room.IsHostReady = false;
+        room.IsOpponentReady = false;
+        room.Status = ROOM_STATUS.FINISHED;
+
+        if (room.OpponentUserId == null)
+        {
+            _unitOfWork.RoomRepository.SoftRemove(room);
+        }
+        else if (room.OpponentUserId == userId)
+        {
+            room.OpponentUserId = null;
+            _unitOfWork.RoomRepository.Update(room);
+        }
+        else
+        {
+            if (room.HostUserId == userId)
+            {
+                room.HostUserId = room.OpponentUserId;
+            }
+            room.OpponentUserId = null;
+            _unitOfWork.RoomRepository.Update(room);
+
+        }
+
         await _unitOfWork.SaveChangesAsync();
 
         string jsonRoom = await GetRoomJsonAsync(roomId);
@@ -252,9 +355,10 @@ public class GameHub(IUnitOfWork unitOfWork, ICurrentTime currentTime) : Hub
         var metric = await _unitOfWork.UserMetricRepository.FirstOrDefaultAsync(x => x.UserId == userId && x.QuarterId == quarter.Id)
             ?? throw new NotFoundException("Không tìm thấy chỉ số người dùng!");
 
+        metric.ChallengeParticipateNum += 1;
         metric.PointInQuarter += isWinner ? points : -points;
         metric.WinNum += isWinner ? 1 : 0;
-        metric.LoseNum += isWinner ? 1 : 0;
+        metric.LoseNum += !isWinner ? 1 : 0;
         if (!isWinner)
         {
             metric.HighestWinStreak = metric.WinStreak;

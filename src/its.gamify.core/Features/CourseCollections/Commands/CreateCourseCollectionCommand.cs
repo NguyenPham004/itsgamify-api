@@ -11,15 +11,11 @@ namespace its.gamify.api.Features.CourseCollections.Commands
 {
     public class CreateCourseCollectionCommand : CourseCollectionCreateModel, IRequest<CourseCollection>
     {
-        class CommandHandler : IRequestHandler<CreateCourseCollectionCommand, CourseCollection>
+        class CommandHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<CreateCourseCollectionCommand, CourseCollection>
         {
-            private readonly IClaimsService claimsService;
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork, IClaimsService claimsService)
-            {
-                this.unitOfWork = unitOfWork;
-                this.claimsService = claimsService;
-            }
+            private readonly IClaimsService claimsService = claimsService;
+            private readonly IUnitOfWork unitOfWork = unitOfWork;
+
             public async Task<CourseCollection> Handle(CreateCourseCollectionCommand request, CancellationToken cancellationToken)
             {
                 if (claimsService.CurrentUser == Guid.Empty) throw new Exception("Check user session login");
@@ -27,7 +23,7 @@ namespace its.gamify.api.Features.CourseCollections.Commands
                 courseCollection.UserId = claimsService != null ? claimsService.CurrentUser : Guid.Empty;
                 //await unitOfWork.UserRepository.EnsureExistsIfIdNotEmpty(courseCollection.UserId);
                 await unitOfWork.CourseRepository.EnsureExistsIfIdNotEmpty(request.CourseId);
-                var find = await unitOfWork.CourseCollectionRepository.FirstOrDefaultAsync(x => x.UserId == claimsService.CurrentUser && x.CourseId == request.CourseId);
+                var find = await unitOfWork.CourseCollectionRepository.FirstOrDefaultAsync(x => x.UserId == claimsService!.CurrentUser && x.CourseId == request.CourseId);
                 if (find is not null) throw new Exception("This course is saved.");
                 await unitOfWork.CourseCollectionRepository.AddAsync(courseCollection);
                 await unitOfWork.SaveChangesAsync();

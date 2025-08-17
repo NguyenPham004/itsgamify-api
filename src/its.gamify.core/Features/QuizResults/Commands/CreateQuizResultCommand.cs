@@ -4,9 +4,11 @@ using its.gamify.core;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.QuizResults;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
+using System.Threading.Tasks;
 
 namespace its.gamify.api.Features.QuizResults.Commands
 {
@@ -63,7 +65,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                             QuizResultId = quizResult.Id
                         }, cancellationToken);
                     }
-                    else
+                    else if (progress!.QuizResultId == null || progress.Status == PROGRESS_STATUS.IN_PROGRESS)
                     {
                         progress.Status = quizResult.IsPassed ? PROGRESS_STATUS.COMPLETED : PROGRESS_STATUS.IN_PROGRESS;
                         _unitOfWork.LearningProgressRepository.Update(progress);
@@ -84,11 +86,22 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 var modules = await _unitOfWork
                     .CourseSectionRepository
                     .WhereAsync(x => x.CourseId == participation.CourseId, includes: x => x.Lessons.Where(x => !x.IsDeleted));
+                var quarter = await _unitOfWork.QuarterRepository
+                                       .FirstOrDefaultAsync(q => q.StartDate <= DateTime.UtcNow && q.EndDate >= DateTime.UtcNow)
+                                       ?? throw new BadRequestException("No current quarter found");
+
+                var metric = await _unitOfWork
+                                      .UserMetricRepository
+                                      .FirstOrDefaultAsync(x => x.UserId == participation.UserId && x.QuarterId == quarter.Id) ?? throw new BadRequestException("No user metric found");
 
                 int totalLessons = modules.Sum(module => module.Lessons.Count);
                 int completedLesson = participation.LearningProgresses.Where(x => x.Status == PROGRESS_STATUS.COMPLETED).Count();
                 if (totalLessons == completedLesson)
                 {
+                    metric.CourseCompletedNum += 1;
+                    metric.PointInQuarter += 1000;
+                    _unitOfWork.UserMetricRepository.Update(metric);
+
                     participation.Status = COURSE_PARTICIPATION_STATUS.COMPLETED;
                     _unitOfWork.CourseParticipationRepository.Update(participation);
                     var course_result = new CourseResult

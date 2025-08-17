@@ -34,6 +34,21 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.ThumbnailId = request.ThumbnailId;
                 course.IntroVideoId = request.IntroVideoId;
                 await unitOfWork.CourseRepository.AddAsync(course, cancellationToken);
+
+                if (request.DepartmentIds.Count > 0 && request.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString())
+                {
+                    var course_departments = new List<CourseDepartment>();
+                    foreach (var item in request.DepartmentIds)
+                    {
+                        course_departments.Add(new CourseDepartment
+                        {
+                            CourseId = course.Id,
+                            DepartmentId = item
+                        });
+                    }
+                    await unitOfWork.CourseDepartmentRepository.AddRangeAsync(course_departments, cancellationToken);
+                }
+
                 await unitOfWork.SaveChangesAsync();
                 return course;
             }

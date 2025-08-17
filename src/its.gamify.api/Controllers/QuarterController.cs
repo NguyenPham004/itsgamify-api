@@ -1,6 +1,4 @@
-﻿using its.gamify.api.Features.Categories.Commands;
-using its.gamify.api.Features.Categories.Queries;
-using its.gamify.api.Features.Quarters.Commands;
+﻿using its.gamify.api.Features.Quarters.Commands;
 using its.gamify.api.Features.Quarters.Queries;
 using its.gamify.core.Models.ShareModels;
 using MediatR;
@@ -34,16 +32,16 @@ namespace its.gamify.api.Controllers
             var res = await mediator.Send(command);
             return Ok(res);
         }
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
-        {
-            return NoContent();
-        }
+        // [HttpPut]
+        // public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updatedItem)
+        // {
+        //     return NoContent();
+        // }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            return NoContent();
-        }
+        // [HttpDelete("{id}")]
+        // public async Task<IActionResult> Delete(Guid id)
+        // {
+        //     return NoContent();
+        // }
     }
 }

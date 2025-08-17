@@ -1,4 +1,5 @@
 ﻿using its.gamify.core.Models.Departments;
+using its.gamify.domains.Entities;
 using System.Text.Json.Serialization;
 
 namespace its.gamify.core.Models.Users
@@ -22,6 +23,11 @@ namespace its.gamify.core.Models.Users
         public string RoleName { get; set; } = string.Empty;
         public Guid RoleId { get; set; }
         public string AvatarUrl { get; set; } = string.Empty;
+        [JsonPropertyName("password")]
+        public string? HashedPassword { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; } = false;
+
+        public List<UserMetric> Metrics { get; set; } = [];
         public DepartmentViewModel Department { get; set; } = new();
     }
 

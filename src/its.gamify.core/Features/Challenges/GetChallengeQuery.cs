@@ -2,6 +2,7 @@ using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -14,6 +15,7 @@ namespace its.gamify.core.Features.Challenges
     public class ChallengeQuery : FilterQuery
     {
         public string? Categories { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
     }
 
     public class GetChallengeQuery : IRequest<BasePagingResponseModel<Challenge>>
@@ -25,6 +27,8 @@ namespace its.gamify.core.Features.Challenges
 
             public async Task<BasePagingResponseModel<Challenge>> Handle(GetChallengeQuery request, CancellationToken cancellationToken)
             {
+                bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
+                    claimsService.CurrentRole == ROLE.MANAGER;
                 Expression<Func<Challenge, bool>>? filter = null;
                 Dictionary<string, bool>? sortOrders = request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
@@ -42,6 +46,9 @@ namespace its.gamify.core.Features.Challenges
                     }
                 }
 
+                Expression<Func<Challenge, bool>> filterDeleted = x => x.IsDeleted == !request.Filter!.IsActive;
+                filter = filter != null ? FilterCustom.CombineFilters(filter, filterDeleted) : filterDeleted;
+
 
                 var (Pagination, Entities) = await unitOfWork
                                 .ChallengeRepository
@@ -54,7 +61,8 @@ namespace its.gamify.core.Features.Challenges
                                     includeFunc: x =>
                                         x.Include(x => x.Course)
                                         .ThenInclude(x => x.CourseResults.Where(x => x.UserId == claimsService.CurrentUser))
-                                        .Include(x => x.Category!)
+                                        .Include(x => x.Category!),
+                                    withDeleted: checkRole
                                 );
                 return new BasePagingResponseModel<Challenge>(Entities, Pagination);
             }

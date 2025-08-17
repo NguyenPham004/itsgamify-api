@@ -1,11 +1,13 @@
 using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
-using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
+using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
+using its.gamify.core.Models;
 using its.gamify.core.Models.Courses;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -127,6 +129,21 @@ namespace its.gamify.api.Controllers
                 PageSize = 10
             });
             return Ok(result);
+        }
+        /// <summary>
+        /// Reactive course
+        /// </summary>
+
+        [HttpPut("{id}/re-active")]
+        [Authorize(Roles = ROLE.TRAININGSTAFF)]
+        public async Task<IActionResult> ReActiveCourse([FromRoute] Guid id, [FromBody] BaseReActiveModel model)
+        {
+            return Ok(await mediator.Send(new ReActiveCourseCommand()
+            {
+                Id = id,
+                IsActive = model.IsActive
+            }));
+
         }
     }
 }

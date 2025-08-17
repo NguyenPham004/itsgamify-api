@@ -1,25 +1,25 @@
 ﻿using its.gamify.core;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace its.gamify.api.Features.Courses.Queries
+namespace its.gamify.core.Features.Courses.Queries
 {
     public class GetCourseByIdQuery : IRequest<Course>
     {
         public Guid Id { get; set; }
-        class QueryHandler : IRequestHandler<GetCourseByIdQuery, Course>
+        class QueryHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<GetCourseByIdQuery, Course>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public QueryHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<Course> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
             {
-                return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
+                bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
+                                claimsService.CurrentRole == ROLE.MANAGER;
+                return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, checkRole, cancellationToken,
                     includeFunc: x => x.Include(course => course.LearningMaterials.Where(x => !x.IsDeleted))
-                        .Include(x => x.Deparment)
+                        .Include(x => x.CourseDepartments.Where(x => x.CourseId == request.Id)).ThenInclude(x => x.Deparment)
                         .Include(x => x.Category)
                         .Include(x => x.Quarter)
                         .Include(course => course.CourseSections.Where(x => !x.IsDeleted))

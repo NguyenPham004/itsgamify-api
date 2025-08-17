@@ -29,24 +29,20 @@ namespace its.gamify.api.Features.Questions.Commands
             public async Task<Guid> Handle(UpsertQuestionCommand request, CancellationToken cancellationToken)
             {
 
-                Quiz? quiz = await _unitOfWork.QuizRepository.GetByIdAsync(request.QuizId);
+                Quiz? quiz_tmp = await _unitOfWork.QuizRepository.GetByIdAsync(request.QuizId);
 
-                if (quiz != null)
+                if (quiz_tmp != null)
                 {
-                    quiz.TotalQuestions = request.QuestionUpsertModels.Count;
-                    quiz.Duration = request.Duration;
-                    _unitOfWork.QuizRepository.Update(quiz);
+                    var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz_tmp.Id);
+                    if (tmp.Count > 0)
+                    {
+                        _unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
+                        await _unitOfWork.SaveChangesAsync();
 
-                    // var tmp = await _unitOfWork.QuestionRepository.WhereAsync(x => x.QuizId == quiz.Id);
-                    // if (tmp.Count > 0)
-                    // {
-                    //     _unitOfWork.QuestionRepository.SoftRemoveRange(tmp);
-                    //     await _unitOfWork.SaveChangesAsync();
-
-                    // }
+                    }
                 }
 
-                quiz ??= await GetQuiz(10, request.QuestionUpsertModels.Count, request.Duration);
+                var quiz = await GetQuiz(10, request.QuestionUpsertModels.Count, request.Duration);
                 var questions = _unitOfWork.Mapper.Map<List<Question>>(request.QuestionUpsertModels);
 
                 foreach (var question in questions)

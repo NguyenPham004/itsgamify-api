@@ -13,15 +13,12 @@ namespace its.gamify.api.Controllers
 {
     [Route("api/[controller]s")]
     [ApiController]
-    public class UserController : BaseController
+    public class UserController(IMediator mediator) : BaseController
     {
-        private readonly IMediator mediator;
-        public UserController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
+        private readonly IMediator mediator = mediator;
+
         [HttpGet]
-        public async Task<IActionResult> GetAllUser([FromQuery] FilterQuery filter)
+        public async Task<IActionResult> GetAllUser([FromQuery] UserFilterQuery filter)
         {
             return Ok(await mediator.Send(new GetAllUserQuery()
             {
@@ -52,7 +49,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserCreateModel model)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UserUpdateModel model)
         {
             var res = await mediator.Send(new UpdateUserCommand()
             {
@@ -72,6 +69,18 @@ namespace its.gamify.api.Controllers
             return res ? NoContent() : StatusCode(500);
 
         }
+
+        [HttpGet("{id}/statistic")]
+        public async Task<IActionResult> GêtStatistic([FromRoute] Guid id, [FromQuery] Guid Quaterid)
+        {
+            var res = await mediator.Send(new GetUserStatistic()
+            {
+                UserId = id,
+                QuarterId = Quaterid
+            });
+            return Ok(res);
+
+        }
         [HttpGet("{id}/course-results")]
         public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] FilterQuery query)
         {
@@ -84,9 +93,12 @@ namespace its.gamify.api.Controllers
         }
         [HttpGet("{id}/user-metrics")]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] FilterQuery Filter, Guid id)
+        public async Task<IActionResult> GetMetric(Guid id)
         {
-            var res = await mediator.Send(new UserMetricQuery());
+            var res = await mediator.Send(new UserMetricQuery
+            {
+                Id = id
+            });
             return Ok(res);
 
         }

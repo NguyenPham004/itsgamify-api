@@ -1,13 +1,8 @@
-﻿using its.gamify.api.Features.CourseCollections.Queries;
-using its.gamify.api.Features.Questions.Queries;
-using its.gamify.core;
-using its.gamify.core.Models.ShareModels;
+﻿using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
-namespace its.gamify.api.Features.CourseMetrics
+namespace its.gamify.core.Features.CourseMetrics
 {
     public class GetAllCourseMetricQuery : IRequest<BasePagingResponseModel<CourseMetric>>
     {

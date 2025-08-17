@@ -5,7 +5,7 @@ public class Challenge : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public int NumOfRoom { get; set; }
-    public string ThumbnailImage { get;set; }= string.Empty;
+    public string ThumbnailImage { get; set; } = string.Empty;
     #region Navigation Properties
     public Guid CategoryId { get; set; }
     public Category? Category { get; set; }

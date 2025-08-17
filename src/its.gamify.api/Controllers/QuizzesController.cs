@@ -1,11 +1,4 @@
-﻿using its.gamify.api.Features.Questions.Commands;
-using its.gamify.api.Features.Questions.Queries;
-using its.gamify.api.Features.QuizAnswers.Commands;
-using its.gamify.api.Features.QuizAnswers.Queries;
-using its.gamify.api.Features.Quizzes.Queries;
-using its.gamify.api.Features.QuizResults.Commands;
-using its.gamify.api.Features.QuizResults.Queries;
-using its.gamify.api.Features.Quizzes.Commands;
+﻿using its.gamify.core.Features.Quizzes.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

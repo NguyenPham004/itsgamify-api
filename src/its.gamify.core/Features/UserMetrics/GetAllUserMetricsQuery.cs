@@ -7,7 +7,7 @@ namespace its.gamify.core.Features.UserMetrics;
 
 public class UserMetricFilterQuery : FilterQuery
 {
-    public Guid DepartmentId { get; set; }
+    public Guid? DepartmentId { get; set; }
     public Guid QuarterId { get; set; }
 }
 
@@ -24,6 +24,7 @@ public class GetAllUserMetricsQuery : IRequest<BasePagingResponseModel<UserMetri
                 pageSize: request.Filter.Limit ?? 10,
                 filter: x => x.QuarterId == request.Filter.QuarterId &&
                              x.User.DepartmentId == request.Filter.DepartmentId &&
+                             !x.User.IsDeleted &&
                              (string.IsNullOrEmpty(request.Filter.Q) || x.User.FullName.Contains(request.Filter.Q, StringComparison.OrdinalIgnoreCase)),
                 cancellationToken: cancellationToken,
                 includes: [x => x.User, x => x.User.Department!, x => x.Quarter]

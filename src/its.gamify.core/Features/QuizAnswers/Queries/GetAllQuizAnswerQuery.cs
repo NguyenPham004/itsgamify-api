@@ -1,11 +1,9 @@
-﻿using its.gamify.api.Features.Questions.Queries;
-using its.gamify.core;
-using its.gamify.core.Models.ShareModels;
+﻿using its.gamify.core.Models.ShareModels;
 using its.gamify.domains.Entities;
 using MediatR;
 using System.Linq.Expressions;
 
-namespace its.gamify.api.Features.QuizAnswers.Queries
+namespace its.gamify.core.Features.QuizAnswers.Queries
 {
     public class GetAllQuizAnswerQuery : IRequest<BasePagingResponseModel<QuizAnswer>>
     {
@@ -25,9 +23,9 @@ namespace its.gamify.api.Features.QuizAnswers.Queries
                 Expression<Func<QuizAnswer, bool>>? filter = null;
                 if (!string.IsNullOrEmpty(request.Search))
                 {
-                    filter = x => x.Answer.Contains(request.Search);
+                    filter = x => x.Answer!.Contains(request.Search);
                 }
-                var res = await unitOfWork.QuizAnswerRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.QuizResult, x=>x.Question]);
+                var res = await unitOfWork.QuizAnswerRepository.ToPagination(request.PageIndex, request.PageSize, filter: filter, includes: [x => x.QuizResult, x => x.Question]);
 
                 return new BasePagingResponseModel<QuizAnswer>(datas: res.Entities, pagination: res.Pagination);
             }

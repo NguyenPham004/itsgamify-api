@@ -47,8 +47,10 @@ public class Course : BaseEntity
     public virtual Quarter Quarter { get; set; } = null!;
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
-    public Guid? DepartmentId { get; set; }
-    public Department? Deparment { get; set; } = null;
+    // public Guid? DepartmentId { get; set; }
+    // public Department? Deparment { get; set; } = null;
+    public virtual ICollection<CourseDepartment> CourseDepartments { get; set; } = [];
+
     public virtual ICollection<Challenge> Challenges { get; set; } = [];
 
 }

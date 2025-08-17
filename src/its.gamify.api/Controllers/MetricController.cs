@@ -19,7 +19,7 @@ namespace its.gamify.api.Controllers
             return Ok(res);
         }
         [HttpGet("general-infor")]
-        public async Task<IActionResult> GetGeneralInfor([FromQuery] UserMetricFilterQuery query)
+        public async Task<IActionResult> GetGeneralInfor()
         {
 
             var res = await mediator.Send(new GetGeneralMetricQuery());

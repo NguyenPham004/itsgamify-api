@@ -1,5 +1,6 @@
 ﻿using its.gamify.api.Features.Questions.Commands;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using MediatR;
 
 namespace its.gamify.api.Features.Categories.Commands
@@ -23,7 +24,7 @@ namespace its.gamify.api.Features.Categories.Commands
                     unitOfWork.CategoryRepository.SoftRemove(category);
                     return await unitOfWork.SaveChangesAsync();
                 }
-                else throw new InvalidOperationException("Category not found");
+                else throw new BadRequestException("Không tìm thấy mục này!");
             }
         }
 

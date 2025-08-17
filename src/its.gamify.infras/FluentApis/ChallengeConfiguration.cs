@@ -15,7 +15,7 @@ public class ChallengeResultConfiguration : IEntityTypeConfiguration<Challenge>
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.Category)
-            .WithMany()
+            .WithMany(x => x.Challenges)
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.NoAction);
     }

@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace its.gamify.core.Models.Categories
 {
-    public class CategoryUpdateModel:CategoryCreateModel
+    public class CategoryUpdateModel : CategoryCreateModel
     {
-        public Guid Id { get; set; }
     }
 }

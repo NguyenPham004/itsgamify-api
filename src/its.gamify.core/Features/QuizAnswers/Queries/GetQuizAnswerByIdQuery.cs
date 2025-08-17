@@ -1,9 +1,7 @@
-﻿using its.gamify.api.Features.Questions.Queries;
-using its.gamify.core;
-using its.gamify.domains.Entities;
+﻿using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.QuizAnswers.Queries
+namespace its.gamify.core.Features.QuizAnswers.Queries
 {
     public class GetQuizAnswerByIdQuery : IRequest<QuizAnswer>
     {
@@ -18,7 +16,7 @@ namespace its.gamify.api.Features.QuizAnswers.Queries
             public async Task<QuizAnswer> Handle(GetQuizAnswerByIdQuery request, CancellationToken cancellationToken)
             {
                 return (await unitOfWork.QuizAnswerRepository.FirstOrDefaultAsync(x => x.Id == request.Id, false, cancellationToken,
-                    [x => x.QuizResult, x=>x.Question]))
+                    [x => x.QuizResult, x => x.Question]))
                      ?? throw new InvalidOperationException("Không tìm thấy Quiz answer với id " + request.Id);
             }
         }

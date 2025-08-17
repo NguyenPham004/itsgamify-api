@@ -1,3 +1,4 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -15,7 +16,8 @@ namespace its.gamify.core.Features.CourseParticipations.Queries
             }
             public async Task<CourseParticipation> Handle(GetCourseParticipationByIdQuery request, CancellationToken cancellationToken)
             {
-                return await unitOfWork.CourseParticipationRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+                return await unitOfWork.CourseParticipationRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken)
+                    ?? throw new BadRequestException("Không tim thấy khóa học đã tham gia!");
             }
         }
     }

@@ -28,5 +28,19 @@
             return (startDate, endDate);
         }
 
+        public static int GetQuarterNumber(int month)
+        {
+            return month switch
+            {
+                >= 1 and <= 3 => 1,
+                >= 4 and <= 6 => 2,
+                >= 7 and <= 9 => 3,
+                >= 10 and <= 12 => 4,
+                _ => throw new ArgumentException("Tháng không hợp lệ")
+            };
+        }
+
     }
+
+
 }

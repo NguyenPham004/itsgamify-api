@@ -1,3 +1,3 @@
 # itsgamify-api
 
-# update readme
+# Readme

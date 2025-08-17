@@ -1,9 +1,7 @@
-﻿using its.gamify.api.Features.Questions.Queries;
-using its.gamify.core;
-using its.gamify.domains.Entities;
+﻿using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.Quizzes.Queries
+namespace its.gamify.core.Features.Quizzes.Queries
 {
     public class GetQuizByIdQuery : IRequest<Quiz>
     {
