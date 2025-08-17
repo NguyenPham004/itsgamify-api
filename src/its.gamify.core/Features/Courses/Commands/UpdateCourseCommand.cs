@@ -4,6 +4,7 @@ using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Lessons;
 using its.gamify.core.Models.Questions;
+using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
 
@@ -35,12 +36,6 @@ namespace its.gamify.api.Features.Courses.Commands
                     RuleForEach(x => x.Model.CourseSections).NotNull().WithMessage("Module đang trống")
                         .SetValidator(new CourseSectionValidator());
                 });
-                When(x => x.Model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString(), () =>
-                {
-                    RuleFor(x => x.Model.DepartmentId).NotNull()
-                        .NotEmpty().WithMessage("Khoá học dành riêng cho phòng ban! Cần chọn phòng ban");
-                });
-
 
             }
             class CourseSectionValidator : AbstractValidator<CourseSectionUpdateModel>
@@ -96,16 +91,44 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.Model.IntroVideoId)
                     ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id ")).Url;
 
+                var course_departments = await unitOfWork.CourseDepartmentRepository.WhereAsync(x => x.CourseId == course.Id);
+
+                if (request.Model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString())
+                {
+                    var existingIds = course_departments.Select(x => x.DepartmentId).ToList();
+                    var newDepartmentIds = request.Model.DepartmentIds;
+
+                    // Những id có trong existingIds mà không có trong newDepartmentIds -> xóa đi
+                    var departmentsToRemove = course_departments.Where(cd => !newDepartmentIds.Contains(cd.DepartmentId)).ToList();
+                    if (departmentsToRemove.Count != 0)
+                    {
+                        unitOfWork.CourseDepartmentRepository.SoftRemoveRange(departmentsToRemove);
+                    }
+
+                    // Những id có trong newDepartmentIds mà không có trong existingIds -> thêm mới
+                    var departmentsToAdd = newDepartmentIds
+                        .Where(id => !existingIds.Contains(id))
+                        .Select(id => new CourseDepartment
+                        {
+                            CourseId = course.Id,
+                            DepartmentId = id
+                        })
+                        .ToList();
+
+                    if (departmentsToAdd.Count != 0)
+                    {
+                        await unitOfWork.CourseDepartmentRepository.AddRangeAsync(departmentsToAdd, cancellationToken);
+                    }
+
+                }
+
                 if (course.CourseType != CourseTypeEnum.DEPARTMENTONLY.ToString())
                 {
-                    course.DepartmentId = null;
+                    unitOfWork.CourseDepartmentRepository.SoftRemoveRange(course_departments);
                 }
 
                 unitOfWork.CourseRepository.Update(course);
-                await unitOfWork.SaveChangesAsync();
-
-                return true;
-
+                return await unitOfWork.SaveChangesAsync();
 
             }
         }

@@ -54,7 +54,7 @@ namespace its.gamify.api.Features.Users.Queries
                         x.IsDraft == false &&
                         (x.CourseType == COURSE_TYPE.ALL ||
                             (x.CourseType == COURSE_TYPE.DEPARTMENTONLY
-                             && x.DepartmentId == user.DepartmentId
+                             && x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
                              && x.Status == COURSE_STATUS.PUBLISHED
                              && x.IsDraft == false
                              && x.QuarterId == request.QuarterId));
@@ -65,7 +65,7 @@ namespace its.gamify.api.Features.Users.Queries
                 {
                     filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
                                 x.IsDraft == false
-                                || (x.DepartmentId == user.DepartmentId
+                                || (x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
                                     && x.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString()
                                     && x.Status == COURSE_STATUS.PUBLISHED &&
                                     x.IsDraft == false && x.QuarterId == request.QuarterId);

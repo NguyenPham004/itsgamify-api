@@ -1,7 +1,6 @@
 using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
-using its.gamify.api.Features.Courses.Queries;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Courses.Queries;

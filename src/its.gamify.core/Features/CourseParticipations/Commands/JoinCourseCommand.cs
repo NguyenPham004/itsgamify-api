@@ -45,10 +45,8 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 switch (course.CourseType)
                 {
                     case COURSE_TYPE.DEPARTMENTONLY:
-                        if (course.DepartmentId != currentUser.DepartmentId)
-                        {
-                            throw new BadRequestException("Khoá học không nằm trong phòng ban của người dùng hiện tại");
-                        }
+                        var checkCourse = await unitOfWork.CourseDepartmentRepository.FirstOrDefaultAsync(x => x.CourseId == course.Id && x.DepartmentId == currentUser.DepartmentId)
+                            ?? throw new BadRequestException("Khoá học không nằm trong phòng ban của người dùng hiện tại");
                         break;
                     case COURSE_TYPE.LEADERONLY:
                         if (currentUser.Role?.Name != RoleEnum.LEADER.ToString())

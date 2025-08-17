@@ -6,7 +6,6 @@ namespace its.gamify.core.Models.Courses;
 
 public class CourseCreateModels
 {
-
     public string Title { get; set; } = string.Empty;
     [JsonPropertyName("classify")]
     public string CourseType { get; set; } = CourseTypeEnum.ALL.ToString();
@@ -23,8 +22,8 @@ public class CourseCreateModels
     public List<string> Targets { get; set; } = [];
     [JsonPropertyName("requirement")]
     public string Requirements { get; set; } = string.Empty;
-    [JsonPropertyName("department_id")]
-    public Guid? DepartmentId { get; set; }
+    [JsonPropertyName("department_ids")]
+    public List<Guid> DepartmentIds { get; set; } = [];
     [JsonPropertyName("category_id")]
     public Guid CategoryId { get; set; }
     public Guid QuarterId { get; set; }
