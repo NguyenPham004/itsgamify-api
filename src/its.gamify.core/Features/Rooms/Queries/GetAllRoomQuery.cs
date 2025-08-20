@@ -27,7 +27,7 @@ namespace its.gamify.core.Features.Rooms.Queries
                     includeFunc: x => x
                         .Include(x => x.Challenge)
                         .Include(x => x.HostUser!).ThenInclude(x => x.UserMetrics!.Where(x => x.QuarterId == quarter.Id))
-                        .Include(x => x.OpponentUser!).ThenInclude(x => x.UserMetrics!.Where(x => x.QuarterId == quarter.Id))
+                        .Include(x => x.RoomUsers!.Where(x => !x.IsDeleted && !x.IsOutRoom))
                     );
 
                 return BasePagingResponseModel<Room>.CreateInstance(Entities, Pagination);

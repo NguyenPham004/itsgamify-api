@@ -28,6 +28,18 @@ namespace its.gamify.api.Controllers
             return Ok(res);
         }
 
+        [HttpPost("{id}/join-room")]
+        [Authorize]
+        public async Task<IActionResult> JoinRoom([FromRoute] Guid id, [FromBody] JoinRoomModel model)
+        {
+            var res = await mediator.Send(new JoinRoomCommand
+            {
+                RoomId = id,
+                Model = model
+            });
+            return Ok(res);
+        }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] RoomUpdateModel model)

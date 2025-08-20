@@ -274,6 +274,7 @@ public class GenericRepository<TEntity>(
         params Expression<Func<TEntity, object>>[] includes)
     {
         var query = PrepareQuery(withDeleted, filter, orderByList, true, includes);
+        query = query.AsNoTracking();
         return await query.ToListAsync(cancellationToken);
     }
 
@@ -316,6 +317,7 @@ public class GenericRepository<TEntity>(
 
     public void Update(TEntity entity)
     {
+        context.Entry(entity).State = EntityState.Detached;
         entity.UpdatedDate = _timeService.GetCurrentTime;
         entity.UpdatedBy = _claimsService.CurrentUser;
         _dbSet.Update(entity);
@@ -328,6 +330,7 @@ public class GenericRepository<TEntity>(
 
         foreach (var entity in entities)
         {
+            context.Entry(entity).State = EntityState.Detached;
             entity.UpdatedDate = currentTime;
             entity.UpdatedBy = currentUser;
         }
@@ -835,6 +838,7 @@ public class GenericRepository<TEntity>(
             query = query.AsSplitQuery();
         }
         query = ApplyBaseFilters(query, withDeleted, expression);
+        query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
     #endregion

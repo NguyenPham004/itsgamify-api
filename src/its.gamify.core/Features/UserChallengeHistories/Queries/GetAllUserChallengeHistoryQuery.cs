@@ -21,7 +21,7 @@ namespace its.gamify.core.Features.UserChallengeHistories.Queries
                     filter: x => x.UserId == request.UserId,
                     searchFields: ["ChallengeId", "UserId", "CreateBy"], searchTerm: request.Filter?.Q ?? string.Empty,
                     sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
-                    includeFunc: x => x.Include(x => x.Challenge).Include(x => x.User).Include(x => x.Opponent));
+                    includeFunc: x => x.Include(x => x.Challenge).Include(x => x.User).Include(x => x.Winner));
                 return BasePagingResponseModel<UserChallengeHistory>.CreateInstance(Entities, Pagination);
 
 

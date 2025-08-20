@@ -10,17 +10,12 @@ namespace its.gamify.api.Features.LearningMaterials.Commands
     {
         public required LearningMaterialCreateModel Model { get; set; }
 
-        class CommandHandler : IRequestHandler<CreateLearningMaterialCommand, LearningMaterial>
+        class CommandHandler(IUnitOfWork unitOfWork,
+            IMediator mediator) : IRequestHandler<CreateLearningMaterialCommand, LearningMaterial>
         {
-            private readonly IUnitOfWork _unitOfWork;
-            private readonly IMediator _mediator;
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+            private readonly IMediator _mediator = mediator;
 
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IMediator mediator)
-            {
-                this._mediator = mediator;
-                this._unitOfWork = unitOfWork;
-            }
             public async Task<LearningMaterial> Handle(CreateLearningMaterialCommand request, CancellationToken cancellationToken)
             {
 
@@ -32,9 +27,9 @@ namespace its.gamify.api.Features.LearningMaterials.Commands
 
                 var material = new LearningMaterial
                 {
-                    Name = file.FileName,
+                    Name = request.Model.File.FileName,
                     Size = file.Size.ToString(),
-                    Type = file.Extension,
+                    Type = Path.GetExtension(request.Model.File.FileName),
                     Url = file.Url,
                     FileId = file.Id,
                     CourseId = request.Model.CourseId

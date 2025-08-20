@@ -37,6 +37,7 @@ namespace its.gamify.core
         public ICourseMetricRepository CourseMetricRepository { get; }
         public IUserChallengeHistoryRepository UserChallengeHistoryRepository { get; }
         public IRoomRepository RoomRepository { get; }
+        public IRoomUserRepository RoomUserRepository { get; }
         Task<bool> SaveChangesAsync();
     }
 }
