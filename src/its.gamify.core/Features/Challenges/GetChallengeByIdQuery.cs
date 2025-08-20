@@ -17,8 +17,8 @@ namespace its.gamify.core.Features.Challenges
                 claimsService.CurrentRole == ROLE.MANAGER;
                 return (await unitOfWork
                     .ChallengeRepository
-                    .GetByIdAsync(
-                        request.Id,
+                    .FirstOrDefaultAsync(
+                        x => !x.Course.IsDeleted && x.Course.Status == COURSE_STATUS.PUBLISHED && x.Course.IsDraft == false,
                         checkRole,
                         cancellationToken: cancellationToken,
                         includes: [x => x.Course, x => x.Category!, x => x.Course.CourseResults.Where(x => x.UserId == claimsService.CurrentUser)]

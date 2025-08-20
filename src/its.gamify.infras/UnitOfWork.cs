@@ -17,6 +17,7 @@ namespace its.gamify.infras
 
         private readonly IPracticeTagRepository practiceTagRepository;
         private readonly IBadgeRepository _badgeRepository;
+        private readonly IRoomUserRepository _roomUserRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IDifficultyRepository _difficultyRepository;
         private readonly IUserMetricRepository _userMetricRepository;
@@ -78,6 +79,7 @@ namespace its.gamify.infras
             _userChallengeHistoryRepository = serviceProvider.GetRequiredService<IUserChallengeHistoryRepository>();
             _roomRepository = serviceProvider.GetRequiredService<IRoomRepository>();
             _courseDepartmentRepository = serviceProvider.GetRequiredService<ICourseDepartmentRepository>();
+            _roomUserRepository = serviceProvider.GetRequiredService<IRoomUserRepository>();
 
         }
         public ICourseRepository CourseRepository => _courseRepository;
@@ -113,6 +115,7 @@ namespace its.gamify.infras
         public IRoomRepository RoomRepository => _roomRepository;
 
         public ICourseDepartmentRepository CourseDepartmentRepository => _courseDepartmentRepository;
+        public IRoomUserRepository RoomUserRepository => _roomUserRepository;
 
         public async Task<bool> SaveChangesAsync()
         => await _appDbContext.SaveChangesAsync() > 0;

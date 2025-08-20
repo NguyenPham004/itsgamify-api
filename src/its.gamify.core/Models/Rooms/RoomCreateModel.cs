@@ -6,6 +6,14 @@
         public int TimePerQuestion { get; set; }
         public int BetPoints { get; set; }
         public Guid ChallengeId { get; set; }
-        public Guid? HostUserId { get; set; }
+        public Guid HostUserId { get; set; }
+        public int MaxPlayers { get; set; } = 10;
+
+    }
+
+    public class JoinRoomModel
+    {
+        public string RoomCode { get; set; } = null!;
+
     }
 }

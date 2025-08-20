@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using its.gamify.core.Models.Rooms;
+using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
 using MediatR;
 
@@ -22,7 +23,18 @@ namespace its.gamify.core.Features.Rooms.Commands
             {
                 await unitOfWork.ChallengeRepository.EnsureExistsIfIdNotEmpty(request.ChallengeId);
                 var room = unitOfWork.Mapper.Map<Room>(request);
+                room.RoomCode = StringUtilities.GenerateRandomCode();
+                var roomUser = new RoomUser
+                {
+                    RoomId = room.Id,
+                    UserId = request.HostUserId,
+                    IsOutRoom = false,
+                    CurrentScore = 0,
+                    CorrectAnswers = 0,
+                    IsCurrentQuestionAnswered = false
+                };
                 await unitOfWork.RoomRepository.AddAsync(room, cancellationToken);
+                await unitOfWork.RoomUserRepository.AddAsync(roomUser, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
                 return room;
             }

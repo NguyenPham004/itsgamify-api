@@ -33,7 +33,7 @@ public class User : BaseEntity
     public virtual ICollection<CourseResult> CourseResults { get; set; } = [];
     public virtual ICollection<Notification> Notifications { get; set; } = [];
     public virtual ICollection<UserChallengeHistory>? UserChallengeHistories { get; set; } = [];
-    
+    public virtual ICollection<RoomUser> RoomUsers { get; set; } = null!;
     public Guid? DepartmentId { get; set; }
     public virtual Department? Department { get; set; }
 

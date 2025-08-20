@@ -7,27 +7,25 @@ using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using MediatR;
 
-namespace its.gamify.api.Features.CourseCollections.Commands
+namespace its.gamify.core.Features.CourseCollections.Commands
 {
-    public class CreateCourseCollectionCommand : CourseCollectionCreateModel, IRequest<CourseCollection>
+    public class CreateCourseCollectionCommand : IRequest<CourseCollection>
     {
+        public Guid CourseId { get; set; }
         class CommandHandler(IUnitOfWork unitOfWork, IClaimsService claimsService) : IRequestHandler<CreateCourseCollectionCommand, CourseCollection>
         {
-            private readonly IClaimsService claimsService = claimsService;
-            private readonly IUnitOfWork unitOfWork = unitOfWork;
 
             public async Task<CourseCollection> Handle(CreateCourseCollectionCommand request, CancellationToken cancellationToken)
             {
-                if (claimsService.CurrentUser == Guid.Empty) throw new Exception("Check user session login");
-                var courseCollection = unitOfWork.Mapper.Map<CourseCollection>(request);
-                courseCollection.UserId = claimsService != null ? claimsService.CurrentUser : Guid.Empty;
-                //await unitOfWork.UserRepository.EnsureExistsIfIdNotEmpty(courseCollection.UserId);
-                await unitOfWork.CourseRepository.EnsureExistsIfIdNotEmpty(request.CourseId);
-                var find = await unitOfWork.CourseCollectionRepository.FirstOrDefaultAsync(x => x.UserId == claimsService!.CurrentUser && x.CourseId == request.CourseId);
-                if (find is not null) throw new Exception("This course is saved.");
-                await unitOfWork.CourseCollectionRepository.AddAsync(courseCollection);
-                await unitOfWork.SaveChangesAsync();
-                var courseMetric = await unitOfWork.CourseMetricRepository.GetByIdAsync(courseCollection.CourseId);
+
+                var courseCollection = await unitOfWork.CourseCollectionRepository.AddAsync(new CourseCollection
+                {
+                    CourseId = request.CourseId,
+                    UserId = claimsService.CurrentUser
+                }, cancellationToken);
+
+                var courseMetric = await unitOfWork.CourseMetricRepository.FirstOrDefaultAsync(x => x.CourseId == courseCollection.CourseId);
+
                 if (courseMetric != null)
                 {
                     ++courseMetric.SaveCount;
@@ -35,26 +33,19 @@ namespace its.gamify.api.Features.CourseCollections.Commands
                 }
                 else
                 {
-                    CourseMetric cm = new CourseMetric()
+                    CourseMetric cm = new()
                     {
                         CourseId = courseCollection.CourseId,
                         SaveCount = 1,
                     };
-                    await unitOfWork.CourseMetricRepository.AddAsync(cm);
+                    await unitOfWork.CourseMetricRepository.AddAsync(cm, cancellationToken);
                 }
 
                 await unitOfWork.SaveChangesAsync();
+
                 return courseCollection;
             }
         }
-        /*class CommandValidation : AbstractValidator<CreateCourseCollectionCommand>
-        {
-            public CommandValidation()
-            {
-                RuleFor(x => x.CourseId).NotEmpty().NotNull().WithMessage("Course not found.");
 
-            }
-            
-        }*/
     }
 }

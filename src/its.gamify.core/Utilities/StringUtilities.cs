@@ -14,18 +14,30 @@ namespace its.gamify.core.Utilities
                 return Convert.ToBase64String(hash);
             }
         }
-        //public static (string Password, byte[] Salt) HashPassword(this string password,
-        //    byte[]? salt = null)
-        //{
+        public static string GenerateRandomCode(int length)
+        {
+            const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder result = new(length);
 
-        //    salt ??= RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes
-        //    string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-        //        password: password!,
-        //        salt: salt,
-        //        prf: KeyDerivationPrf.HMACSHA256,
-        //        iterationCount: 100000,
-        //        numBytesRequested: 256 / 8));
-        //    return (hashed, salt);
-        //}
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                byte[] randomBytes = new byte[length];
+                rng.GetBytes(randomBytes);
+
+                for (int i = 0; i < length; i++)
+                {
+                    // Chuyển đổi byte ngẫu nhiên thành chỉ mục trong chuỗi validChars
+                    int index = randomBytes[i] % validChars.Length;
+                    result.Append(validChars[index]);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        public static string GenerateRandomCode()
+        {
+            return GenerateRandomCode(8);
+        }
     }
 }

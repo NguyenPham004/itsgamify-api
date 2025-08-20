@@ -29,7 +29,8 @@ namespace its.gamify.core.Features.Challenges
             {
                 bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
                     claimsService.CurrentRole == ROLE.MANAGER;
-                Expression<Func<Challenge, bool>>? filter = null;
+                Expression<Func<Challenge, bool>>? filter = x =>
+                    !x.Course.IsDeleted && x.Course.Status == COURSE_STATUS.PUBLISHED && x.Course.IsDraft == false;
                 Dictionary<string, bool>? sortOrders = request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC");
 
                 Func<IQueryable<Challenge>, IIncludableQueryable<Challenge, object>>? includeFunc =

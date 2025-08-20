@@ -44,6 +44,7 @@ public class AppDbContext : DbContext
     public DbSet<UserChallengeHistory> UserChallengeHistory { get; set; }
     public DbSet<CourseDepartment> CourseDepartment { get; set; }
     public DbSet<Room> Room { get; set; }
+    public DbSet<RoomUser> RoomUser { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);

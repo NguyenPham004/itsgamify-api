@@ -40,6 +40,7 @@ public class Course : BaseEntity
     public virtual ICollection<CourseReview> CourseReviews { get; set; } = [];
     [JsonPropertyName("modules")]
     public virtual ICollection<CourseSection> CourseSections { get; set; } = [];
+    public virtual ICollection<CourseCollection> CourseCollections { get; set; } = [];
 
     [JsonPropertyName("learning_materials")]
     public virtual ICollection<LearningMaterial> LearningMaterials { get; set; } = [];

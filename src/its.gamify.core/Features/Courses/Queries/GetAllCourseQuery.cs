@@ -61,7 +61,9 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                          && x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
                          && x.Status == COURSE_STATUS.PUBLISHED
                          && x.IsDraft == false));
-                includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                includeFunc = x => x
+                        .Include(x => x.CourseCollections.Where(x => x.UserId == user.Id && !x.IsDeleted))
+                        .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                         .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Deparment)
                         .Include(x => x.Category);
@@ -76,7 +78,9 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                                 && x.Status == COURSE_STATUS.PUBLISHED &&
                                 x.IsDraft == false);
 
-                includeFunc = x => x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
+                includeFunc = x => x
+                        .Include(x => x.CourseCollections.Where(x => x.UserId == user.Id && !x.IsDeleted))
+                        .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Deparment)
                         .Include(x => x.Category);
             }
@@ -100,12 +104,6 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             bool isManageRole = _claimSerivce.CurrentRole == ROLE.ADMIN || _claimSerivce.CurrentRole == ROLE.TRAININGSTAFF ||
                                        _claimSerivce.CurrentRole == ROLE.MANAGER;
 
-            // if (!string.IsNullOrEmpty(request.CourseQuery?.Deparments) && isManageRole)
-            // {
-            //     Expression<Func<Course, bool>> filter_classify = await ClassifyFunc(request.CourseQuery?.Classify, user.Id);
-            //     filter = filter != null ? FilterCustom.CombineFilters(filter, filter_classify) : filter_classify;
-
-            // }
             if (!string.IsNullOrEmpty(request.CourseQuery?.CourseTypes))
             {
                 List<string> courseTypes = [.. request.CourseQuery.CourseTypes.Split('.')];
@@ -154,25 +152,6 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             }
             return x => true;
         }
-
-        // private async Task<Expression<Func<Course, bool>>> DeparmentFunc(string? value, Guid UserId)
-        // {
-        //     if (string.IsNullOrWhiteSpace(value))
-        //     {
-        //         return x => true;
-        //     }
-
-        //     List<Guid> deparments = [.. value.Split(".", StringSplitOptions.RemoveEmptyEntries)
-        //                                  .Where(s => Guid.TryParse(s, out _))
-        //                                  .Select(s => Guid.Parse(s))];
-
-        //     if (deparments != null && deparments.Count > 0)
-        //     {
-        //         return x => x.CourseType == COURSE_TYPE.DEPARTMENTONLY && deparments.Contains((Guid)x.DepartmentId!);
-        //     }
-
-        //     return x => true;
-        // }
 
     }
 
