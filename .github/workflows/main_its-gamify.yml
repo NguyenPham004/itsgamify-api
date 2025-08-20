@@ -65,4 +65,4 @@ jobs:
           app-name: "its-gamification"
           slot-name: "Production"
           package: .
-          publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE}}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6E2FB20ED9044D0B9CC878127088B9DC }}
