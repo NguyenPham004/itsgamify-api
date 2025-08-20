@@ -18,7 +18,9 @@ namespace its.gamify.core.Features.Courses.Queries
                 bool checkRole = claimsService.CurrentRole == ROLE.ADMIN || claimsService.CurrentRole == ROLE.TRAININGSTAFF ||
                                 claimsService.CurrentRole == ROLE.MANAGER;
                 return (await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Id == request.Id, checkRole, cancellationToken,
-                    includeFunc: x => x.Include(course => course.LearningMaterials.Where(x => !x.IsDeleted))
+                    includeFunc: x => x
+                        .Include(x => x.CourseCollections.Where(x => x.UserId == claimsService.CurrentUser && !x.IsDeleted))
+                        .Include(course => course.LearningMaterials.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseDepartments.Where(x => x.CourseId == request.Id)).ThenInclude(x => x.Deparment)
                         .Include(x => x.Category)
                         .Include(x => x.Quarter)

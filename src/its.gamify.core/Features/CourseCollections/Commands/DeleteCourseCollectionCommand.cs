@@ -1,19 +1,12 @@
-﻿using its.gamify.api.Features.Questions.Commands;
-using its.gamify.core;
-using MediatR;
+﻿using MediatR;
 
-namespace its.gamify.api.Features.CourseCollections.Commands
+namespace its.gamify.core.Features.CourseCollections.Commands
 {
     public class DeleteCourseCollectionCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        class CommandHandler : IRequestHandler<DeleteCourseCollectionCommand, bool>
+        class CommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteCourseCollectionCommand, bool>
         {
-            private readonly IUnitOfWork unitOfWork;
-            public CommandHandler(IUnitOfWork unitOfWork)
-            {
-                this.unitOfWork = unitOfWork;
-            }
 
             public async Task<bool> Handle(DeleteCourseCollectionCommand request, CancellationToken cancellationToken)
             {

@@ -2,6 +2,7 @@ using its.gamify.api.Features.CourseParticipations;
 using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.CourseSections.Queries;
+using its.gamify.core.Features.CourseCollections.Commands;
 using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Courses.Queries;
 using its.gamify.core.Features.LearningMaterials.Queries;
@@ -142,6 +143,17 @@ namespace its.gamify.api.Controllers
             {
                 Id = id,
                 IsActive = model.IsActive
+            }));
+
+        }
+
+        [HttpPut("{id}/course-collections")]
+        [Authorize]
+        public async Task<IActionResult> UpsertCourseCollection([FromRoute] Guid id)
+        {
+            return Ok(await mediator.Send(new UpsertCourseCollectionCommand()
+            {
+                CourseId = id,
             }));
 
         }

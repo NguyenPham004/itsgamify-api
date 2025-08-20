@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - its-gamify
 on:
   push:
     branches:
-      - main2
+      - main
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Update appsettings.json with CON_STRING
         run: |
           $appsettings = "src/its.gamify.api/appsettings.json"
@@ -30,11 +30,11 @@ jobs:
           (Get-Content $appsettings) -replace '"ServiceAccountPass":\s*""', '"ServiceAccountPass": "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PASS }}"' | Set-Content $appsettings
           (Get-Content $appsettings) -replace '"ApiKey":\s*""', '"ApiKey": "${{ secrets.FIREBASE_API_KEY }}"' | Set-Content $appsettings
         shell: pwsh
-        
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 'v9.0'
+          dotnet-version: "v9.0"
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -51,18 +51,18 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'its-gamification'
-          slot-name: 'Production'
+          app-name: "its-gamification"
+          slot-name: "Production"
           package: .
           publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE}}

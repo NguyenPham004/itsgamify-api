@@ -2,8 +2,7 @@
 
 namespace its.gamify.core.Models.CourseCollections
 {
-    public class CourseCollectionUpdateModel:CourseCollectionCreateModel
+    public class CourseCollectionUpdateModel : CourseCollectionCreateModel
     {
-        public Guid Id { get; set; }
     }
 }
