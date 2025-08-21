@@ -5,6 +5,7 @@ using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
 using its.gamify.core.Models.QuizResults;
 using its.gamify.core.Services.Interfaces;
+using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
@@ -111,7 +112,8 @@ namespace its.gamify.api.Features.QuizResults.Commands
                         CompletedDate = DateTime.UtcNow,
                         CourseId = participation.CourseId,
                         UserId = participation.UserId,
-                        CourseParticipationId = participation.Id
+                        CourseParticipationId = participation.Id,
+                        CourseNumber = StringUtilities.GenerateRandomCode(8)
                     };
 
                     await _unitOfWork.CourseResultRepository.AddAsync(course_result);
