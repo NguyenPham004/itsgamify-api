@@ -124,5 +124,8 @@ namespace its.gamify.core.Models.ShareModels
             return null;
         }
     }
-
+    public class CourseResultByUserModel: FilterQuery
+    {
+        public string FilterString { get; set; } = string.Empty;
+    }
 }

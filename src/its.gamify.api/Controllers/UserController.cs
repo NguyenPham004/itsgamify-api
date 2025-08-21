@@ -71,7 +71,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpGet("{id}/statistic")]
-        public async Task<IActionResult> GêtStatistic([FromRoute] Guid id, [FromQuery] Guid Quaterid)
+        public async Task<IActionResult> GetStatistic([FromRoute] Guid id, [FromQuery] Guid Quaterid)
         {
             var res = await mediator.Send(new GetUserStatistic()
             {
@@ -82,7 +82,7 @@ namespace its.gamify.api.Controllers
 
         }
         [HttpGet("{id}/course-results")]
-        public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] FilterQuery query)
+        public async Task<IActionResult> GetAllCourseResult([FromRoute] Guid id, [FromQuery] CourseResultByUserModel query)
         {
 
             return Ok(await mediator.Send(new GetCourseResultByUserIdQuery()
