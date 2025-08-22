@@ -18,10 +18,15 @@ namespace its.gamify.api.Features.Courses.Commands
 
             public async Task<bool> Handle(DeleteCourseCommand request, CancellationToken cancellationToken)
             {
-                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id)
+                var course = await unitOfWork.CourseRepository.GetByIdAsync(request.Id, includes: [x => x.Challenges.Where(c => !c.IsDeleted), x => x.CourseReviews.Where(cr => !cr.IsDeleted)])
                     ?? throw new BadRequestException("Khóa học không tồn tại!");
 
-                unitOfWork.CourseRepository.SoftRemove(course);
+                if (course.Challenges.Any(c => !c.IsDeleted))
+                {
+                    throw new BadRequestException("Khóa học không thể xóa vì có các thử thách đang sử dụng!");
+                }
+
+                unitOfWork.CourseRepository.SoftRemove(course!);
                 return await unitOfWork.SaveChangesAsync();
 
 
