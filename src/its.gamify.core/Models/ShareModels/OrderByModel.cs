@@ -124,5 +124,8 @@ namespace its.gamify.core.Models.ShareModels
             return null;
         }
     }
-
+    public class FilterQueryExtend: FilterQuery
+    {
+        public string FilterString { get; set; } = string.Empty;
+    }
 }

@@ -6,6 +6,8 @@ public class CourseResult : BaseEntity
     public bool IsPassed { get; set; } = false;
     public DateTime CompletedDate { get; set; } = DateTime.UtcNow;
 
+    public string CourseNumber { get; set; } = string.Empty;
+
     #region Relationship Configuration 
     public Guid UserId { get; set; }
     public virtual User User { get; set; } = null!;

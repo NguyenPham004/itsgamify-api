@@ -6,3 +6,9 @@ public enum UserStatusEnum
     INACTIVE,
     SUSPENDED
 }
+public static class CourseResultsFilterEnum
+{
+    public const string COMPLETEDDATE = "COMPLETEDDATE";
+    public const string COURSENAME = "COURSENAME";
+
+}

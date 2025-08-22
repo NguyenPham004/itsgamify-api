@@ -24,7 +24,7 @@ namespace its.gamify.api.Features.Departments.Queries
                 var res = await unitOfWork.DepartmentRepository.ToDynamicPagination(
                     pageIndex: request.Filter.Page ?? 0,
                     pageSize: request.Filter.Limit ?? 0,
-                    searchFields: ["Description", "Name"],
+                    searchFields: ["Name", "Description"],
                     searchTerm: request.Filter.Q,
                     sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
                     includeFunc: x => x.Include(d => d.Users!)
