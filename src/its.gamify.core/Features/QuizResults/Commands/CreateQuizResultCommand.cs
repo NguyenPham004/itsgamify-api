@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hangfire;
 using its.gamify.core;
+using its.gamify.core.Features.Badges.Commands;
 using its.gamify.core.Features.Notifications.Commands;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.QuizAnswers;
@@ -35,7 +36,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 RuleFor(x => x.Answer).Null();
             }
         }
-        class CommandHandler(IUnitOfWork _unitOfWork, IBackgroundJobClient _backgroundJobClient, IMediator mediator) : IRequestHandler<CreateQuizResultCommand, QuizResult>
+        class CommandHandler(IUnitOfWork _unitOfWork, IBackgroundJobClient _backgroundJobClient, IMediator mediator, IClaimsService claimsService) : IRequestHandler<CreateQuizResultCommand, QuizResult>
         {
             public async Task<QuizResult> Handle(CreateQuizResultCommand request, CancellationToken cancellationToken)
             {
@@ -76,6 +77,14 @@ namespace its.gamify.api.Features.QuizResults.Commands
 
                 await _unitOfWork.SaveChangesAsync();
                 _backgroundJobClient.Enqueue(() => CompletedCourse(request.Model.ParticipationId!));
+                if (quizResult.Score == 10)
+                {
+                    await mediator.Send(new CreateBadgeCommand()
+                    {
+                        Model = new CreateBadgeModel { Type = BadgeType.CERTIFICATE_HUNTER, UserId = claimsService.CurrentUser }
+                    }, cancellationToken);
+
+                }
                 return quizResult;
             }
             public async Task CompletedCourse(Guid participationId)
@@ -128,6 +137,23 @@ namespace its.gamify.api.Features.QuizResults.Commands
 
                         }
                     });
+
+                    await mediator.Send(new CreateBadgeCommand()
+                    {
+                        Model = new CreateBadgeModel { Type = BadgeType.CERTIFICATE_HUNTER, UserId = participation.UserId }
+                    });
+
+                    await mediator.Send(new CreateBadgeCommand()
+                    {
+                        Model = new CreateBadgeModel { Type = BadgeType.SKILL_BUILDER, UserId = participation.UserId }
+                    });
+
+                    await mediator.Send(new CreateBadgeCommand()
+                    {
+                        Model = new CreateBadgeModel { Type = BadgeType.KNOWLEDGE_SEEKER, UserId = participation.UserId }
+                    });
+
+
 
                     await mediator.Send(new CreateNotificationCommand()
                     {

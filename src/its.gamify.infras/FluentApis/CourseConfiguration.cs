@@ -23,7 +23,7 @@ namespace its.gamify.infras.FluentApis
                 .HasForeignKey(x => x.CourseId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasOne(x => x.Deparment)
+            builder.HasOne(x => x.Department)
                 .WithMany(x => x.CourseDepartments)
                 .HasForeignKey(x => x.DepartmentId)
                 .OnDelete(DeleteBehavior.NoAction);

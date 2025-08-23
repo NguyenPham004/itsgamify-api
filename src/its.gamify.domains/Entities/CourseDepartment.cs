@@ -6,6 +6,6 @@ namespace its.gamify.domains.Entities
         public Course Course { get; set; } = null!;
 
         public Guid DepartmentId { get; set; }
-        public Department Deparment { get; set; } = null!;
+        public Department Department { get; set; } = null!;
     }
 }

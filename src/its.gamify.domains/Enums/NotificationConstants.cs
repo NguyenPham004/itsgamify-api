@@ -5,13 +5,14 @@ public static class NotificationType
     public const string COURSE_COMPLETED = "COURSE_COMPLETED";
     public const string POINTS_BONUS = "POINTS_BONUS";
     public const string REMIND_COURSE = "REMIND_COURSE";
+    public const string NEW_BADGE = "NEW_BADGE";
 
     private static readonly Dictionary<string, (string Title, string Message)> NotificationDetails =
         new()
         {
            {
                 COURSE_COMPLETED,
-                ("Hoàn thành khóa học", "Chúc mừng! Bạn đã hoàn thành khóa học.")
+                ("Chúc mừng bạn đã hoàn thành khóa học", "Chúc mừng! Bạn đã hoàn thành khóa học.")
             },
             {
                 POINTS_BONUS,
@@ -20,6 +21,10 @@ public static class NotificationType
             {
                 REMIND_COURSE,
                 ("Nhắc nhở hoàn thành khóa học", "Bạn còn khóa học chưa hoàn thành. Hãy hoàn thành để nhận điểm thưởng!")
+            },
+            {
+                NEW_BADGE,
+                ("Chúc mừng bạn đã đạt danh hiệu mới", "Chúc mừng bạn đã đạt được danh hiệu mới!")
             }
         };
 
