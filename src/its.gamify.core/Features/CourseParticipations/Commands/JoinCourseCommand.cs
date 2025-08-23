@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using its.gamify.core;
+using its.gamify.core.Features.Badges.Commands;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
@@ -16,7 +17,8 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
             IClaimsService claimService,
             IUnitOfWork unitOfWork,
             ICurrentTime currentTime,
-            IBackgroundJobClient _backgroundJobClient
+            IBackgroundJobClient _backgroundJobClient,
+            IMediator _mediator
         ) : IRequestHandler<JoinCourseCommand, CourseParticipation>
         {
 
@@ -88,6 +90,11 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 await unitOfWork.SaveChangesAsync();
 
                 _backgroundJobClient.Enqueue(() => UpdateUserMetric(currentUser.Id, quarter.Id));
+
+                await _mediator.Send(new CreateBadgeCommand()
+                {
+                    Model = new CreateBadgeModel { Type = BadgeType.EXPLORER, UserId = currentUser.Id }
+                }, cancellationToken);
 
                 return courseParticipation;
             }

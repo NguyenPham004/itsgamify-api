@@ -4,10 +4,12 @@ using its.gamify.domains.Enums;
 using Newtonsoft.Json;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
+using MediatR;
+using its.gamify.core.Features.Badges.Commands;
 
 namespace its.gamify.core.SingalR;
 
-public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime) : Hub
+public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediator mediator) : Hub
 {
     private static readonly Dictionary<string, HashSet<string>> _roomConnections = [];
     private static readonly Dictionary<string, string> _connectionToUser = [];
@@ -267,42 +269,6 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime) : Hub
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
-    // private async Task SendCurrentQuestion(Guid roomId)
-    // {
-    //     var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
-    //     if (room == null) return;
-
-    //     var roomIdStr = roomId.ToString();
-    //     if (!_roomQuestions.ContainsKey(roomIdStr) ||
-    //         room.CurrentQuestionIndex >= _roomQuestions[roomIdStr].Count)
-    //     {
-    //         return;
-    //     }
-
-    //     var question = _roomQuestions[roomIdStr][room.CurrentQuestionIndex];
-
-    //     // Gửi câu hỏi (không bao gồm đáp án đúng)
-    //     var questionData = new
-    //     {
-    //         questionIndex = room.CurrentQuestionIndex + 1,
-    //         totalQuestions = _roomQuestions[roomIdStr].Count,
-    //         content = question.Content,
-    //         optionA = question.OptionA,
-    //         optionB = question.OptionB,
-    //         optionC = question.OptionC,
-    //         optionD = question.OptionD,
-    //         timeLimit = room.TimePerQuestion
-    //     };
-
-    //     await Clients.Group($"room_{roomId}").SendAsync("NewQuestion", questionData);
-
-    //     // Tự động chuyển câu sau timeLimit + 3 giây
-    //     _ = Task.Run(async () =>
-    //     {
-    //         await Task.Delay((room.TimePerQuestion + 3) * 1000);
-    //         await MoveToNextQuestion(roomId);
-    //     });
-    // }
 
     private async Task EndMatch(Guid roomId)
     {
@@ -343,6 +309,20 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime) : Hub
             });
 
             await UpdateUserMetric(roomUser.UserId, roomUser.UserId == winner.UserId, room.BetPoints);
+
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.COMBO_MASTER, UserId = roomUser.UserId }
+            });
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.INVINCIBLE, UserId = roomUser.UserId }
+            });
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.FIRST_VICTORY, UserId = roomUser.UserId }
+            });
+
         }
 
         await _unitOfWork.SaveChangesAsync();
@@ -361,6 +341,26 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime) : Hub
 
         string jsonRoom = await GetRoomJsonAsync(roomId);
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
+
+
+        foreach (var rankedUser in rankedUsers)
+        {
+            var roomUser = rankedUser.User;
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.COMBO_MASTER, UserId = roomUser.UserId }
+            });
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.INVINCIBLE, UserId = roomUser.UserId }
+            });
+            await mediator.Send(new CreateBadgeCommand()
+            {
+                Model = new CreateBadgeModel { Type = BadgeType.FIRST_VICTORY, UserId = roomUser.UserId }
+            });
+
+        }
+
     }
 
     public async Task OutRoom(Guid roomId, Guid userId)

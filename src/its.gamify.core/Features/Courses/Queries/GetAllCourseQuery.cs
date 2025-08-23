@@ -47,41 +47,36 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
             Func<IQueryable<Course>, IIncludableQueryable<Course, object>>? includeFunc =
                 x =>
                     x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
-                    .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Deparment)
+                    .Include(x => x.CourseDepartments!.Where(x => x.IsDeleted == false)).ThenInclude(x => x.Department)
                     .Include(x => x.Category);
 
             (Pagination Pagination, List<Course> Entities)? res = null;
 
             if (_claimSerivce.CurrentRole == ROLE.EMPLOYEE)
             {
-                filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                    x.IsDraft == false && x.QuarterId == quarter!.Id &&
+                filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false && x.QuarterId == quarter!.Id &&
                     (x.CourseType == COURSE_TYPE.ALL ||
-                        (x.CourseType == COURSE_TYPE.DEPARTMENTONLY
-                         && x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
-                         && x.Status == COURSE_STATUS.PUBLISHED
-                         && x.IsDraft == false));
+                    (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.CourseDepartments!.Any(cd => cd.DepartmentId == user.DepartmentId && cd.IsDeleted == false)));
+
                 includeFunc = x => x
                         .Include(x => x.CourseCollections.Where(x => x.UserId == user.Id && !x.IsDeleted))
                         .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
-                        .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Deparment)
+                        .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && x.IsDeleted == false)).ThenInclude(x => x.Department)
                         .Include(x => x.Category);
             }
 
             else if (_claimSerivce.CurrentRole == ROLE.LEADER)
             {
-                filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                            x.IsDraft == false && x.QuarterId == quarter.Id
-                            || (x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
-                                && x.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString()
-                                && x.Status == COURSE_STATUS.PUBLISHED &&
-                                x.IsDraft == false);
+                filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false && x.QuarterId == quarter.Id
+                           && (x.CourseType == COURSE_TYPE.ALL || x.CourseType == COURSE_TYPE.LEADERONLY ||
+                            (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.CourseDepartments!.Any(cd => cd.DepartmentId == user.DepartmentId && cd.IsDeleted == false)));
 
                 includeFunc = x => x
                         .Include(x => x.CourseCollections.Where(x => x.UserId == user.Id && !x.IsDeleted))
                         .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
-                        .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Deparment)
+                        .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
+                        .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Department)
                         .Include(x => x.Category);
             }
 

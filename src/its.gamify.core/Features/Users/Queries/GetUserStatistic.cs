@@ -125,7 +125,14 @@ namespace its.gamify.api.Features.Users.Queries
                         status = "Đang học";
                         int completedCount = cp.LearningProgresses.Count(lp => lp.Status == PROGRESS_STATUS.COMPLETED);
                         int totalCount = cp.LearningProgresses.Count;
-                        progress = totalCount > 0 ? (int)((completedCount * 100.0) / totalCount) : 0;
+
+                        var modules = await unitOfWork
+                            .CourseSectionRepository
+                            .WhereAsync(x => x.CourseId == cp.CourseId, includes: x => x.Lessons.Where(x => !x.IsDeleted));
+                        int totalLessons = modules.Sum(module => module.Lessons.Count);
+
+                        // Calculate progress based on completed lessons relative to total lessons
+                        progress = totalLessons > 0 ? (int)((completedCount * 100.0) / totalLessons) : 0;
                     }
 
                     // Tính số ngày còn lại
