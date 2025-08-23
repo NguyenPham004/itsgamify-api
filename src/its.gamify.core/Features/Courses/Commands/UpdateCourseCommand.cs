@@ -27,10 +27,6 @@ namespace its.gamify.api.Features.Courses.Commands
                     RuleFor(x => x.Model.Description).NotEmpty().WithMessage("Vui lòng nhập mô tả ngắn");
                     RuleFor(x => x.Model.LongDescription).NotEmpty().WithMessage("Vui lòng nhập mô tả");
                 });
-                // When(x => x.Model.Status == CourseStatusEnum.MATERIAL.ToString(), () =>
-                // {
-                //     RuleFor(x => x.Model.LearningMaterialIds).NotEmpty().WithMessage("Vui lòng nhập");
-                // });
                 When(x => x.Model.Status == CourseStatusEnum.CONTENT.ToString(), () =>
                 {
                     RuleForEach(x => x.Model.CourseSections).NotNull().WithMessage("Module đang trống")
@@ -91,26 +87,37 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.IntroVideo = (await unitOfWork.FileRepository.FirstOrDefaultAsync(x => x.Id == request.Model.IntroVideoId)
                     ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id ")).Url;
 
-                var course_departments = await unitOfWork.CourseDepartmentRepository.WhereAsync(x => x.CourseId == course.Id);
+                if (request.Model.IsUpdateDepartment)
+                {
+                    await UpdateCourseDepartments(request.Model, cancellationToken);
+                }
 
-                if (request.Model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString())
+                unitOfWork.CourseRepository.Update(course);
+                return await unitOfWork.SaveChangesAsync();
+
+            }
+
+
+            private async Task UpdateCourseDepartments(CourseUpdateModel model, CancellationToken cancellationToken)
+            {
+                var course_departments = await unitOfWork.CourseDepartmentRepository.WhereAsync(x => x.CourseId == model.Id);
+
+                if (model.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString())
                 {
                     var existingIds = course_departments.Select(x => x.DepartmentId).ToList();
-                    var newDepartmentIds = request.Model.DepartmentIds;
+                    var newDepartmentIds = model.DepartmentIds;
 
-                    // Những id có trong existingIds mà không có trong newDepartmentIds -> xóa đi
                     var departmentsToRemove = course_departments.Where(cd => !newDepartmentIds.Contains(cd.DepartmentId)).ToList();
                     if (departmentsToRemove.Count != 0)
                     {
                         unitOfWork.CourseDepartmentRepository.SoftRemoveRange(departmentsToRemove);
                     }
 
-                    // Những id có trong newDepartmentIds mà không có trong existingIds -> thêm mới
                     var departmentsToAdd = newDepartmentIds
                         .Where(id => !existingIds.Contains(id))
                         .Select(id => new CourseDepartment
                         {
-                            CourseId = course.Id,
+                            CourseId = model.Id!.Value,
                             DepartmentId = id
                         })
                         .ToList();
@@ -122,13 +129,10 @@ namespace its.gamify.api.Features.Courses.Commands
 
                 }
 
-                if (course.CourseType != CourseTypeEnum.DEPARTMENTONLY.ToString())
+                if (model.CourseType != CourseTypeEnum.DEPARTMENTONLY.ToString())
                 {
                     unitOfWork.CourseDepartmentRepository.SoftRemoveRange(course_departments);
                 }
-
-                unitOfWork.CourseRepository.Update(course);
-                return await unitOfWork.SaveChangesAsync();
 
             }
         }
