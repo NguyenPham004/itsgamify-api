@@ -3,6 +3,7 @@ using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace its.gamify.core.Features.Badges.Queries;
 
@@ -20,7 +21,8 @@ public class GetAllBadgeByUserIdQuery : IRequest<BasePagingResponseModel<Badge>>
                 pageSize: request.Filter?.Limit ?? 10,
                 searchFields: ["Name", "Description"], searchTerm: request.Filter?.Q ?? string.Empty,
                 sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC"),
-                filter: filter
+                filter: filter,
+                includeFunc: x => x.Include(x => x.User)
 
             );
             return BasePagingResponseModel<Badge>.CreateInstance(Entities, Pagination);

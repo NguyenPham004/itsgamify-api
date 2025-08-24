@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers;
 
-public class BadgeController(IMediator _mediator) : BaseController
+public class BadgesController(IMediator _mediator) : BaseController
 {
 
     [HttpGet]
