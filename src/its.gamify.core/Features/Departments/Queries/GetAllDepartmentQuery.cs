@@ -27,7 +27,7 @@ namespace its.gamify.api.Features.Departments.Queries
                     searchFields: ["Name", "Description"],
                     searchTerm: request.Filter.Q,
                     sortOrders: request.Filter?.OrderBy?.ToDictionary(x => x.OrderColumn ?? string.Empty, x => x.OrderDir == "ASC") ?? [],
-                    includeFunc: x => x.Include(d => d.Users!)
+                    includeFunc: x => x.Include(d => d.Users!.Where(x => !x.IsDeleted))
                         .ThenInclude(u => u!.Role!)
                         .Include(x => x.Courses!));
                 var models = unitOfWork.Mapper.Map<List<DepartmentViewModel>>(res.Entities);
