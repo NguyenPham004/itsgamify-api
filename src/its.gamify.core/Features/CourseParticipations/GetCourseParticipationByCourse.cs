@@ -25,9 +25,7 @@ namespace its.gamify.api.Features.CourseParticipations
             public async Task<BasePagingResponseModel<CourseParticipation>> Handle(GetCourseParticipationByCourse request, CancellationToken cancellationToken)
             {
 
-                Expression<Func<CourseParticipation, bool>> filter = x =>
-                            x.CourseId == request.CourseId &&
-                           (_claimService.CurrentRole != ROLE.EMPLOYEE || x.UserId == _claimService.CurrentUser);
+                Expression<Func<CourseParticipation, bool>> filter = x => x.CourseId == request.CourseId && x.UserId == _claimService.CurrentUser;
 
                 var (Pagination, Entities) = await unitOfWork.CourseParticipationRepository.ToPagination(
                     pageIndex: request.PageIndex,
