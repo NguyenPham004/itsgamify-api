@@ -68,8 +68,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             else if (_claimSerivce.CurrentRole == ROLE.LEADER)
             {
-                filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false && x.QuarterId == quarter.Id
-                           && (x.CourseType == COURSE_TYPE.ALL || x.CourseType == COURSE_TYPE.LEADERONLY ||
+                filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false && x.QuarterId == quarter.Id &&
+                            (x.CourseType == COURSE_TYPE.ALL || x.CourseType == COURSE_TYPE.LEADERONLY ||
                             (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.CourseDepartments!.Any(cd => cd.DepartmentId == user.DepartmentId && cd.IsDeleted == false)));
 
                 includeFunc = x => x
