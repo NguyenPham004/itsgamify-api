@@ -20,7 +20,7 @@ namespace its.gamify.core.Features.Challenges
                 return (await unitOfWork
                     .ChallengeRepository
                     .FirstOrDefaultAsync(
-                        x => !x.Course.IsDeleted && x.Course.Status == COURSE_STATUS.PUBLISHED && x.Course.IsDraft == false,
+                        x => !x.Course.IsDeleted && x.Course.Status == COURSE_STATUS.PUBLISHED && x.Course.IsDraft == false && x.Id == request.Id,
                         checkRole,
                         cancellationToken: cancellationToken,
                         includeFunc: x => x
