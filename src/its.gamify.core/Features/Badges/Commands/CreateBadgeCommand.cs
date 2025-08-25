@@ -6,6 +6,7 @@ using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace its.gamify.core.Features.Badges.Commands;
@@ -55,7 +56,7 @@ public class CreateBadgeCommand : IRequest
                     isValid = await HandleSkillBuilder(model);
                     break;
                 case BadgeType.OUTSTANDING_ACHIEVEMENT:
-                    isValid = await HandleOutstandingAchievement(model);
+                    await HandleOutstandingAchievement();
                     break;
                 case BadgeType.EXPLORER:
                     isValid = await HandleExplorer(model);
@@ -73,7 +74,7 @@ public class CreateBadgeCommand : IRequest
                     isValid = await HandleInvincible(model);
                     break;
                 case BadgeType.TOP_CHALLENGER:
-                    isValid = await HandleTopChallenger(model);
+                    await HandleTopChallenger();
                     break;
             }
 
@@ -139,11 +140,44 @@ public class CreateBadgeCommand : IRequest
             return true;
         }
 
-        public async Task<bool> HandleOutstandingAchievement(CreateBadgeModel model)
+        public async Task HandleOutstandingAchievement()
         {
-            await Task.Delay(1);
-            return false;
+            var currentTime = _currentTime.GetCurrentTime;
 
+            var currentQuarter = await _unitOfWork.QuarterRepository
+                             .FirstOrDefaultAsync(q => q.StartDate <= currentTime && q.EndDate >= currentTime)
+                            ?? throw new Exception("Quarter is not exist!");
+            var departments = await _unitOfWork.DepartmentRepository.GetAllAsync();
+
+            List<UserMetric> metrics = [];
+
+            foreach (var department in departments)
+            {
+                var (Pagination, Entities) = await _unitOfWork.UserMetricRepository.ToDynamicPagination(
+                    pageIndex: 0,
+                    pageSize: 5,
+                    filter: x => x.QuarterId == currentQuarter.Id && x.User.DepartmentId == department.Id,
+                    sortOrders: new Dictionary<string, bool> { { "PointInQuarter", false } },
+                    includeFunc: x => x.Include(x => x.User)
+                );
+
+                metrics.AddRange(Entities);
+            }
+
+            foreach (var metric in metrics)
+            {
+                var badge = await _unitOfWork
+                  .BadgeRepository
+                  .FirstOrDefaultAsync(x => x.UserId == metric.UserId && x.Type == BadgeType.TOP_CHALLENGER);
+
+                if (badge != null) continue;
+
+                await CreateBageAsync(new CreateBadgeModel
+                {
+                    Type = BadgeType.OUTSTANDING_ACHIEVEMENT,
+                    UserId = metric.UserId,
+                });
+            }
         }
 
         public async Task<bool> HandleExplorer(CreateBadgeModel model)
@@ -223,10 +257,40 @@ public class CreateBadgeCommand : IRequest
             return true;
         }
 
-        public async Task<bool> HandleTopChallenger(CreateBadgeModel model)
+        public async Task HandleTopChallenger()
         {
-            await Task.Delay(1);
-            return false;
+            var currentTime = _currentTime.GetCurrentTime;
+
+            var currentQuarter = await _unitOfWork.QuarterRepository
+                             .FirstOrDefaultAsync(q => q.StartDate <= currentTime && q.EndDate >= currentTime)
+                            ?? throw new Exception("Quarter is not exist!");
+
+            var (Pagination, Entities) = await _unitOfWork.UserMetricRepository.ToDynamicPagination(
+                pageIndex: 0,
+                pageSize: 5,
+                filter: x => x.QuarterId == currentQuarter.Id,
+                sortOrders: new Dictionary<string, bool>
+                {
+                    { "PointInQuarter", false }
+                }
+            );
+
+            foreach (var user in Entities)
+            {
+                var badge = await _unitOfWork
+                    .BadgeRepository
+                    .FirstOrDefaultAsync(x => x.UserId == user.UserId && x.Type == BadgeType.TOP_CHALLENGER);
+
+                if (badge != null) continue;
+
+                await CreateBageAsync(new CreateBadgeModel
+                {
+
+                    Type = BadgeType.TOP_CHALLENGER,
+                    UserId = user.UserId,
+                });
+            }
+
         }
     }
 }

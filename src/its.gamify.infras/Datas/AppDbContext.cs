@@ -29,7 +29,6 @@ public class AppDbContext : DbContext
     public DbSet<Lesson> Lesson { get; set; }
     public DbSet<LearningProgress> LearningProgress { get; set; }
     public DbSet<LearningMaterial> LearningMaterial { get; set; }
-    public DbSet<LeadearBoard> LeadearBoard { get; set; }
     public DbSet<UserMetric> UserMetrics { get; set; }
     public DbSet<Department> Department { get; set; }
     public DbSet<CourseSection> CourseSection { get; set; }

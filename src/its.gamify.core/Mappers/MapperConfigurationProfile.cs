@@ -6,7 +6,6 @@ using its.gamify.core.Models.CourseCollections;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Departments;
-using its.gamify.core.Models.DifficultyLevels;
 using its.gamify.core.Models.LearningMaterials;
 using its.gamify.core.Models.Lessons;
 using its.gamify.core.Models.Practices;
@@ -97,7 +96,6 @@ public class MapperConfigurationProfile : Profile
 
         CreateMap<Quarter, QuarterCreateModel>().ReverseMap();
 
-        CreateMap<Difficulty, DifficultyCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizCreateModel>().ReverseMap();
         CreateMap<Quiz, QuizUpdateModel>().ReverseMap();
         CreateMap<Quiz, QuizViewModel>().ReverseMap();

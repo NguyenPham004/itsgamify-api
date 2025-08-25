@@ -1,5 +1,6 @@
 using its.gamify.core.Features.CourseReviews.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace its.gamify.api.Controllers
@@ -11,6 +12,7 @@ namespace its.gamify.api.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateCourseReview([FromBody] CreateReviewCommand command)
         {
 
@@ -19,6 +21,7 @@ namespace its.gamify.api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCourseReview([FromRoute] Guid id)
         {
 

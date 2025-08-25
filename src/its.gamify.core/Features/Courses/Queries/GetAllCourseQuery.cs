@@ -48,7 +48,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                 x =>
                     x.Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                     .Include(x => x.CourseDepartments!.Where(x => x.IsDeleted == false)).ThenInclude(x => x.Department)
-                    .Include(x => x.Category);
+                    .Include(x => x.Category)
+                    .Include(x => x.CourseMetric);
 
             (Pagination Pagination, List<Course> Entities)? res = null;
 
@@ -63,7 +64,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                         .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                         .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && x.IsDeleted == false)).ThenInclude(x => x.Department)
-                        .Include(x => x.Category);
+                        .Include(x => x.Category)
+                        .Include(x => x.CourseMetric);
             }
 
             else if (_claimSerivce.CurrentRole == ROLE.LEADER)
@@ -77,7 +79,8 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
                         .Include(x => x.CourseSections.Where(x => !x.IsDeleted))
                         .Include(x => x.CourseParticipations.Where(x => x.UserId == user.Id))
                         .Include(x => x.CourseDepartments!.Where(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)).ThenInclude(x => x.Department)
-                        .Include(x => x.Category);
+                        .Include(x => x.Category)
+                        .Include(x => x.CourseMetric);
             }
 
             if (!string.IsNullOrEmpty(request.CourseQuery?.Categories))

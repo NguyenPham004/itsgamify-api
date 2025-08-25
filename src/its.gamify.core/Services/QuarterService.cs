@@ -1,7 +1,10 @@
+using its.gamify.core.Features.Badges.Commands;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
+using its.gamify.domains.Enums;
+using MediatR;
 
 namespace its.gamify.core.Services;
 
@@ -9,10 +12,11 @@ public interface IQuarterService
 {
     Task AutoGenerateQuarter();
     Task CreateCurrentQuarter();
+    Task SumarizeFinalQuarter();
 }
 
 
-public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime) : IQuarterService
+public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime, IMediator mediator) : IQuarterService
 {
 
     public async Task AutoGenerateQuarter()
@@ -59,8 +63,31 @@ public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime) 
 
         await _unitOfWork.QuarterRepository.AddAsync(newQuarter);
         await _unitOfWork.SaveChangesAsync();
+        await AutoGenerateMetrics(newQuarter.Id);
     }
+    public async Task AutoGenerateMetrics(Guid quarterId)
+    {
+        // Kiểm tra quarter có tồn tại không
+        var quarter = await _unitOfWork.QuarterRepository.GetByIdAsync(quarterId) ?? throw new NotFoundException($"Không tìm thấy Quarter với ID: {quarterId}");
 
+        // Lấy danh sách tất cả người dùng
+        var users = await _unitOfWork.UserRepository.GetAllAsync(withDeleted: true);
+
+        // Tạo UserMetric cho mỗi người dùng
+        foreach (var user in users)
+        {
+            var userMetric = new UserMetric
+            {
+                UserId = user.Id,
+                QuarterId = quarter.Id
+            };
+
+            await _unitOfWork.UserMetricRepository.AddAsync(userMetric);
+        }
+
+        // Lưu các thay đổi vào cơ sở dữ liệu
+        await _unitOfWork.SaveChangesAsync();
+    }
     public async Task CreateCurrentQuarter()
     {
         var currentTime = _currentTime.GetCurrentTime;
@@ -92,6 +119,45 @@ public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime) 
 
         await _unitOfWork.QuarterRepository.AddAsync(currentQuarter);
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task SumarizeFinalQuarter()
+    {
+        var currentTime = _currentTime.GetCurrentTime;
+
+        var currentQuarter = await _unitOfWork.QuarterRepository
+                         .FirstOrDefaultAsync(q => q.StartDate <= currentTime && q.EndDate >= currentTime);
+
+        if (currentQuarter == null)
+        {
+            return;
+        }
+
+        var tenMinutesBeforeEndOfQuarter = currentQuarter.EndDate!.Value.AddMinutes(-10);
+
+        if (currentTime < tenMinutesBeforeEndOfQuarter)
+        {
+            return;
+        }
+
+        await mediator.Send(new CreateBadgeCommand()
+        {
+            Model = new CreateBadgeModel
+            {
+                Type = BadgeType.OUTSTANDING_ACHIEVEMENT,
+                UserId = Guid.NewGuid()
+            }
+        });
+
+
+        await mediator.Send(new CreateBadgeCommand()
+        {
+            Model = new CreateBadgeModel
+            {
+                Type = BadgeType.TOP_CHALLENGER,
+                UserId = Guid.NewGuid()
+            }
+        });
     }
 
 }

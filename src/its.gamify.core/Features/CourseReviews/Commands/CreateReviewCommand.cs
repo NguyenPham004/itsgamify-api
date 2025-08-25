@@ -30,8 +30,13 @@ public class CreateReviewCommand : CourseReviewCreateModel, IRequest<CourseRevie
 
             if (participation.Status != COURSE_PARTICIPATION_STATUS.COMPLETED)
                 throw new BadRequestException("Bạn chưa hoàn thành khóa học này.");
+            var course_metric = await unitOfWork.CourseMetricRepository.FirstOrDefaultAsync(x => x.CourseId == participation.CourseId) ?? throw new Exception("Metric is not found!");
 
             var review = unitOfWork.Mapper.Map<CourseReview>(request);
+
+            course_metric.ReviewCount += 1;
+
+            course_metric.StarRating = (course_metric.StarRating * (course_metric.ReviewCount - 1) + request.Rating) / course_metric.ReviewCount;
 
             await unitOfWork.CourseReviewRepository.AddAsync(review, cancellationToken);
 

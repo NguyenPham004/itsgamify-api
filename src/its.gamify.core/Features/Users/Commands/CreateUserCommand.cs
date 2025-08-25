@@ -18,7 +18,7 @@ namespace its.gamify.api.Features.Users.Commands
             public CommandValidation()
             {
                 RuleFor(x => x.Model.Email).EmailAddress();
-                RuleFor(x => x.Model.HashedPassword).NotNull().NotEmpty();
+                RuleFor(x => x.Model.Password).NotNull().NotEmpty();
                 RuleFor(x => x.Model.DepartmentId).NotNull().NotEmpty();
             }
         }
@@ -50,11 +50,11 @@ namespace its.gamify.api.Features.Users.Commands
                         throw new BadRequestException("Phòng ban đã có leader");
                     }
                 }
-                   
-                await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
-                if (!string.IsNullOrEmpty(request.Model.HashedPassword))
 
-                    await authService.SignUpAsync(user.Email, request.Model.HashedPassword);
+                await unitOfWork.UserRepository.AddAsync(user, cancellationToken);
+                if (!string.IsNullOrEmpty(request.Model.Password))
+
+                    await authService.SignUpAsync(user.Email, request.Model.Password);
 
                 var quarter = (await unitOfWork.QuarterRepository
                     .FirstOrDefaultAsync(q => q.StartDate <= DateTime.UtcNow && q.EndDate >= DateTime.UtcNow))

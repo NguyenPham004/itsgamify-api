@@ -52,4 +52,10 @@ RecurringJob.AddOrUpdate<IQuarterService>("auto-generate-quarter", service => se
     MisfireHandling = MisfireHandlingMode.Relaxed
 });
 
+RecurringJob.AddOrUpdate<IQuarterService>("summarize-final-quarter", service => service.SumarizeFinalQuarter(), "0 0 L * *", new RecurringJobOptions
+{
+    TimeZone = TimeZoneInfo.Utc,
+    MisfireHandling = MisfireHandlingMode.Relaxed
+});
+
 app.Run();

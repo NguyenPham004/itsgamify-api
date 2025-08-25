@@ -9,9 +9,8 @@ namespace its.gamify.domains.Entities;
 public class User : BaseEntity
 {
     [JsonPropertyName("password")]
-    public string? HashedPassword { get; set; } = string.Empty;
-    [JsonPropertyName("salt")]
-    public byte[]? Salt { get; set; } = null;
+    public string? Password { get; set; } = string.Empty;
+
     public string Email { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     [JsonPropertyName("phone_number")]

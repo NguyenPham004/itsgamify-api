@@ -24,7 +24,7 @@ namespace its.gamify.core.Models.Users
         public Guid RoleId { get; set; }
         public string AvatarUrl { get; set; } = string.Empty;
         [JsonPropertyName("password")]
-        public string? HashedPassword { get; set; } = string.Empty;
+        public string? Password { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
 
         public List<UserMetric> Metrics { get; set; } = [];

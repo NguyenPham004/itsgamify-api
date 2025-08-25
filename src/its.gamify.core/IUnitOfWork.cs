@@ -15,9 +15,7 @@ namespace its.gamify.core
         public ICourseDepartmentRepository CourseDepartmentRepository { get; }
         public IBadgeRepository BadgeRepository { get; }
         public ICategoryRepository CategoryRepository { get; }
-        public IDifficultyRepository DifficultyRepository { get; }
         public IUserMetricRepository UserMetricRepository { get; }
-        public ILeaderBoardRepository LeaderBoardRepository { get; }
         public ILessonRepository LessonRepository { get; }
         public IFileRepository FileRepository { get; }
         public ICourseSectionRepository CourseSectionRepository { get; }
