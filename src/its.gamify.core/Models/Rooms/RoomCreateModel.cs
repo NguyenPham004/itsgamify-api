@@ -2,6 +2,7 @@
 {
     public class RoomCreateModel
     {
+        public required string Name { get; set; }
         public int QuestionCount { get; set; }
         public int TimePerQuestion { get; set; }
         public int BetPoints { get; set; }

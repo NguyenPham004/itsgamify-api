@@ -4,6 +4,7 @@ namespace its.gamify.domains.Entities
 {
     public class Room : BaseEntity
     {
+        public string Name { get; set; } = string.Empty!;
         public int QuestionCount { get; set; }
         public int TimePerQuestion { get; set; }
         public int BetPoints { get; set; }

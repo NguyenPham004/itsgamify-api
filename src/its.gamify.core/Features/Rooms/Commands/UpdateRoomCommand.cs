@@ -10,7 +10,7 @@ namespace its.gamify.core.Features.Rooms.Commands
     public class UpdateRoomCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        public RoomUpdateModel Model { get; set; } = new();
+        public required RoomUpdateModel Model { get; set; }
         class CommandValidate : AbstractValidator<UpdateRoomCommand>
         {
             public CommandValidate()
