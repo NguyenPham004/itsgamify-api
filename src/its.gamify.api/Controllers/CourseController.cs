@@ -4,6 +4,7 @@ using its.gamify.api.Features.CourseParticipations.Commands;
 using its.gamify.api.Features.Courses.Commands;
 using its.gamify.api.Features.CourseSections.Queries;
 using its.gamify.core.Features.CourseCollections.Commands;
+using its.gamify.core.Features.CourseResults;
 using its.gamify.core.Features.CourseReviews;
 using its.gamify.core.Features.Courses.Commands;
 using its.gamify.core.Features.Courses.Queries;
@@ -169,6 +170,15 @@ namespace its.gamify.api.Controllers
             {
                 CourseId = id,
                 Filter = filterQuery
+            }));
+        }
+        [HttpGet("{id}/course-result")]
+        [Authorize]
+        public async Task<IActionResult> GetCourseResult([FromRoute] Guid id)
+        {
+            return Ok(await mediator.Send(new GetCourseResultByCourseIdQuery()
+            {
+                CourseId = id,
             }));
         }
 
