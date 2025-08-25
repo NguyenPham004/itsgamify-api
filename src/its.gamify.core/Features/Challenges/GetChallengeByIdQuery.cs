@@ -1,7 +1,9 @@
-﻿using its.gamify.core.Services.Interfaces;
+﻿using its.gamify.core.GlobalExceptionHandling.Exceptions;
+using its.gamify.core.Services.Interfaces;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace its.gamify.core.Features.Challenges
 {
@@ -21,8 +23,12 @@ namespace its.gamify.core.Features.Challenges
                         x => !x.Course.IsDeleted && x.Course.Status == COURSE_STATUS.PUBLISHED && x.Course.IsDraft == false,
                         checkRole,
                         cancellationToken: cancellationToken,
-                        includes: [x => x.Course, x => x.Category!, x => x.Course.CourseResults.Where(x => x.UserId == claimsService.CurrentUser)]
-                    )) ?? throw new InvalidOperationException("Thử thách không tồn tại");
+                        includeFunc: x => x
+                            .Include(x => x.Category!)
+                            .Include(x => x.Course)
+                                .ThenInclude(x => x.CourseResults!.Where(x => x.UserId == claimsService.CurrentUser))
+
+                    )) ?? throw new BadRequestException("Thử thách không tồn tại");
             }
         }
     }

@@ -81,7 +81,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 {
                     await mediator.Send(new CreateBadgeCommand()
                     {
-                        Model = new CreateBadgeModel { Type = BadgeType.CERTIFICATE_HUNTER, UserId = claimsService.CurrentUser }
+                        Model = new CreateBadgeModel { Type = BadgeType.QUIZ_MASTER, UserId = claimsService.CurrentUser }
                     }, cancellationToken);
 
                 }

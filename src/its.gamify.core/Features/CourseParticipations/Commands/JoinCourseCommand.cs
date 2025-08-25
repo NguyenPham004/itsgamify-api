@@ -85,6 +85,9 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                     Deadline = quarter.EndDate!.Value,
 
                 };
+                metric.CourseParticipatedNum += 1;
+
+                unitOfWork.UserMetricRepository.Update(metric);
 
                 await unitOfWork.CourseParticipationRepository.AddAsync(courseParticipation, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
