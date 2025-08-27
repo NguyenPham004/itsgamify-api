@@ -302,13 +302,13 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
                 YourScore = roomUser.CurrentScore,
                 WinnerScore = winner.CurrentScore,
                 Points = room.BetPoints,
-                Rank = rankedUser.Rank, // Thêm thứ hạng của người chơi
+                Rank = rankedUser.Rank,
                 AverageCorrect = roomUser.CorrectAnswers / (double)_roomQuestions[roomId.ToString()].Count,
                 Status = roomUser.UserId == winner.UserId ?
                     UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
 
-            await UpdateUserMetric(roomUser.UserId, roomUser.UserId == winner.UserId, room.BetPoints);
+            await UpdateUserMetric(roomUser.UserId, roomUser.UserId == winner.UserId, room.BetPoints, rankedUsers.Count);
 
             await mediator.Send(new CreateBadgeCommand()
             {
@@ -408,7 +408,7 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
     }
 
     // Các method khác giữ nguyên...
-    private async Task UpdateUserMetric(Guid userId, bool isWinner, int points)
+    private async Task UpdateUserMetric(Guid userId, bool isWinner, int points, int totalPlayers = 0)
     {
         var quarter = await _unitOfWork.QuarterRepository
                .FirstOrDefaultAsync(q =>
@@ -420,7 +420,15 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
             ?? throw new NotFoundException("Không tìm thấy chỉ số người dùng!");
 
         metric.ChallengeParticipateNum += 1;
-        metric.PointInQuarter += isWinner ? points : -points;
+        if (isWinner)
+        {
+            int pointsToAdd = points * (totalPlayers - 1);
+            metric.PointInQuarter += pointsToAdd;
+        }
+        else
+        {
+            metric.PointInQuarter -= points;
+        }
         metric.WinNum += isWinner ? 1 : 0;
         metric.LoseNum += !isWinner ? 1 : 0;
         if (!isWinner)
