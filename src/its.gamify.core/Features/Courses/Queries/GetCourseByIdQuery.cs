@@ -24,6 +24,7 @@ namespace its.gamify.core.Features.Courses.Queries
                         .Include(x => x.CourseDepartments.Where(x => x.CourseId == request.Id && !x.IsDeleted)).ThenInclude(x => x.Department)
                         .Include(x => x.Category)
                         .Include(x => x.Quarter)
+                        .Include(x => x.CourseMetric)
                         .Include(course => course.CourseSections.Where(x => !x.IsDeleted))
                             .ThenInclude(cs => cs.Lessons.Where(x => !x.IsDeleted))
                                 .ThenInclude(x => x.Quiz)
