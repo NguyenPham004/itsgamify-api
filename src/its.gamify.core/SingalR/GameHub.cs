@@ -19,7 +19,7 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
     public async Task JoinRoom(Guid roomId, Guid userId)
     {
 
-        // Tìm room bằng roomCode
+        // Tìm room bằng roomId
         var room = await _unitOfWork.RoomRepository
             .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted, includes: x => x.Challenge);
 
@@ -78,22 +78,16 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
     public async Task<List<Question>> InitialMatch(Guid roomId)
     {
         var room = await _unitOfWork.RoomRepository
-            .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted, includes: x => x.Challenge);
-
-        if (room == null)
-        {
-            throw new NotFoundException("Room không tồn tại hoặc đã bị xóa.");
-        }
+            .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted, includes: x => x.Challenge) ?? throw new NotFoundException("Room không tồn tại hoặc đã bị xóa.");
 
         var roomIdStr = roomId.ToString();
 
-        // Nếu đã có câu hỏi cho phòng này, trả về danh sách đó
         if (_roomQuestions.TryGetValue(roomIdStr, out List<Question>? value))
         {
             return value;
         }
 
-        // Nếu chưa có, tạo danh sách câu hỏi mới
+        // Nếu chưa có, tạo danh sách câu hỏi mới - Back up nếu chưa có questions
         var questions = await _unitOfWork.QuestionRepository
             .WhereAsync(q => q.CourseId == room.Challenge.CourseId && !q.IsHidden);
 
@@ -165,12 +159,8 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         _unitOfWork.RoomRepository.Update(room);
         await _unitOfWork.SaveChangesAsync();
 
-        // Gửi câu hỏi đầu tiên
-        // await SendCurrentQuestion(roomId);
-
         string jsonRoom = await GetRoomJsonAsync(roomId);
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
-        // await Clients.Group($"room_{roomId}").SendAsync("GameStarted");
     }
     public async Task SubmitAnswer(Guid roomId, Guid userId, int currentQuestion, int points)
     {
@@ -269,7 +259,6 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
-
     private async Task EndMatch(Guid roomId)
     {
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
@@ -294,6 +283,17 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         foreach (var rankedUser in rankedUsers)
         {
             var roomUser = rankedUser.User;
+
+            bool isWinner = roomUser.UserId == winner.UserId;
+            int pointsToAdd;
+            if (isWinner)
+            {
+                pointsToAdd = room.BetPoints * (rankedUsers.Count - 1);
+            }
+            else
+            {
+                pointsToAdd = -room.BetPoints;
+            }
             await _unitOfWork.UserChallengeHistoryRepository.AddAsync(new UserChallengeHistory
             {
                 UserId = roomUser.UserId,
@@ -301,10 +301,10 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
                 ChallengeId = room.ChallengeId,
                 YourScore = roomUser.CurrentScore,
                 WinnerScore = winner.CurrentScore,
-                Points = room.BetPoints,
+                Points = pointsToAdd,
                 Rank = rankedUser.Rank,
                 AverageCorrect = roomUser.CorrectAnswers / (double)_roomQuestions[roomId.ToString()].Count,
-                Status = roomUser.UserId == winner.UserId ?
+                Status = isWinner ?
                     UserChallengeHistoryEnum.WIN : UserChallengeHistoryEnum.LOSE
             });
 
@@ -407,7 +407,6 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
     }
 
-    // Các method khác giữ nguyên...
     private async Task UpdateUserMetric(Guid userId, bool isWinner, int points, int totalPlayers = 0)
     {
         var quarter = await _unitOfWork.QuarterRepository
@@ -440,82 +439,6 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         _unitOfWork.UserMetricRepository.Update(metric);
     }
 
-    public async Task PlayAgain(Guid roomId, Guid userId)
-    {
-        // Kiểm tra phòng có tồn tại không
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
-        if (room == null)
-        {
-            await Clients.Caller.SendAsync("Error", "Room không tồn tại.");
-            return;
-        }
-
-        // Kiểm tra người dùng có quyền yêu cầu chơi lại không (chỉ host mới có quyền)
-        if (room.HostUserId != userId)
-        {
-            await Clients.Caller.SendAsync("Error", "Chỉ chủ phòng mới có quyền bắt đầu lại trò chơi.");
-            return;
-        }
-
-        // Kiểm tra trạng thái phòng (chỉ có thể chơi lại khi trò chơi đã kết thúc)
-        if (room.Status != ROOM_STATUS.FINISHED)
-        {
-            await Clients.Caller.SendAsync("Error", "Chỉ có thể chơi lại khi trò chơi đã kết thúc.");
-            return;
-        }
-
-        // Kiểm tra có đủ người chơi không
-        var activePlayers = await _unitOfWork.RoomUserRepository
-            .WhereAsync(ru => ru.RoomId == roomId && !ru.IsOutRoom);
-
-        // Tạo bộ câu hỏi mới cho phòng
-        var roomIdStr = roomId.ToString();
-
-        // Lấy thông tin challenge từ room
-        var roomWithChallenge = await _unitOfWork.RoomRepository
-            .FirstOrDefaultAsync(r => r.Id == roomId, includes: x => x.Challenge);
-
-        if (roomWithChallenge?.Challenge == null)
-        {
-            await Clients.Caller.SendAsync("Error", "Không tìm thấy thông tin challenge.");
-            return;
-        }
-
-        // Lấy câu hỏi mới
-        var questions = await _unitOfWork.QuestionRepository
-            .WhereAsync(q => q.CourseId == roomWithChallenge.Challenge.CourseId && !q.IsHidden);
-
-        _roomQuestions[roomIdStr] = [.. questions
-        .OrderBy(x => Guid.NewGuid()) // Random order
-        .Take(room.QuestionCount)];
-
-        // Reset trạng thái phòng
-        room.Status = ROOM_STATUS.WAITING;
-        room.CurrentQuestionIndex = 0;
-        _unitOfWork.RoomRepository.Update(room);
-
-        // Reset trạng thái người chơi
-        foreach (var player in activePlayers)
-        {
-            player.CurrentScore = 0;
-            player.CorrectAnswers = 0;
-            player.IsCurrentQuestionAnswered = false;
-            _unitOfWork.RoomUserRepository.Update(player);
-        }
-
-        await _unitOfWork.SaveChangesAsync();
-
-        // Thông báo cho tất cả người chơi
-        await Clients.Group($"room_{roomId}").SendAsync("Notify", "Chủ phòng đã bắt đầu trò chơi mới!");
-
-        // Cập nhật thông tin phòng
-        string jsonRoom = await GetRoomJsonAsync(roomId);
-        await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
-        await Clients.Group($"room_{roomId}").SendAsync("PlayAgain");
-
-        return;
-    }
-
     private async Task<string> GetRoomJsonAsync(Guid id)
     {
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(
@@ -541,30 +464,4 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         });
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        // var connectionId = Context.ConnectionId;
-        // var userId = _connectionToUser.GetValueOrDefault(connectionId);
-
-        // if (userId != null)
-        // {
-        //     var roomId = _roomConnections.FirstOrDefault(kv => kv.Value.Contains(connectionId)).Key;
-        //     if (roomId != null)
-        //     {
-        //         _roomConnections[roomId].Remove(connectionId);
-        //         _connectionToUser.Remove(connectionId);
-
-        //         // Tự động out room khi disconnect
-        //         // await OutRoom(Guid.Parse(roomId), Guid.Parse(userId));
-
-        //         if (_roomConnections[roomId].Count == 0)
-        //         {
-        //             _roomConnections.Remove(roomId);
-        //             _roomQuestions.Remove(roomId);
-        //         }
-        //     }
-        // }
-
-        await base.OnDisconnectedAsync(exception);
-    }
 }

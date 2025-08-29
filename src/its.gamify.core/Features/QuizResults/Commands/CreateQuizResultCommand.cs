@@ -110,7 +110,7 @@ namespace its.gamify.api.Features.QuizResults.Commands
                 if (totalLessons == completedLesson)
                 {
                     metric.CourseCompletedNum += 1;
-                    metric.ChallengeParticipateNum = -1;
+                    metric.CourseParticipatedNum = -1;
                     metric.PointInQuarter += 1000;
                     _unitOfWork.UserMetricRepository.Update(metric);
 

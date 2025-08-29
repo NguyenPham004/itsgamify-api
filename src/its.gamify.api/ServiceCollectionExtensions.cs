@@ -71,7 +71,9 @@ public static class ServiceCollectionExtensions
             appSetting.ConnectionStrings["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
         services.Scan(scan =>
         {
             scan.FromAssemblies(getAssemblies())
@@ -80,6 +82,7 @@ public static class ServiceCollectionExtensions
                 .AsMatchingInterface()
                 .WithScopedLifetime();
         });
+
         services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -136,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Stopwatch>();
 
         services.AddHangfire(config => config.UseInMemoryStorage());
+
         services.AddHangfireServer();
 
         services.Configure<FormOptions>(options =>

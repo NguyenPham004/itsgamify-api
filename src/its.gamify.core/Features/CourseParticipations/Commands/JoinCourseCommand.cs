@@ -17,21 +17,9 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
             IClaimsService claimService,
             IUnitOfWork unitOfWork,
             ICurrentTime currentTime,
-            IBackgroundJobClient _backgroundJobClient,
             IMediator _mediator
         ) : IRequestHandler<JoinCourseCommand, CourseParticipation>
         {
-
-            public async Task UpdateUserMetric(Guid userId, Guid quarterId)
-            {
-                var metric = await unitOfWork
-                    .UserMetricRepository
-                    .FirstOrDefaultAsync(x => x.UserId == userId && x.QuarterId == quarterId)
-                    ?? throw new Exception("No user metric found");
-
-                metric.CourseParticipatedNum += 1;
-                unitOfWork.UserMetricRepository.Update(metric);
-            }
 
             public async Task<CourseParticipation> Handle(JoinCourseCommand request,
                 CancellationToken cancellationToken)
@@ -92,7 +80,6 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                 await unitOfWork.CourseParticipationRepository.AddAsync(courseParticipation, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
 
-                _backgroundJobClient.Enqueue(() => UpdateUserMetric(currentUser.Id, quarter.Id));
 
                 await _mediator.Send(new CreateBadgeCommand()
                 {
