@@ -6,6 +6,7 @@ using its.gamify.core.Services.Interfaces;
 using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using MediatR;
 using its.gamify.core.Features.Badges.Commands;
+using its.gamify.core.Utilities;
 
 namespace its.gamify.core.SingalR;
 
@@ -50,29 +51,10 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
 
         var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
 
-        // Cập nhật RoomUser
-        existingRoomUser.IsOutRoom = false;
-        existingRoomUser.CurrentScore = 0;
-        existingRoomUser.CorrectAnswers = 0;
-        existingRoomUser.IsCurrentQuestionAnswered = false;
-        _unitOfWork.RoomUserRepository.Update(existingRoomUser);
-
-        // Load questions cho room nếu chưa có
-        if (!_roomQuestions.ContainsKey(roomIdStr))
-        {
-            var questions = await _unitOfWork.QuestionRepository
-                .WhereAsync(q => q.CourseId == room.Challenge.CourseId && !q.IsHidden);
-
-            _roomQuestions[roomIdStr] = [.. questions
-                .OrderBy(x => Guid.NewGuid()) // Random order
-                .Take(room.QuestionCount)];
-        }
-
-        await _unitOfWork.SaveChangesAsync();
-
         await Clients.Group($"room_{room.Id}").SendAsync("Notify", $"Người chơi {user!.FullName} đã tham gia!");
 
         string jsonRoom = await GetRoomJsonAsync(room.Id);
+
         await Clients.Group($"room_{room.Id}").SendAsync("RoomUpdated", jsonRoom);
     }
     public async Task<List<Question>> InitialMatch(Guid roomId)
@@ -99,30 +81,11 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         // Lưu danh sách câu hỏi vào bộ nhớ
         _roomQuestions[roomIdStr] = selectedQuestions;
 
-        // Reset room và players
-        room.Status = ROOM_STATUS.WAITING;
-        room.CurrentQuestionIndex = 0;
-        _unitOfWork.RoomRepository.Update(room);
-
-        // Reset tất cả players
-        var roomUsers = await _unitOfWork.RoomUserRepository
-            .WhereAsync(ru => ru.RoomId == roomId && !ru.IsOutRoom);
-
-        foreach (var roomUser in roomUsers)
-        {
-            roomUser.CurrentScore = 0;
-            roomUser.CorrectAnswers = 0;
-            roomUser.IsCurrentQuestionAnswered = false;
-            _unitOfWork.RoomUserRepository.Update(roomUser);
-        }
-
-        await _unitOfWork.SaveChangesAsync();
-
         return selectedQuestions;
     }
     public async Task StartMatch(Guid roomId)
     {
-        var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId, includes: [x => x.Challenge]);
         if (room == null)
         {
             await Clients.Caller.SendAsync("Error", "Room không tồn tại.");
@@ -144,16 +107,15 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         room.Status = ROOM_STATUS.PLAYING;
         room.CurrentQuestionIndex = 0;
 
-        // Reset tất cả players
-        var roomUsers = await _unitOfWork.RoomUserRepository
-            .WhereAsync(ru => ru.RoomId == roomId && !ru.IsOutRoom);
-
-        foreach (var roomUser in roomUsers)
+        // Load questions cho room nếu chưa có
+        if (!_roomQuestions.ContainsKey(roomId.ToString()))
         {
-            roomUser.CurrentScore = 0;
-            roomUser.CorrectAnswers = 0;
-            roomUser.IsCurrentQuestionAnswered = false;
-            _unitOfWork.RoomUserRepository.Update(roomUser);
+            var questions = await _unitOfWork.QuestionRepository
+                .WhereAsync(q => q.CourseId == room.Challenge.CourseId && !q.IsHidden);
+
+            _roomQuestions[roomId.ToString()] = [.. questions
+                .OrderBy(x => Guid.NewGuid()) // Random order
+                .Take(room.QuestionCount)];
         }
 
         _unitOfWork.RoomRepository.Update(room);
@@ -328,18 +290,14 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         await _unitOfWork.SaveChangesAsync();
 
         // Gửi kết quả
-        var results = roomUsers.Select(ru => new
-        {
-            userId = ru.UserId,
-            userName = ru.User.FullName,
-            score = ru.CurrentScore,
-            correctAnswers = ru.CorrectAnswers,
-            isWinner = ru.UserId == winner.UserId
-        }).OrderByDescending(r => r.score);
+        var results = roomUsers.OrderByDescending(r => r.CurrentScore);
 
-        await Clients.Group($"room_{roomId}").SendAsync("GameEnded", results);
+        var jsonResult = JsonHelper.SerializeObject(results);
+
+        await Clients.Group($"room_{roomId}").SendAsync("GameEnded", jsonResult);
 
         string jsonRoom = await GetRoomJsonAsync(roomId);
+
         await Clients.Group($"room_{roomId}").SendAsync("RoomUpdated", jsonRoom);
 
 
@@ -375,7 +333,12 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
             _unitOfWork.RoomUserRepository.Update(roomUser);
 
             // Nếu là host thì chuyển host cho người khác
-            var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId);
+            var room = await _unitOfWork.RoomRepository.GetByIdAsync(roomId) ?? throw new BadRequestException("Không tìm thấy thi đấu!");
+            if (room.Status == ROOM_STATUS.PLAYING)
+            {
+                room.Status = ROOM_STATUS.WAITING;
+            }
+
             if (room?.HostUserId == userId)
             {
                 var newHost = await _unitOfWork.RoomUserRepository
@@ -437,6 +400,22 @@ public class GameHub(IUnitOfWork _unitOfWork, ICurrentTime currentTime, IMediato
         metric.WinStreak = isWinner ? (metric.WinStreak + 1) : 0;
 
         _unitOfWork.UserMetricRepository.Update(metric);
+    }
+
+    public async Task GetRoomDetail(Guid roomId)
+    {
+        var room = await _unitOfWork.RoomRepository
+           .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted, includes: x => x.Challenge);
+
+        if (room == null)
+        {
+            await Clients.Caller.SendAsync("Error", "Room không tồn tại hoặc đã bị xóa.");
+            return;
+        }
+
+        string jsonRoom = await GetRoomJsonAsync(room.Id);
+
+        await Clients.Group($"room_{room.Id}").SendAsync("RoomUpdated", jsonRoom);
     }
 
     private async Task<string> GetRoomJsonAsync(Guid id)

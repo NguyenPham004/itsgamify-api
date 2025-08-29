@@ -16,7 +16,7 @@ public static class NotificationType
             },
             {
                 POINTS_BONUS,
-                ("Điểm thưởng hoàn thành khóa học", "Bạn vừa nhận được 1000 điểm cho quý này sau khi hoàn thành khóa học!")
+                ("+1000 điểm thưởng hoàn thành khóa học", "Bạn vừa nhận được 1000 điểm cho quý này sau khi hoàn thành khóa học!")
             },
             {
                 REMIND_COURSE,

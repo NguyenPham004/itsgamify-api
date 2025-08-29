@@ -274,7 +274,6 @@ public class GenericRepository<TEntity>(
         params Expression<Func<TEntity, object>>[] includes)
     {
         var query = PrepareQuery(withDeleted, filter, orderByList, true, includes);
-        query = query.AsNoTracking();
         return await query.ToListAsync(cancellationToken);
     }
 
