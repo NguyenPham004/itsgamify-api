@@ -11,6 +11,8 @@ namespace its.gamify.api.Features.Categories.Commands
         {
             public async Task<Category> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
             {
+                bool checkDupName = (await unitOfWork.CategoryRepository.WhereAsync(x => x.Name.ToLower().Trim()== request.Name.ToLower().Trim())) != null;
+                if (checkDupName) throw new Exception("Trùng tên!");
                 var category = unitOfWork.Mapper.Map<Category>(request);
                 await unitOfWork.CategoryRepository.AddAsync(category, cancellationToken);
                 await unitOfWork.SaveChangesAsync();

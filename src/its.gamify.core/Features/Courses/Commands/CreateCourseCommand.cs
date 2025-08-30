@@ -33,7 +33,8 @@ namespace its.gamify.api.Features.Courses.Commands
                     ?? throw new InvalidOperationException("Không tìm thấy Intro Video với Id " + request.IntroVideoId)).Url;
                 course.ThumbnailId = request.ThumbnailId;
                 course.IntroVideoId = request.IntroVideoId;
-
+                bool checkDupName = (await unitOfWork.CourseRepository.WhereAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim())) != null;
+                if (checkDupName) throw new Exception("Trùng tên!");
                 CourseMetric cm = new()
                 {
                     CourseId = course.Id,

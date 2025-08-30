@@ -26,6 +26,8 @@ namespace its.gamify.core.Features.Categories.Commands
                 var category = await unitOfWork.CategoryRepository.GetByIdAsync(request.Id);
                 if (category is not null)
                 {
+                    bool checkDupName = (await unitOfWork.CategoryRepository.WhereAsync(x => x.Name.ToLower().Trim() == request.Model.Name.ToLower().Trim())) != null;
+                    if (checkDupName) throw new Exception("Trùng tên!");
                     unitOfWork.Mapper.Map(request.Model, category);
                     unitOfWork.CategoryRepository.Update(category);
                     return await unitOfWork.SaveChangesAsync();

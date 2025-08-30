@@ -55,9 +55,6 @@ namespace its.gamify.api.Features.CourseParticipations.Commands
                         .FirstOrDefaultAsync(x => x.UserId == currentUser.Id && x.QuarterId == quarter.Id)
                         ?? throw new Exception("No user metric found");
 
-                if (metric.CourseParticipatedNum >= 5)
-                    throw new BadRequestException("Đã đạt mức giới hạn cho phép trong 1 quý!");
-
                 if (quarter.Id != course.QuarterId)
                     throw new BadRequestException("Bạn không thể tham gia khoá học!");
 

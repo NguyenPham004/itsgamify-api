@@ -22,6 +22,8 @@ namespace its.gamify.core.Features.Challenges.Commands
             public async Task<Challenge> Handle(CreateChallengeCommand request, CancellationToken cancellationToken)
             {
                 await unitOfWork.CourseRepository.EnsureExistsIfIdNotEmpty(request.CourseId);
+                bool checkDupName = (await unitOfWork.ChallengeRepository.WhereAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim())) != null;
+                if (checkDupName) throw new Exception("Trùng tên!");
                 var challenge = unitOfWork.Mapper.Map<Challenge>(request);
                 await unitOfWork.ChallengeRepository.AddAsync(challenge, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
