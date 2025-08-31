@@ -1,9 +1,11 @@
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.ShareModels;
 using its.gamify.core.Services.Interfaces;
 using its.gamify.core.Utilities;
 using its.gamify.domains.Entities;
 using its.gamify.domains.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
@@ -50,6 +52,12 @@ namespace its.gamify.core.Features.Challenges
                 Expression<Func<Challenge, bool>> filterDeleted = x => x.IsDeleted == !request.Filter!.IsActive;
                 filter = filter != null ? FilterCustom.CombineFilters(filter, filterDeleted) : filterDeleted;
 
+                if (!checkRole)
+                {
+                    var courseIds = (await GetCourseByUserId()).Select(x => x.Id);
+                    Expression<Func<Challenge, bool>> filterByCourse = x => courseIds.Contains(x.CourseId);
+                    filter = filter != null ? FilterCustom.CombineFilters(filter, filterByCourse) : filterByCourse;
+                }
 
                 var (Pagination, Entities) = await unitOfWork
                                 .ChallengeRepository
@@ -66,6 +74,33 @@ namespace its.gamify.core.Features.Challenges
                                     withDeleted: checkRole
                                 );
                 return new BasePagingResponseModel<Challenge>(Entities, Pagination);
+            }
+
+
+            private async Task<List<Course>> GetCourseByUserId()
+            {
+                var user = await unitOfWork.UserRepository.GetByIdAsync(claimsService.CurrentUser) ?? throw new BadRequestException("Người dùng không tồn tại!");
+
+
+                Expression<Func<Course, bool>>? filter = null;
+
+                if (claimsService.CurrentRole == ROLE.EMPLOYEE)
+                {
+                    filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false &&
+                        (x.CourseType == COURSE_TYPE.ALL ||
+                        (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.CourseDepartments!.Any(cd => cd.DepartmentId == user.DepartmentId && cd.IsDeleted == false)));
+                }
+
+                else if (claimsService.CurrentRole == ROLE.LEADER)
+                {
+                    filter = x => x.Status == COURSE_STATUS.PUBLISHED && x.IsDraft == false &&
+                                (x.CourseType == COURSE_TYPE.ALL || x.CourseType == COURSE_TYPE.LEADERONLY ||
+                                (x.CourseType == COURSE_TYPE.DEPARTMENTONLY && x.CourseDepartments!.Any(cd => cd.DepartmentId == user.DepartmentId && cd.IsDeleted == false)));
+
+                }
+
+                return await unitOfWork.CourseRepository.WhereAsync(filter: filter!);
+
             }
         }
     }
