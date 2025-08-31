@@ -36,8 +36,9 @@ namespace its.gamify.api.Features.Users.Commands
             public async Task<UserViewModel?> Handle(CreateUserCommand request,
                 CancellationToken cancellationToken)
             {
-                bool checkDupEmail = (await unitOfWork.UserRepository.WhereAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim())) != null;
-                if (checkDupEmail) throw new Exception("Email đã được sử dụng!");
+                var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
+                if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
                 var roles = await unitOfWork.RoleRepository.GetAllAsync();
                 var leaderRole = roles.FirstOrDefault(x => x.Name == RoleEnum.LEADER.ToString());
