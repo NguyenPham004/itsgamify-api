@@ -34,7 +34,7 @@ public class QuarterService(IUnitOfWork _unitOfWork, ICurrentTime _currentTime, 
         }
 
         // Tính toán thông tin cho quý kế tiếp
-        var nextQuarterStartDate = currentQuarter.EndDate?.AddDays(1);
+        var nextQuarterStartDate = currentQuarter.EndDate?.AddDays(3);
         var nextQuarterEndDate = nextQuarterStartDate?.AddMonths(3).AddDays(-1);
 
         if (!nextQuarterStartDate.HasValue || !nextQuarterEndDate.HasValue)
