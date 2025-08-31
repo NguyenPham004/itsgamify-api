@@ -19,8 +19,12 @@ namespace its.gamify.api.Features.Users.Commands
                 // 1. Lấy user về check (Nếu không tồn tại quăng lỗi)
                 var user = await unitOfWork.UserRepository.GetByIdAsync(request.Id, includes: [x => x.Role!])
                     ?? throw new BadRequestException("Không tìm thấy người dùng!");
+                //2. Kiểm tra xem email đã tồn tại chưa
 
-                // 2. Check Role từ request vs user.RoleId vừa lấy về
+                var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
+                if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+
+                // 3. Check Role từ request vs user.RoleId vừa lấy về
                 if (request.Model.RoleId != user.RoleId)
                 {
                     var roles = await unitOfWork.RoleRepository.GetAllAsync();
@@ -44,11 +48,11 @@ namespace its.gamify.api.Features.Users.Commands
                     }
                 }
 
-                // 3. Map data từ request sang user
+                // 4. Map data từ request sang user
                 mapper.Map(request.Model, user);
                 user.Role = null;
 
-                // 4. Update user
+                // 5. Update user
                 unitOfWork.UserRepository.Update(user);
                 return await unitOfWork.SaveChangesAsync();
             }

@@ -34,6 +34,9 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.ThumbnailId = request.ThumbnailId;
                 course.IntroVideoId = request.IntroVideoId;
 
+                var checkDupName = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim());
+                if (checkDupName != null) throw new Exception("Tên khóa học đã tồn tại!");
+
                 CourseMetric cm = new()
                 {
                     CourseId = course.Id,

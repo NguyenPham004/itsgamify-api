@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using its.gamify.core.Features.Questions.Commands;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Challenges;
 using its.gamify.domains.Entities;
 using MediatR;
@@ -22,6 +23,8 @@ namespace its.gamify.core.Features.Challenges.Commands
             public async Task<Challenge> Handle(CreateChallengeCommand request, CancellationToken cancellationToken)
             {
                 await unitOfWork.CourseRepository.EnsureExistsIfIdNotEmpty(request.CourseId);
+                var checkDupName = await unitOfWork.ChallengeRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim());
+                if (checkDupName != null) throw new BadRequestException("Tên đã tồn tại!");
                 var challenge = unitOfWork.Mapper.Map<Challenge>(request);
                 await unitOfWork.ChallengeRepository.AddAsync(challenge, cancellationToken);
                 await unitOfWork.SaveChangesAsync();
