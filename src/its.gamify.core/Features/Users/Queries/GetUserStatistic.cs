@@ -64,11 +64,11 @@ namespace its.gamify.api.Features.Users.Queries
                 else if (user.Role!.Name == ROLE.LEADER)
                 {
                     filter = x => x.Status == COURSE_STATUS.PUBLISHED &&
-                                x.IsDraft == false
+                                x.IsDraft == false && x.QuarterId == request.QuarterId
                                 || (x.CourseDepartments.Any(x => x.DepartmentId == user.DepartmentId && !x.IsDeleted)
                                     && x.CourseType == CourseTypeEnum.DEPARTMENTONLY.ToString()
                                     && x.Status == COURSE_STATUS.PUBLISHED &&
-                                    x.IsDraft == false && x.QuarterId == request.QuarterId);
+                                    x.IsDraft == false);
                 }
                 // Lấy khóa học của phòng ban của người dùng
                 var departmentCourses = await unitOfWork.CourseRepository.WhereAsync(filter!);
