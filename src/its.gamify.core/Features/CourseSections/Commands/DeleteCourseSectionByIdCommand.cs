@@ -7,31 +7,43 @@ namespace its.gamify.api.Features.CourseSections.Commands
     public class DeleteCourseSectionByIdCommand : IRequest<bool>
     {
         public Guid Id { get; set; }
-        class CommandHandler : IRequestHandler<DeleteCourseSectionByIdCommand, bool>
+        class CommandHandler(IUnitOfWork unitOfWork,
+            IMediator mediator) : IRequestHandler<DeleteCourseSectionByIdCommand, bool>
         {
-            private readonly IUnitOfWork unitOfWork;
-            private readonly IMediator mediato;
-            public CommandHandler(IUnitOfWork unitOfWork,
-                IMediator mediator)
-            {
-                this.mediato = mediator;
-                this.unitOfWork = unitOfWork;
-            }
+
             public async Task<bool> Handle(DeleteCourseSectionByIdCommand request, CancellationToken cancellationToken)
             {
                 var courseSection = await unitOfWork.CourseSectionRepository.GetByIdAsync(request.Id)
                     ?? throw new InvalidOperationException($"Không tìm thấy module");
                 unitOfWork.CourseSectionRepository.SoftRemove(courseSection);
+
+                var other_sections = await unitOfWork
+                    .CourseSectionRepository
+                    .WhereAsync(x =>
+                        x.CourseId == courseSection.CourseId &&
+                        x.Id != courseSection.Id &&
+                        x.OrderedNumber > courseSection.OrderedNumber);
+
+                if (other_sections.Count > 0)
+                {
+                    foreach (var section in other_sections)
+                    {
+                        section.OrderedNumber -= 1;
+                    }
+
+                    unitOfWork.CourseSectionRepository.UpdateRange(other_sections);
+                }
+
                 if (courseSection is not null)
                 {
                     courseSection.IsDeleted = true;
                 }
                 foreach (var lesson in courseSection?.Lessons ?? [])
                 {
-                    await mediato.Send(new DeleteLessonCommand()
+                    await mediator.Send(new DeleteLessonCommand()
                     {
                         Id = lesson.Id
-                    });
+                    }, cancellationToken);
                 }
 
                 return await unitOfWork.SaveChangesAsync();
