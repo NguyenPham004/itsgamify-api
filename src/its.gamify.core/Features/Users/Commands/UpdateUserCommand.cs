@@ -21,8 +21,11 @@ namespace its.gamify.api.Features.Users.Commands
                     ?? throw new BadRequestException("Không tìm thấy người dùng!");
                 //2. Kiểm tra xem email đã tồn tại chưa
 
-                var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
-                if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+                if (user.Email != request.Model.Email)
+                {
+                    var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
+                    if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+                }
 
                 // 3. Check Role từ request vs user.RoleId vừa lấy về
                 if (request.Model.RoleId != user.RoleId)
