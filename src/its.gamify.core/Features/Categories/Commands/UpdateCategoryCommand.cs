@@ -28,8 +28,8 @@ namespace its.gamify.core.Features.Categories.Commands
                 {
                     if (category.Name != request.Model.Name)
                     {
-                        var checkDupName = await unitOfWork.CategoryRepository.FirstOrDefaultAsync(x => x.Name.ToLower().Trim() == request.Model.Name.ToLower().Trim());
-                        if (checkDupName != null) throw new BadRequestException("Tên đã tồn tại!");
+                        var checkDupName = await unitOfWork.CategoryRepository.FirstOrDefaultAsync(x => x.Name.ToLower().Trim() == request.Model.Name.ToLower().Trim(), withDeleted: true);
+                        if (checkDupName != null) throw new BadRequestException("Tên danh mục đã tồn tại!");
                     }
 
                     unitOfWork.Mapper.Map(request.Model, category);

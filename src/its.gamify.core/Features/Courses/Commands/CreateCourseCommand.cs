@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using its.gamify.api.Features.CourseSections.Commands;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.IntegrationServices.Interfaces;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Utilities;
@@ -34,8 +35,8 @@ namespace its.gamify.api.Features.Courses.Commands
                 course.ThumbnailId = request.ThumbnailId;
                 course.IntroVideoId = request.IntroVideoId;
 
-                var checkDupName = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim());
-                if (checkDupName != null) throw new Exception("Tên khóa học đã tồn tại!");
+                var checkDupName = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Title.ToLower().Trim(), withDeleted: true);
+                if (checkDupName != null) throw new BadRequestException("Tên khóa học đã tồn tại!");
 
                 CourseMetric cm = new()
                 {

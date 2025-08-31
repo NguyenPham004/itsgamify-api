@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using its.gamify.core;
+using its.gamify.core.GlobalExceptionHandling.Exceptions;
 using its.gamify.core.Models.Courses;
 using its.gamify.core.Models.CourseSections;
 using its.gamify.core.Models.Lessons;
@@ -89,8 +90,8 @@ namespace its.gamify.api.Features.Courses.Commands
 
                 if (course.Title != request.Model.Title)
                 {
-                    var checkDupName = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Model.Title.ToLower().Trim());
-                    if (checkDupName != null) throw new Exception("Tên khóa học đã tồn tại!");
+                    var checkDupName = await unitOfWork.CourseRepository.FirstOrDefaultAsync(x => x.Title.ToLower().Trim() == request.Model.Title.ToLower().Trim(), withDeleted: true);
+                    if (checkDupName != null) throw new BadRequestException("Tên khóa học đã tồn tại!");
 
                 }
                 if (request.Model.IsUpdateDepartment)

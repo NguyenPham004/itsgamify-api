@@ -24,7 +24,7 @@ namespace its.gamify.api.Features.Users.Commands
                 if (user.Email != request.Model.Email)
                 {
                     var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
-                    if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+                    if (checkDupEmail != null) throw new BadRequestException("Email đã được sử dụng!");
                 }
 
                 // 3. Check Role từ request vs user.RoleId vừa lấy về

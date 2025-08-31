@@ -37,7 +37,7 @@ namespace its.gamify.api.Features.Users.Commands
                 CancellationToken cancellationToken)
             {
                 var checkDupEmail = await unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.Email.ToLower().Trim() == request.Model.Email.ToLower().Trim(), withDeleted: true);
-                if (checkDupEmail != null) throw new Exception("Email đã được sử dụng!");
+                if (checkDupEmail != null) throw new BadRequestException("Email đã được sử dụng!");
 
                 var user = unitOfWork.Mapper.Map<User>(request.Model);
                 var roles = await unitOfWork.RoleRepository.GetAllAsync();
