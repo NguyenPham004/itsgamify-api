@@ -23,6 +23,7 @@ public class CourseQuery : FilterQuery
     public string? Deparments { get; set; }
     public string? CourseTypes { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsOption { get; set; }
 }
 public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 {
@@ -115,6 +116,13 @@ public class GetAllCourseQuery : IRequest<BasePagingResponseModel<Course>>
 
             Expression<Func<Course, bool>> filterDeleted = x => x.IsDeleted == !request.CourseQuery!.IsActive;
             filter = filter != null ? FilterCustom.CombineFilters(filter, filterDeleted) : filterDeleted;
+
+            if (request.CourseQuery!.IsOption)
+            {
+                Expression<Func<Course, bool>> filter_option = x => x.Challenges.Count == 0;
+                filter = filter != null ? FilterCustom.CombineFilters(filter, filter_option) : filter_option;
+
+            }
 
             res = await unitOfWork.CourseRepository.ToDynamicPagination(
                               request.CourseQuery?.Page ?? 0,
