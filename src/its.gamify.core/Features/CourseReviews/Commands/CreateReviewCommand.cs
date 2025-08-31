@@ -38,6 +38,7 @@ public class CreateReviewCommand : CourseReviewCreateModel, IRequest<CourseRevie
 
             course_metric.StarRating = (course_metric.StarRating * (course_metric.ReviewCount - 1) + request.Rating) / course_metric.ReviewCount;
 
+            unitOfWork.CourseMetricRepository.Update(course_metric);
             await unitOfWork.CourseReviewRepository.AddAsync(review, cancellationToken);
 
             await unitOfWork.SaveChangesAsync();
