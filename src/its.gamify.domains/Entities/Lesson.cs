@@ -9,7 +9,7 @@ public class Lesson : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string? Content { get; set; }
     [JsonPropertyName("duration")]
-    public int DurationInMinutes { get; set; }
+    public double DurationInMinutes { get; set; }
     public string Type { get; set; } = LearningMaterialType.VIDEO.ToString(); // e.g., Video, Article, Quiz
     [JsonPropertyName("video_url")]
     public string? Url { get; set; } = string.Empty;

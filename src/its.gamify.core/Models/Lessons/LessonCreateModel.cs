@@ -13,7 +13,7 @@ public class LessonCreateModel
     public string Title { get; set; } = string.Empty;
     public int Index { get; set; }
     [JsonPropertyName("duration")]
-    public int DurationInMinutes { get; set; }
+    public double DurationInMinutes { get; set; }
     public string Type { get; set; } = LearningMaterialType.VIDEO.ToString();
     public string? Content { get; set; }
     [JsonPropertyName("module_id")]
